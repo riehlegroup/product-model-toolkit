@@ -1,6 +1,6 @@
-# Product Model Toolkit
+<p align="center"><img src="logo.png"></p>
 
-Product Model Toolkit for Managing Open Source Depndencies in Products
+Product Model Toolkit for Managing Open Source Dependencies in Products
 
 ## Introduction
 
