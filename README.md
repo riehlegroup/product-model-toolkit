@@ -2,6 +2,8 @@
 
 Product Model Toolkit for Managing Open Source Dependencies in Products
 
+![Build](https://github.com/osrgroup/product-model-toolkit/workflows/Go/badge.svg)
+
 ## Introduction
 
 The Product Model Toolkit helps you to manage third-party open source dependencies in your product. The toolkit itself is not a license scanner. Instead, it facilitates other license scanners to incorporate license and other information together with architectural information into a unified model.
