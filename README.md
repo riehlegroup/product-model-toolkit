@@ -18,6 +18,20 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 
 4. The PHP scanner performs a deep analysis of a web project and sends its result as a standardized representation (like the CLI client) to the server.
 
+## Project Structure
+
+```
+├── cmd/.................Main applications of this project which will be compiled as executables
+│   ├── client/
+│   │   └── main.go......Client application entry point
+│   └── server/
+│       └── main.go......Server application entry point
+├── docs/................Documentation
+├── pkg/.................Library code for client and server
+├── model/...............The model for representing a software product
+└── README.md
+```
+
 ## How to Use
 
 TBA
