@@ -1,3 +1,7 @@
+GIT_COMMIT= `git rev-parse --short HEAD`
+
+LDFLAGS = -ldflags "-X main.gitCommit=${GIT_COMMIT}"
+
 .PHONY: all
 all: test build
 
@@ -11,8 +15,8 @@ test: ## Run all tests.
 
 .PHONY: build
 build: ## Build client and server application.
-	go build -o pmtclient ./cmd/client
-	go build -o pmtserver ./cmd/server
+	go build ${LDFLAGS} -o pmtclient ./cmd/client
+	go build ${LDFLAGS} -o pmtserver ./cmd/server
 
 .PHONY: clean
 clean: ## Clean up all build artifacts.
