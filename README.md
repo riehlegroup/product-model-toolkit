@@ -34,7 +34,22 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 
 ## How to Use
 
-TBA
+All important commands needed to build, test, and run the applications are represented as Makefile rule.
+All available rules can be displeyed with `make help`.
+
+### Build
+
+Build with `make build` the client and server application. The generated artifacts are `pmtserver` and `pmtclient`.
+
+### Test
+
+Test with `make test`. This also produces a code coverage report as a file called `coverage.out`.
+
+### Run
+
+Already built executables can be executed directly. For exampl `./pmtclient` or `./pmtserver`.
+
+During development, `go run cmd/client/main.go` or `go run cmd/server/main.go` can be used to run a specific application.
 
 ## Requirements
 
