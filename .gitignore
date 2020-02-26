@@ -27,3 +27,8 @@
 
 # JetBrains
 .idea
+
+
+# Build artifacts
+pmtserver
+pmtclient
