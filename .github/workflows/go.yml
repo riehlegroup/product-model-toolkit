@@ -23,6 +23,12 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
+    
+    - name: Format Check
+      run: diff -u <(echo -n) <(gofmt -d ./)
+    
+    - name: Test
+      run: make test
 
     - name: Build
-      run: go build -v .
+      run: make build
