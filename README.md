@@ -18,9 +18,38 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 
 4. The PHP scanner performs a deep analysis of a web project and sends its result as a standardized representation (like the CLI client) to the server.
 
+## Project Structure
+
+```
+├── cmd/.................Main applications of this project which will be compiled as executables
+│   ├── client/
+│   │   └── main.go......Client application entry point
+│   └── server/
+│       └── main.go......Server application entry point
+├── docs/................Documentation
+├── pkg/.................Library code for client and server
+├── model/...............The model for representing a software product
+└── README.md
+```
+
 ## How to Use
 
-TBA
+All important commands needed to build, test, and run the applications are represented as Makefile rule.
+All available rules can be displeyed with `make help`.
+
+### Build
+
+Build with `make build` the client and server application. The generated artifacts are `pmtserver` and `pmtclient`.
+
+### Test
+
+Test with `make test`. This also produces a code coverage report as a file called `coverage.out`.
+
+### Run
+
+Already built executables can be executed directly. For exampl `./pmtclient` or `./pmtserver`.
+
+During development, `go run cmd/client/main.go` or `go run cmd/server/main.go` can be used to run a specific application.
 
 ## Requirements
 
