@@ -14,8 +14,14 @@ test: ## Run all tests.
 	go test -race -coverprofile=coverage.out ./...
 
 .PHONY: build
-build: ## Build client and server application.
+build: build-client build-server ## Build client and server application.
+
+.PHONY: build-client
+build-client: ## Build client application.
 	go build ${LDFLAGS} -o pmtclient ./cmd/client
+
+.PHONY: build-server
+build-server: ## Build server application.
 	go build ${LDFLAGS} -o pmtserver ./cmd/server
 
 .PHONY: clean
