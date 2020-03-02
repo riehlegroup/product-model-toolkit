@@ -3,19 +3,26 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
+	"github.com/osrgroup/product-model-toolkit/pkg/version/server/http/rest"
 )
 
 var gitCommit string
 
 func main() {
-	initFlags()
+	usedFlag := initFlags()
 
-	fmt.Println("Hello, I'm the server.")
+	if usedFlag {
+		os.Exit(0)
+	}
+
+	srv := rest.NewSrv("127.0.0.1:8080")
+	srv.Start()
 }
 
-func initFlags() {
+func initFlags() bool {
 	version := flag.Bool("v", false, "show version")
 
 	flag.Parse()
@@ -23,6 +30,8 @@ func initFlags() {
 	if *version {
 		printVersion()
 	}
+
+	return flag.NFlag() > 0
 }
 
 func printVersion() {
