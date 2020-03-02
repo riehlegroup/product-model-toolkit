@@ -16,14 +16,14 @@ func TestExecutor_CmdStr(t *testing.T) {
 		want   string
 	}{
 		{
-			name: "tool1",
-			fields: fields{Img:"myImage",Cmd: "/bin/sh", InputDir: "/input1", ResultDir: "/result1"},
-			want: "docker run -v /input1:/input -v /result1:/result myImage /bin/sh",
+			name:   "tool1",
+			fields: fields{Img: "myImage", Cmd: "/bin/sh", InputDir: "/input1", ResultDir: "/result1"},
+			want:   "docker run -v /input1:/input -v /result1:/result myImage /bin/sh",
 		},
 		{
-			name: "licensee",
-			fields: fields{Img:"myRepo/licensee:9.13.0",Cmd: "licensee --version", InputDir: "/input", ResultDir: "/result"},
-			want: "docker run -v /input:/input -v /result:/result myRepo/licensee:9.13.0 licensee --version",
+			name:   "licensee",
+			fields: fields{Img: "myRepo/licensee:9.13.0", Cmd: "licensee --version", InputDir: "/input", ResultDir: "/result"},
+			want:   "docker run -v /input:/input -v /result:/result myRepo/licensee:9.13.0 licensee --version",
 		},
 	}
 	for _, tt := range tests {
