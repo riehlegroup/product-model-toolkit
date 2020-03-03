@@ -19,9 +19,10 @@ func NewSrv(address string) *Instance {
 	e.Use(middleware.Recover())
 
 	// Routes
-	e.GET("/", handleVersion)
-	e.GET("/version", handleVersion)
-	e.GET("/health", handleHealth)
+	v1 := e.Group("/api/v1")
+	v1.GET("/", handleEntryPoint)
+	v1.GET("/version", handleVersion)
+	v1.GET("/health", handleHealth)
 
 	return &Instance{
 		httpSrv: e,

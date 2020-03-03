@@ -19,3 +19,7 @@ func handleHealth(c echo.Context) error {
 	up := status{Status: "UP"}
 	return c.JSON(http.StatusOK, up)
 }
+
+func handleEntryPoint(c echo.Context) error {
+	return c.JSON(http.StatusOK, rs)
+}
