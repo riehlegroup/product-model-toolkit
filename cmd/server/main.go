@@ -19,7 +19,8 @@ func main() {
 	}
 
 	srv := rest.NewSrv("127.0.0.1:8080")
-	srv.Start()
+	go srv.Start()
+	defer srv.Shutdown()
 }
 
 func initFlags() bool {

@@ -1,6 +1,12 @@
 package rest
 
 import (
+	"context"
+	"fmt"
+	"os"
+	"os/signal"
+	"time"
+
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -33,6 +39,18 @@ func NewSrv(address string) *Instance {
 // Start starts the REST server.
 func (srv *Instance) Start() {
 	srv.httpSrv.Start(srv.Addr())
+}
+
+// Shutdown perform a gracefully shutdown of the HTTP sever with a 10 seconds timeout
+func (srv *Instance) Shutdown() {
+	quit := make(chan os.Signal)
+	signal.Notify(quit, os.Interrupt)
+	<-quit
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := srv.httpSrv.Shutdown(ctx); err != nil {
+		srv.httpSrv.Logger.Fatal(err)
+	}
 }
 
 // Addr return the address with port of the REST server.
