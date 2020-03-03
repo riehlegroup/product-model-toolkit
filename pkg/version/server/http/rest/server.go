@@ -2,7 +2,6 @@ package rest
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"time"
