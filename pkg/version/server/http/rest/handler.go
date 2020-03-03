@@ -21,5 +21,5 @@ func handleHealth(c echo.Context) error {
 }
 
 func handleEntryPoint(c echo.Context) error {
-	return c.JSON(http.StatusOK, rs)
+	return c.JSON(http.StatusOK, c.Echo().Routers())
 }
