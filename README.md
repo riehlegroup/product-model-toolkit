@@ -53,6 +53,19 @@ Already built executables can be executed directly. For exampl `./pmtclient` or 
 
 During development, `go run cmd/client/main.go` or `go run cmd/server/main.go` can be used to run a specific application.
 
+## API (Server)
+
+
+
+### General info 
+Base path: `http://[hostname]:[port]/api/v1`
+
+| Method | Path     | Description                  |
+|--------|----------|------------------------------|
+| GET    | /        | Get all routes               |
+| GET    | /version | Get version of server        |
+| GET    | /health  | Check if server is available |
+
 ## Requirements
 
 Here you can find the functional requirements for the toolkit. We strive to implement these features in an agile fashion.
