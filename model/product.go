@@ -8,14 +8,26 @@ type Product struct {
 	Version        string
 	VCS            string
 	ClearingState  interface{} // TODO: Specify type
-	Infrastructure Infrastructure
+	RootComponents []Component
+	Infrastructure
 }
 
 // Component represents a unit of compositon of the product, e.g. class, lib, module.
-type Component struct{}
+type Component struct {
+	Name    string
+	Pkg     string
+	Version string
+	License
+	Copyright
+	Artifact
+	Dependency
+}
 
 // Dependency represents the relationship between two components.
-type Dependency struct{}
+type Dependency struct {
+	Type   interface{} // TODO: Specify type
+	Target Component
+}
 
 // License represents a open source license.
 type License struct{}
@@ -27,7 +39,10 @@ type Copyright struct{}
 type Policy struct{}
 
 // Artifact represents a digital artifact like source code files or binaries.
-type Artifact struct{}
+type Artifact struct {
+	Path   string
+	Hashes []interface{} // TODO: Specify type
+}
 
 // Deliverable represents a subset a product's components that are deliverable.
 type Deliverable struct{} // deployment unit
