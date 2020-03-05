@@ -2,7 +2,14 @@ package model
 
 // Product represents a software product and its main properties. 
 // It is the root element in the product architecture model.
-type Product struct {}
+type Product struct {
+	Name string
+	Description string
+	Version string
+	VCS string
+	ClearingState interface{} // TODO: Specify type
+	Infrastructure Infrastructure
+}
 
 // Component represents a unit of compositon of the product, e.g. class, lib, module.
 type Component struct {}
