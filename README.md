@@ -66,6 +66,10 @@ Base path: `http://[hostname]:[port]/api/v1`
 | GET    | /version | Get version of server        |
 | GET    | /health  | Check if server is available |
 
+## License Crawler
+
+PHP: [product-model-php-plugin](https://github.com/hallowelt/product-model-php-plugin)
+
 ## Requirements
 
 Here you can find the functional requirements for the toolkit. We strive to implement these features in an agile fashion.
