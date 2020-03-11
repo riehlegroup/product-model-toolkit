@@ -10,7 +10,7 @@ var (
 )
 
 func TestNextTrue(t *testing.T) {
-	d := &Dependency{Type: StaticLinking, From: cmp1, To: cmp2}
+	d := &Dependency{Type: StaticLinked, From: cmp1, To: cmp2}
 
 	if !d.Next() {
 		t.Error("Expected dependency to have next element")
@@ -18,7 +18,7 @@ func TestNextTrue(t *testing.T) {
 }
 
 func TestNextFalse(t *testing.T) {
-	d := &Dependency{Type: StaticLinking, From: cmp1, To: nil}
+	d := &Dependency{Type: StaticLinked, From: cmp1, To: nil}
 
 	if d.Next() {
 		t.Error("Expected dependency to have no next element")
