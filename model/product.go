@@ -12,16 +12,6 @@ type Product struct {
 	Infrastructure
 }
 
-// Component represents a unit of compositon of the product, e.g. class, lib, module.
-type Component struct {
-	Name    string
-	Pkg     string
-	Version string
-	License
-	Copyright
-	Artifact
-}
-
 // Dependency represents the relationship between two components.
 type Dependency struct {
 	Type interface{} // TODO: Specify type
@@ -30,7 +20,9 @@ type Dependency struct {
 }
 
 // License represents a open source license.
-type License struct{}
+type License struct{
+	SPDXID string
+}
 
 // Copyright represents a copyright statement.
 type Copyright struct{}
