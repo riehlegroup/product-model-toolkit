@@ -12,13 +12,6 @@ type Product struct {
 	Infrastructure
 }
 
-// Dependency represents the relationship between two components.
-type Dependency struct {
-	Type interface{} // TODO: Specify type
-	From Component
-	To   Component
-}
-
 // License represents a open source license.
 type License struct{
 	SPDXID string
