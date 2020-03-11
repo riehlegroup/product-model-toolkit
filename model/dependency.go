@@ -16,8 +16,8 @@ func (d *Dependency) Next() bool {
 type DepType string
 
 const (
-	StaticLinking  DepType = "STATIC_LINKING"
-	DynamicLinking DepType = "DYNAMIC_LINKING"
+	StaticLinked  DepType = "STATIC_LINKED"
+	DynamicLinked DepType = "DYNAMIC_LINKED"
 )
 
 type Iterator interface {
