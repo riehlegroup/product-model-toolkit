@@ -11,6 +11,7 @@ type Product struct {
 	RootDep       []*Dependency
 	Components    []Component
 	Infrastructure
+	UsageType
 }
 
 // License represents a open source license.
@@ -38,3 +39,6 @@ type Infrastructure struct{}
 
 // Vulnerability represents known security vulnerabilities of software components, e.g. CVE
 type Vulnerability struct{}
+
+// UsageType represents the scenario in which a product ist used, e.g. cloud service or internal usage only.
+type UsageType interface{}
