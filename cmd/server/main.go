@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/osrgroup/product-model-toolkit/pkg/server/http/rest"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
-	"github.com/osrgroup/product-model-toolkit/pkg/version/server/http/rest"
 )
 
 var gitCommit string
