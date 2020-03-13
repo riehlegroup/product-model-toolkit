@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-// DB represents a
+// DB represents a Dgraph db connection.
 type DB struct {
 	client *dgo.Dgraph
 }
