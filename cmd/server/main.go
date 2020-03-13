@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/osrgroup/product-model-toolkit/pkg/server"
+	"github.com/osrgroup/product-model-toolkit/pkg/server/dgraph"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/http/rest"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
@@ -18,9 +20,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	srv := rest.NewSrv("127.0.0.1:8080")
-	go srv.Start()
-	defer srv.Shutdown()
+	r := rest.NewSrv("127.0.0.1:8080")
+	go r.Start()
+	defer r.Shutdown()
+
+	db := dgraph.NewClient(dgraph.DefaultURI)
+
+	srv := &server.Instance{
+		REST: r,
+		DB:   db,
+	}
+
+	srv.DB.DropAll()
 }
 
 func initFlags() bool {
