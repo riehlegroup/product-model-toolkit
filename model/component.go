@@ -4,12 +4,13 @@ import "fmt"
 
 // Component represents a unit of compositon of the product, e.g. class, lib, module.
 type Component struct {
-	Name    string
-	Pkg     string
-	Version string
-	License
-	Copyright
-	Artifact
+	UID       string `json:"uid"`
+	Name      string `json:"name,omitempty"`
+	Pkg       string `json:"package,omitempty"`
+	Version   string `json:"version,omitempty"`
+	License   string `json:"license,omitempty"`
+	Copyright `json:"-"`
+	Artifact  `json:"-"`
 }
 
 // CmpID represents an component identifier which is a combination of package + name + version.
