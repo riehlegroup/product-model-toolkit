@@ -3,15 +3,16 @@ package model
 // Product represents a software product and its main properties.
 // It is the root element in the product architecture model.
 type Product struct {
-	Name          string
-	Description   string
-	Version       string
-	VCS           string
-	ClearingState interface{} // TODO: Specify type
-	RootDep       []*Dependency
-	Components    []Component
-	Infrastructure
-	UsageType
+	UID            string        `json:"uid"`
+	Name           string        `json:"name",omitempty`
+	Description    string        `json:"description",omitempty`
+	Version        string        `json:"version",omitempty`
+	VCS            string        `json:"vcs",omitempty`
+	ClearingState  interface{}   `json:"-"` // TODO: Specify type
+	RootDep        []*Dependency `json:"-"`
+	Components     []Component   `json:"components"`
+	Infrastructure `json:"-"`
+	UsageType      `json:"-"`
 }
 
 // License represents a open source license.
