@@ -113,4 +113,6 @@ Here you can find the functional requirements for the toolkit. We strive to impl
 
 ## License
 
+Copyright 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+
 TBA
