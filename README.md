@@ -3,6 +3,7 @@
 Product Model Toolkit for Managing Open Source Dependencies in Products
 
 ![Build](https://github.com/osrgroup/product-model-toolkit/workflows/Go/badge.svg)
+![REUSE Compliance](https://github.com/osrgroup/product-model-toolkit/workflows/REUSE%20Compliance/badge.svg)
 
 ## Introduction
 
