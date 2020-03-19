@@ -110,9 +110,12 @@ Here you can find the functional requirements for the toolkit. We strive to impl
 - [ ] The crawler shall send scanned information to the server application via HTTP calls (REST).
 - [ ] The crawler shall store scanned information as structured representation (SPDX, SBOM, etc.) as files.
 
-
 ## License
 
 Copyright 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
 
-TBA
+All original source code is licensed under [Apache-2.0](./LICENSES/Apache-2.0.txt).
+
+Some configuration and data files are licensed under [CC0-1.0](./LICENSES/CC0-1.0.txt).
+
+See the [LICENSES](./LICENSES/) folder in the root of this project for license details.
