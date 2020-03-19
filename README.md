@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+-->
+
 <p align="center"><img src="logo.png"></p>
 
 Product Model Toolkit for Managing Open Source Dependencies in Products
