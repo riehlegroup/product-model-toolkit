@@ -48,6 +48,16 @@ func TestFindProductByID(t *testing.T) {
 	}
 }
 
+func TestFindProductByIDNotFound(t *testing.T) {
+	db := new(DB)
+	db.AddSampleData()
+
+	_, err := db.FindProductByID("3")
+	if err != querying.ErrNotFound {
+		t.Errorf("Expected error to be ErrNotFound, but got %v", err)
+	}
+}
+
 func TestSaveProduct(t *testing.T) {
 	db := new(DB)
 
