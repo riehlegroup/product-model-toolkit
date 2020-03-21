@@ -13,6 +13,7 @@ type Product struct {
 	Components     []Component   `json:"components"`
 	Infrastructure `json:"-"`
 	UsageType      `json:"-"`
+	DType          []string `json:"dgraph.type,omitempty"`
 }
 
 // License represents a open source license.

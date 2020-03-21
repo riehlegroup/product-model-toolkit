@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/server"
-	"github.com/osrgroup/product-model-toolkit/pkg/server/dgraph"
-	"github.com/osrgroup/product-model-toolkit/pkg/server/http/rest"
+	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
+	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
+	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
@@ -20,18 +20,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	r := rest.NewSrv("127.0.0.1:8080")
+	repo := new(memory.DB)
+	repo.AddSampleData()
+
+	querying := querying.NewService(repo)
+
+	r := rest.NewSrv("127.0.0.1:8081", &querying)
 	go r.Start()
 	defer r.Shutdown()
 
-	db := dgraph.NewClient(dgraph.DefaultURI)
-
-	srv := &server.Instance{
-		REST: r,
-		DB:   db,
-	}
-
-	srv.DB.DropAll()
+	// Dgraph
+	//db := dgraph.NewClient(dgraph.DefaultURI)
+	//db.DropAll()
 }
 
 func initFlags() bool {
