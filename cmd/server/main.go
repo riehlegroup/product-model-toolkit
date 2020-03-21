@@ -28,10 +28,6 @@ func main() {
 	r := rest.NewSrv("127.0.0.1:8081", &querying)
 	go r.Start()
 	defer r.Shutdown()
-
-	// Dgraph
-	//db := dgraph.NewClient(dgraph.DefaultURI)
-	//db.DropAll()
 }
 
 func initFlags() bool {
