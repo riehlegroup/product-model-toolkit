@@ -7,7 +7,7 @@ import (
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 )
 
-var p = &model.Product{UID: "001", Name: "Prod A"}
+var p = &model.Product{ID: "001", Name: "Prod A"}
 
 func TestFindAllProducts(t *testing.T) {
 	db := new(DB)
@@ -43,8 +43,8 @@ func TestFindProductByID(t *testing.T) {
 		t.Error("Expected product to be nil")
 	}
 
-	if prod.UID != "2" {
-		t.Errorf("Expected product ID to be 2, but got %v", prod.UID)
+	if prod.ID != "2" {
+		t.Errorf("Expected product ID to be 2, but got %v", prod.ID)
 	}
 }
 
@@ -71,8 +71,8 @@ func TestSaveProduct(t *testing.T) {
 		t.Errorf("Expected size to be 0, but got %v", size)
 	}
 	pResult := db.products[0]
-	if pResult.UID != p.UID {
-		t.Errorf("Expected products to have the same ID, but got %v", pResult.UID)
+	if pResult.ID != p.ID {
+		t.Errorf("Expected products to have the same ID, but got %v", pResult.ID)
 	}
 }
 

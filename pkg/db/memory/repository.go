@@ -18,7 +18,7 @@ func (db *DB) FindAllProducts() (*[]model.Product, error) {
 // FindProductByID return the Product with the given ID from the DB.
 func (db *DB) FindProductByID(id string) (*model.Product, error) {
 	for i := range db.products {
-		if db.products[i].UID == id {
+		if db.products[i].ID == id {
 			return &db.products[i], nil
 		}
 	}
@@ -28,7 +28,7 @@ func (db *DB) FindProductByID(id string) (*model.Product, error) {
 
 // SaveProduct store a Prodact to the DB.
 func (db *DB) SaveProduct(prod *model.Product) error {
-	found := db.productExists(prod.UID)
+	found := db.productExists(prod.ID)
 	if !found {
 		db.products = append(db.products, *prod)
 		return nil
@@ -39,7 +39,7 @@ func (db *DB) SaveProduct(prod *model.Product) error {
 
 func (db *DB) productExists(id string) bool {
 	for i := range db.products {
-		if db.products[i].UID == id {
+		if db.products[i].ID == id {
 			return true
 		}
 	}
@@ -50,14 +50,14 @@ func (db *DB) productExists(id string) bool {
 // AddSampleData adds dummy data to the DB.
 func (db *DB) AddSampleData() {
 	prod1 := &model.Product{
-		UID:     "1",
+		ID:     "1",
 		Name:    "Product 1",
 		Version: "1.0.0",
 		VCS:     "github.com/prod1",
 	}
 
 	prod2 := &model.Product{
-		UID:     "2",
+		ID:     "2",
 		Name:    "Product 2",
 		Version: "2.0.0",
 		VCS:     "github.com/prod2",
