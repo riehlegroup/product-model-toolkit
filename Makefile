@@ -26,8 +26,7 @@ build-server: ## Build server application.
 
 .PHONY: clean
 clean: ## Clean up all build artifacts.
-	rm pmtclient*
-	rm pmtserver*
+	rm -v -f pmtclient* pmtserver* coverage.out
 
 .PHONY: lint
 lint: ## Check if code is formatted correctly.
