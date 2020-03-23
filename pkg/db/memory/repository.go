@@ -50,14 +50,14 @@ func (db *DB) productExists(id string) bool {
 // AddSampleData adds dummy data to the DB.
 func (db *DB) AddSampleData() {
 	prod1 := &model.Product{
-		ID:     "1",
+		ID:      "1",
 		Name:    "Product 1",
 		Version: "1.0.0",
 		VCS:     "github.com/prod1",
 	}
 
 	prod2 := &model.Product{
-		ID:     "2",
+		ID:      "2",
 		Name:    "Product 2",
 		Version: "2.0.0",
 		VCS:     "github.com/prod2",
