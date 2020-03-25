@@ -7,7 +7,7 @@ type Scanner struct {
 	DockerImg string
 }
 
-// Available lsit all available scanner tools that can be used.
+// Available list all available scanner tools that can be used.
 var Available = [...]Scanner{
 	Scanner{
 		Name:      "Licensee",
