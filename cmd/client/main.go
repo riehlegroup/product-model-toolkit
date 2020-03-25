@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/scanner"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
@@ -11,12 +12,15 @@ import (
 var gitCommit string
 
 func main() {
-	initFlags()
+	usedFlag := initFlags()
+	if usedFlag {
+		os.Exit(0)
+	}
 
 	fmt.Println("Hello, I'm the client.")
 }
 
-func initFlags() {
+func initFlags() bool {
 	version := flag.Bool("v", false, "show version")
 	list := flag.Bool("l", false, "list all available scanner")
 
@@ -29,6 +33,8 @@ func initFlags() {
 	if *list {
 		listScanner()
 	}
+
+	return flag.NFlag() > 0
 }
 
 func printVersion() {
