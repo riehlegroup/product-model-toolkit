@@ -1,0 +1,9 @@
+version: "3.7"
+services:
+  licensee:
+    image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0
+    build: ./licensee/
+
+  scancode:
+    image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1
+    build: ./scancode/
