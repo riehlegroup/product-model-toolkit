@@ -3,6 +3,7 @@
 Product Model Toolkit for Managing Open Source Dependencies in Products
 
 ![Build](https://github.com/osrgroup/product-model-toolkit/workflows/Go/badge.svg)
+[![codebeat badge](https://codebeat.co/badges/2fef65f3-8f0b-4a11-abf9-d8d0955daf1c)](https://codebeat.co/projects/github-com-osrgroup-product-model-toolkit-master)
 
 ## Introduction
 
