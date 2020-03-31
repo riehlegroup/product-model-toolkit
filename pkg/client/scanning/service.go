@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -38,6 +37,7 @@ func execDockerCall(cfg *scanner.Config) error {
 	return nil
 }
 
+// execStr returns a command string for a Docker execution by the OS.
 func execStr(cfg *scanner.Config) string {
 	return fmt.Sprintf("docker run --rm -v %s:/input -v %s:/result %s %s", cfg.InDir, cfg.ResultDir, cfg.Tool.DockerImg, cfg.Tool.Cmd)
 }
@@ -51,26 +51,31 @@ func findResultFiles(cfg *scanner.Config) []fileName {
 		return nil
 	}
 
-	expected := cfg.Tool.Results
+	var names = make([]fileName, 0)
+	for _, e := range infos {
+		names = append(names, fileName(e.Name()))
+	}
 
-	return findFiles(infos, expected)
+	expected := cfg.Tool.Results
+	return findFiles(names, expected)
 }
 
-func findFiles(infos []os.FileInfo, expected []string) []fileName {
+// findFiles returns an array of file names that are both presented in names and expected args.
+func findFiles(names []fileName, expected []string) []fileName {
 	found := make([]fileName, 0)
 	others := make([]fileName, 0)
 
-	for _, f := range infos {
-		if contains(expected, f.Name()) {
-			found = append(found, fileName(f.Name()))
+	for _, n := range names {
+		if contains(expected, string(n)) {
+			found = append(found, n)
 		} else {
-			others = append(others, fileName(f.Name()))
+			others = append(others, n)
 		}
 	}
-	
+
 	log.Printf("[Scanner] Found %v of %v expected result files: %v", len(found), len(expected), found)
 	log.Printf("[Scanner] Found %v other files in result folder: %v", len(others), others)
-	
+
 	return found
 }
 
@@ -83,6 +88,7 @@ func checkResults(resDir string, files []fileName) {
 	}
 }
 
+// contains return true if the given value is present in the given array.
 func contains(slice []string, val string) bool {
 	for _, e := range slice {
 		if e == val {
