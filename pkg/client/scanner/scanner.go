@@ -40,8 +40,8 @@ var Licensee = Tool{
 	Name:      "Licensee",
 	Version:   "9.13.0",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
-	Cmd:       "licensee detect /input/hamster/ --json > /results/scan.json",
-	Results:   []string{"scan.json"},
+	Cmd:       `/bin/bash -c "licensee detect /input/ --json > /result/result.json"`,
+	Results:   []string{"result.json"},
 }
 
 // Scancode represents the latest usable Scancode version

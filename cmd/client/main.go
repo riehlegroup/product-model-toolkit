@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/scanner"
-	"github.com/osrgroup/product-model-toolkit/pkg/scanning"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
