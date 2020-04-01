@@ -1,1 +1,0 @@
-docker run -it --rm -v /tmp/andi:/input -v /tmp/andi:/results docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0 /bin/bash -c "licensee detect /input/hamster/ --json > /results/scan.json"
