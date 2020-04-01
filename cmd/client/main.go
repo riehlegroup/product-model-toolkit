@@ -22,7 +22,10 @@ type flags struct {
 
 func main() {
 	flg := initFlags()
-	printInfos(&flg)
+	did := printInfos(&flg)
+	if did {
+		os.Exit(0)
+	}
 
 	scn := scanner.FromStr(flg.scanner)
 	cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
@@ -51,15 +54,18 @@ func initFlags() flags {
 	}
 }
 
-func printInfos(flg *flags) {
+func printInfos(flg *flags) bool {
 	if *flg.version {
 		printVersion()
+		return true
 	}
 
 	if *flg.lstScanner {
 		listScanner()
+		return true
 	}
 
+	return false
 }
 
 func printVersion() {
