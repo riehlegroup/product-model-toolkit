@@ -55,6 +55,20 @@ Already built executable can be executed directly. For example `./pmtclient` or 
 
 During development, `go run cmd/client/main.go` or `go run cmd/server/main.go` can be used to run a specific application.
 
+Run client and server with `-h` as argument to show all available arguments.
+
+#### Perform Scan with Client
+
+To list all available scanner execute `./pmtclient -l`
+
+Example call: `./pmtclient [-s SCANNER] -i [PROJECT_DIR_TO_SCAN]`
+
+Scan with specific scanner: `./pmtclient -s Licensee -i ~/workspace/myProject`
+
+Scan with default scanner: `./pmtclient -i ~/workspace/myProject`
+
+If you run the client without arguments `./pmtclient` it will use the default scanner and scan the current working directory.
+
 ## API (Server)
 
 ### General Info
