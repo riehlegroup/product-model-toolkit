@@ -28,6 +28,8 @@
 # JetBrains
 .idea
 
+# Debug artifacts
+__debug_bin
 
 # Build artifacts
 pmtserver
