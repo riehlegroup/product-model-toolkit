@@ -133,6 +133,23 @@ Here you can find the functional requirements for the toolkit. We strive to impl
 - [ ] The crawler shall send scanned information to the server application via HTTP calls (REST).
 - [ ] The crawler shall store scanned information as structured representation (SPDX, SBOM, etc.) as files.
 
+## Development
+
+### Add license and copyright header
+
+If you have installed the [REUSE Tool](https://github.com/fsfe/reuse-tool) you execute the following commands to add the correct header to the files.
+
+```shell
+# For source code use
+$ reuse addheader --copyright "Friedrich-Alexander University Erlangen-Nürnberg (FAU)" --license Apache-2.0 myFile.go
+
+# For documentation and media files use
+$ reuse addheader --copyright "Friedrich-Alexander University Erlangen-Nürnberg (FAU)" --license CC-BY-SA-4.0 myImage.png
+
+# For configuration and data files use
+$ reuse addheader --copyright "Friedrich-Alexander University Erlangen-Nürnberg (FAU)" --license CC0-1.0 myConfig.cfg
+```
+
 ## License
 
 Copyright 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
