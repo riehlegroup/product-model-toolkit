@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+#
+# SPDX-License-Identifier: Apache-2.0
+
 GIT_COMMIT= `git rev-parse --short HEAD`
 
 LDFLAGS = -ldflags "-X main.gitCommit=${GIT_COMMIT}"
