@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+//
+// SPDX-License-Identifier: CC0-1.0
 module github.com/osrgroup/product-model-toolkit
 
 go 1.13
