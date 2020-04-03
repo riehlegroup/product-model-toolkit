@@ -8,6 +8,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 )
 
 type Instance struct {
@@ -16,7 +17,7 @@ type Instance struct {
 }
 
 // NewSrv creates a new REST server.
-func NewSrv(address string) *Instance {
+func NewSrv(address string, qSrv *querying.Service) *Instance {
 	e := echo.New()
 
 	// Middleware
@@ -25,9 +26,7 @@ func NewSrv(address string) *Instance {
 
 	// Routes
 	v1 := e.Group("/api/v1")
-	v1.GET("/", handleEntryPoint)
-	v1.GET("/version", handleVersion)
-	v1.GET("/health", handleHealth)
+	Handler(v1, *qSrv)
 
 	return &Instance{
 		httpSrv: e,

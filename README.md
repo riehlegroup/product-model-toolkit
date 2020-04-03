@@ -1,8 +1,15 @@
+<!--
+SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+-->
+
 <p align="center"><img src="logo.png"></p>
 
 Product Model Toolkit for Managing Open Source Dependencies in Products
 
 ![Build](https://github.com/osrgroup/product-model-toolkit/workflows/Go/badge.svg)
+[![codebeat badge](https://codebeat.co/badges/2fef65f3-8f0b-4a11-abf9-d8d0955daf1c)](https://codebeat.co/projects/github-com-osrgroup-product-model-toolkit-master)
 ![REUSE Compliance](https://github.com/osrgroup/product-model-toolkit/workflows/REUSE%20Compliance/badge.svg)
 
 ## Introduction
@@ -30,6 +37,7 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 │   └── server/
 │       └── main.go......Server application entry point
 ├── docs/................Documentation
+├── docker/..............Dockerfiles for scanner tools 
 ├── pkg/.................Library code for client and server
 ├── model/...............The model for representing a software product
 └── README.md
@@ -38,7 +46,7 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 ## How to Use
 
 All important commands needed to build, test, and run the applications are represented as Makefile rule.
-All available rules can be displeyed with `make help`.
+All available rules can be displayed with `make help`.
 
 ### Build
 
@@ -50,15 +58,28 @@ Test with `make test`. This also produces a code coverage report as a file calle
 
 ### Run
 
-Already built executables can be executed directly. For exampl `./pmtclient` or `./pmtserver`.
+Already built executable can be executed directly. For example `./pmtclient` or `./pmtserver`.
 
 During development, `go run cmd/client/main.go` or `go run cmd/server/main.go` can be used to run a specific application.
 
+Run client and server with `-h` as argument to show all available arguments.
+
+#### Perform Scan with Client
+
+To list all available scanner execute `./pmtclient -l`
+
+Example call: `./pmtclient [-s SCANNER] -i [PROJECT_DIR_TO_SCAN]`
+
+Scan with specific scanner: `./pmtclient -s Licensee -i ~/workspace/myProject`
+
+Scan with default scanner: `./pmtclient -i ~/workspace/myProject`
+
+If you run the client without arguments `./pmtclient` it will use the default scanner and scan the current working directory.
+
 ## API (Server)
 
+### General Info
 
-
-### General info 
 Base path: `http://[hostname]:[port]/api/v1`
 
 | Method | Path     | Description                  |
@@ -75,43 +96,52 @@ PHP: [product-model-php-plugin](https://github.com/hallowelt/product-model-php-p
 
 Here you can find the functional requirements for the toolkit. We strive to implement these features in an agile fashion.
 
-**BOM Generation**
+### BOM Generation
 
 - [ ] The system shall generate BOM artifacts as SDPX document.
 - [ ] The system shall generate BOM artifacts as human readable representation.
 - [ ] The system will be able to provide BOM information for custom reports.
 
-**SPDX support**
+### SPDX support
 
 - [ ] The system shall import the component graph from a SPDX document.
 - [ ] The system shall export the component graph as SPDX document.
 - [ ] The system shall import licence information from a SPDX document.
 
-**Diff**
+### Diff
 
 - [ ] The system shall validate if two component graphs are the same.
 - [ ] The system shall validate if two components are the same.
 - [ ] The system shall present the difference in components between two component graphs of the same product.
 - [ ] The system shall present the difference in meta-data between two component graphs of the same product.
 
-**Search**
+### Search
 
 - [ ] The system shall be able to search for components by its name.
 - [ ] The system shall be able to search for components by its meta-data.
 
-**Data Merging**
+### Data Merging
 
 - [ ] The system should merge license information from different sources into a SDPX license identifier representation.
 - [ ] The system should merge sub component graphs into the component graph.
 
-**Client Crawler**
+### Client Crawler
 
 - [ ] The crawler should be executable in a CI environment.
 - [ ] The crawler shall be able to facilitate other scanners running in Docker containers to collect license information.
 - [ ] The crawler shall send scanned information to the server application via HTTP calls (REST).
 - [ ] The crawler shall store scanned information as structured representation (SPDX, SBOM, etc.) as files.
 
-
 ## License
 
-TBA
+Copyright 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+
+This work (source code) is licensed under [Apache-2.0](./LICENSES/Apache-2.0.txt).
+
+Files other than source code are licensed as follows:
+
+- Configuration and data files are licensed under [CC0-1.0](./LICENSES/CC0-1.0.txt).
+
+- Documentation is licensed under [CC BY-SA 4.0](./LICENSES/CC-BY-SA-4.0.txt).
+
+See the [LICENSES](./LICENSES/) folder in the root of this project for license details.

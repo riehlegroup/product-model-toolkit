@@ -4,7 +4,7 @@ import "fmt"
 
 // Component represents a unit of compositon of the product, e.g. class, lib, module.
 type Component struct {
-	UID       string `json:"uid"`
+	UID       string `json:"id"`
 	Name      string `json:"name,omitempty"`
 	Pkg       string `json:"package,omitempty"`
 	Version   string `json:"version,omitempty"`
