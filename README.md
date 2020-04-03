@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+-->
+
 <p align="center"><img src="logo.png"></p>
 
 Product Model Toolkit for Managing Open Source Dependencies in Products
@@ -129,4 +135,12 @@ Here you can find the functional requirements for the toolkit. We strive to impl
 
 Copyright 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
 
-TBA
+This work (source code) is licensed under [Apache-2.0](./LICENSES/Apache-2.0.txt).
+
+Files other than source code are licensed as follows:
+
+- Configuration and data files are licensed under [CC0-1.0](./LICENSES/CC0-1.0.txt).
+
+- Documentation is licensed under [CC BY-SA 4.0](./LICENSES/CC-BY-SA-4.0.txt).
+
+See the [LICENSES](./LICENSES/) folder in the root of this project for license details.
