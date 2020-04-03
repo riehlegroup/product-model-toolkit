@@ -11,6 +11,7 @@ Product Model Toolkit for Managing Open Source Dependencies in Products
 ![Build](https://github.com/osrgroup/product-model-toolkit/workflows/Go/badge.svg)
 [![codebeat badge](https://codebeat.co/badges/2fef65f3-8f0b-4a11-abf9-d8d0955daf1c)](https://codebeat.co/projects/github-com-osrgroup-product-model-toolkit-master)
 ![REUSE Compliance](https://github.com/osrgroup/product-model-toolkit/workflows/REUSE%20Compliance/badge.svg)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Introduction
 
