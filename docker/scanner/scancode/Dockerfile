@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+#
+# SPDX-License-Identifier: Apache-2.0
+
 FROM ubuntu:19.04
 
 RUN apt-get update \
