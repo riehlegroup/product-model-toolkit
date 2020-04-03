@@ -21,6 +21,10 @@ type License struct {
 }
 
 // Copyright represents a copyright statement.
+// SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+//
+// SPDX-License-Identifier: Apache-2.0
+
 type Copyright struct{}
 
 // Policy represents user/company specific rules for the usage of components and its licenses.
