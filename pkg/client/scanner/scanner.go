@@ -53,7 +53,7 @@ var Scancode = Tool{
 	Name:      "Scancode",
 	Version:   "3.1.1",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
-	Cmd:       `/bin/bash -c "./scancode --spdx-rdf /result/result.spdx /input"`,
+	Cmd:       `/bin/bash -c "./scancode --spdx-tv /result/result.spdx /input"`,
 	Results:   []string{"result.spdx"},
 }
 
