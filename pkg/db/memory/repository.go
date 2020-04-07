@@ -5,8 +5,16 @@
 package memory
 
 import (
+	"errors"
+
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/querying"
+)
+
+var (
+	// ErrNotFound if a entity couldn't be found in the db.
+	ErrNotFound = errors.New("Entity not found")
+	// ErrAlreadyExist if a entity with the same ID already exist in the db.
+	ErrAlreadyExist = errors.New("Entity already exist")
 )
 
 // DB represents a database.
@@ -27,7 +35,7 @@ func (db *DB) FindProductByID(id string) (*model.Product, error) {
 		}
 	}
 
-	return nil, querying.ErrNotFound
+	return nil, ErrNotFound
 }
 
 // SaveProduct store a Prodact to the DB.
@@ -38,7 +46,7 @@ func (db *DB) SaveProduct(prod *model.Product) error {
 		return nil
 	}
 
-	return querying.ErrAlreadyExist
+	return ErrAlreadyExist
 }
 
 func (db *DB) productExists(id string) bool {

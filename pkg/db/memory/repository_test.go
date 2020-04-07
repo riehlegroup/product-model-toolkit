@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 )
 
 var p = &model.Product{ID: "001", Name: "Prod A"}
@@ -57,7 +56,7 @@ func TestFindProductByIDNotFound(t *testing.T) {
 	db.AddSampleData()
 
 	_, err := db.FindProductByID("3")
-	if err != querying.ErrNotFound {
+	if err.Error() != ErrNotFound.Error() {
 		t.Errorf("Expected error to be ErrNotFound, but got %v", err)
 	}
 }
@@ -86,7 +85,7 @@ func TestSaveProductAlreadyExist(t *testing.T) {
 	err := db.SaveProduct(p)
 	err = db.SaveProduct(p)
 
-	if err != querying.ErrAlreadyExist {
+	if err != ErrAlreadyExist {
 		t.Errorf("Expected error ErrAlreadyExist, but got %v", err)
 	}
 

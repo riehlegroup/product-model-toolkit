@@ -13,8 +13,6 @@ import (
 var (
 	// ErrNotFound if a entity couldn't be found in the db.
 	ErrNotFound = errors.New("Entity not found")
-	// ErrAlreadyExist if a entity with the same ID already exist in the db.
-	ErrAlreadyExist = errors.New("Entity already exist")
 )
 
 // Repository provides access to the product db.
