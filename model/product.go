@@ -15,11 +15,6 @@ type Product struct {
 	UsageType      `json:"-"`
 }
 
-// License represents a open source license.
-type License struct {
-	SPDXID string
-}
-
 // Copyright represents a copyright statement.
 // SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
 //
