@@ -9,7 +9,7 @@ package model
 type Product struct {
 	ID             string        `json:"id"`
 	Name           string        `json:"name,omitempty"`
-	Description    string        `json:"description,omitempty"`
+	Info           Info          `json:"info,omitempty"`
 	Version        string        `json:"version,omitempty"`
 	VCS            string        `json:"vcs,omitempty"`
 	ClearingState  interface{}   `json:"-"` // TODO: Specify type
