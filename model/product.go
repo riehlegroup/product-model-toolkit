@@ -8,15 +8,15 @@ package model
 // It is the root element in the product architecture model.
 type Product struct {
 	ID             string        `json:"id"`
-	Name           string        `json:"name",omitempty`
-	Description    string        `json:"description",omitempty`
-	Version        string        `json:"version",omitempty`
-	VCS            string        `json:"vcs",omitempty`
+	Name           string        `json:"name,omitempty"`
+	Description    string        `json:"description,omitempty"`
+	Version        string        `json:"version,omitempty"`
+	VCS            string        `json:"vcs,omitempty"`
 	ClearingState  interface{}   `json:"-"` // TODO: Specify type
 	RootDep        []*Dependency `json:"-"`
 	Components     []Component   `json:"components"`
 	Infrastructure `json:"-"`
-	UsageType      `json:"-"`
+	UsageTypes     []UsageType `json:"usage-types,omitempty"`
 }
 
 // Copyright represents a copyright statement.
@@ -34,11 +34,8 @@ type Artifact struct {
 // Deliverable represents a subset a product's components that are deliverable.
 type Deliverable struct{} // deployment unit
 
-// Infrastructure represents a dependency to required infrastructure, e.g. a runtime enviroment like the Java Runtime in a specific version.
+// Infrastructure represents a dependency to required infrastructure, e.g. a runtime environment like the Java Runtime in a specific version.
 type Infrastructure struct{}
 
 // Vulnerability represents known security vulnerabilities of software components, e.g. CVE
 type Vulnerability struct{}
-
-// UsageType represents the scenario in which a product ist used, e.g. cloud service or internal usage only.
-type UsageType interface{}
