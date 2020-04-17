@@ -67,18 +67,14 @@ func findResultFiles(cfg *scanner.Config) []fileName {
 // findFiles returns an array of file names that are both presented in names and expected args.
 func findFiles(names []fileName, expected []string) []fileName {
 	found := make([]fileName, 0)
-	others := make([]fileName, 0)
 
 	for _, n := range names {
 		if contains(expected, string(n)) {
 			found = append(found, n)
-		} else {
-			others = append(others, n)
 		}
 	}
 
 	log.Printf("[Scanner] Found %v of %v expected result files: %v", len(found), len(expected), found)
-	log.Printf("[Scanner] Found %v other files in result folder: %v", len(others), others)
 
 	return found
 }
