@@ -1,13 +1,15 @@
 \connect product_model;
 
-/*Create some dummy users*/
-INSERT INTO public.user (username) VALUES
-('Benjie'),
-('Singingwolfboy'),
-('Lexius');
+/*Create some dummy products*/
+INSERT INTO public.product (name, version, vcs) VALUES
+('First product', '0.1.0', 'github.com/first-product'),
+('Second product', '0.2.0', 'github.com/second-product');
 
-/*Create some dummy posts*/
-INSERT INTO public.post (title, body, author_id) VALUES
-('First post example', 'Lorem ipsum dolor sit amet', 1),
-('Second post example', 'Consectetur adipiscing elit', 2),
-('Third post example', 'Aenean blandit felis sodales', 3);
+/*Create some dummy components*/
+INSERT INTO public.component (name, version, package, license, product_id) VALUES 
+('Comp A', '1.0.0', 'org.a', 'MIT', 1),
+('Comp B', '1.1.0', 'org.b', 'MIT', 1),
+('Comp C', '2.0.0', 'org.c', 'GPL', 1),
+('Comp D', '1.2.0', 'org.d', 'MIT', 1),
+('Comp X', '1.0.0-beta', 'org.x', 'Apache', 2),
+('Comp Y', '3.2.0', 'org.y', 'unkown', 2);

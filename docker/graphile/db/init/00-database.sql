@@ -1,22 +1,19 @@
 \connect product_model;
 
-/*Create user table in public schema*/
-CREATE TABLE public.user (
+CREATE TABLE public.product (
     id SERIAL PRIMARY KEY,
-    username TEXT,
-    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    name TEXT,
+    version TEXT,
+    vcs TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-COMMENT ON TABLE public.user IS
-'Forum users.';
-
-CREATE TABLE public.post (
+CREATE TABLE public.component(
     id SERIAL PRIMARY KEY,
-    title TEXT,
-    body TEXT,
-    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    author_id INTEGER NOT NULL REFERENCES public.user(id)
-);
+    name TEXT,
+    version TEXT,
+    package TEXT,
+    license TEXT,
+    product_id INTEGER NOT NULL REFERENCES public.product(id)
 
-COMMENT ON TABLE public.post IS
-'Forum posts written by a user.';
+);
