@@ -4,7 +4,7 @@
 
 GIT_COMMIT= `git rev-parse --short HEAD`
 
-LDFLAGS = -ldflags "-X main.gitCommit=${GIT_COMMIT}"
+LDFLAGS = -ldflags "-w -s -X main.gitCommit=${GIT_COMMIT}"
 
 .PHONY: all
 all: test build
