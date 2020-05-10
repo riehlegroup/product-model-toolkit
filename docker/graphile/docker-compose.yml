@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+#
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.3"
+services:
+  db:
+    container_name: product-model-db
+    restart: "no"
+    image: product-model-db
+    build:
+      context: ./db
+    # volume mount disabled for development
+    # volumes:
+    #   - db:/var/lib/postgresql/data
+    env_file:
+      - ./.env
+    ports:
+      - 5432:5432
+
+  graphql:
+    container_name: product-model-graphql
+    restart: "no"
+    image: product-model-graphql
+    build:
+      context: ./graphql
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    ports:
+      - 5433:5433
+    command:
+      [
+        "--enhance-graphiql",
+        "--connection",
+        "${DATABASE_URL}",
+        "--port",
+        "5433",
+        "--schema",
+        "public",
+        "--append-plugins",
+        "postgraphile-plugin-connection-filter",
+      ]
+
+  adminer:
+    image: adminer
+    restart: "no"
+    ports:
+      - 8090:8080
+
+volumes:
+  db:
