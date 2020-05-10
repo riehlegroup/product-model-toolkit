@@ -1,7 +1,9 @@
-FROM node:alpine
-LABEL description="Instant high-performance GraphQL API for your PostgreSQL database https://github.com/graphile/postgraphile"
+# SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+#
+# SPDX-License-Identifier: Apache-2.0
 
-# Install PostGraphile and PostGraphile connection filter plugin
+FROM node:alpine
+
 RUN npm install -g postgraphile
 RUN npm install -g postgraphile-plugin-connection-filter
 
