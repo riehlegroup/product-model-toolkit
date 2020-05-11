@@ -7,7 +7,7 @@ package model
 // Product represents a software product and its main properties.
 // It is the root element in the product architecture model.
 type Product struct {
-	ID             string        `json:"id"`
+	ID             int           `json:"id"`
 	Name           string        `json:"name,omitempty"`
 	Info           Info          `json:"info,omitempty"`
 	Version        string        `json:"version,omitempty"`

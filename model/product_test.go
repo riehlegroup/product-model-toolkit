@@ -11,7 +11,7 @@ import (
 )
 
 var prod = Product{
-	ID:      "1",
+	ID:      1,
 	Name:    "Product-Model-Tookit",
 	Version: "0.1.0",
 	Info: Info{
@@ -26,7 +26,7 @@ var prod = Product{
 
 const prodStr string = `
   {
-	"id": "1",
+	"id": 1,
 	"name": "Product-Model-Tookit",
 	"info": {
 	  "description": "Manage OSS dependencies in software products",

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
@@ -57,7 +58,12 @@ func findAllProducts(q querying.Service) echo.HandlerFunc {
 func findProductByID(q querying.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		id := c.Param("id")
-		prod, err := q.FindProductByID(id)
+		idstr, err := strconv.Atoi(id)
+		if err != nil {
+			c.Error(err)
+		}
+
+		prod, err := q.FindProductByID(idstr)
 		if err != nil {
 			c.Error(err)
 		}

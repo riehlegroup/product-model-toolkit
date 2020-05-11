@@ -135,7 +135,7 @@ func TestFindProductByID(t *testing.T) {
 		t.Errorf("Expected unmarshaling JSON without an error, but got %v", err.Error())
 	}
 
-	expectedID := "2"
+	expectedID := 2
 	if prod.ID != expectedID {
 		t.Errorf("Expected product ID to be %v, but got %v", expectedID, prod.ID)
 	}

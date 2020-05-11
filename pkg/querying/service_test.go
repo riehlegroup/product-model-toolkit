@@ -29,13 +29,13 @@ func TestFindProdcutByID(t *testing.T) {
 	r := inMemRepo()
 	s := NewService(r)
 
-	prod, err := s.FindProductByID("2")
+	prod, err := s.FindProductByID(2)
 	if err != nil {
 		t.Errorf("Expected error to be nil, but got %v", err)
 	}
 
-	if prod.ID != "2" {
-		t.Errorf("Expected found product to have ID %v , but go %v", "2", prod.ID)
+	if prod.ID != 2 {
+		t.Errorf("Expected found product to have ID %v , but go %v", 2, prod.ID)
 	}
 }
 
@@ -43,7 +43,7 @@ func TestFindProdcutByID_ErrNotFound(t *testing.T) {
 	r := inMemRepo()
 	s := NewService(r)
 
-	_, err := s.FindProductByID("not existing")
+	_, err := s.FindProductByID(-1)
 	if errors.Is(err, ErrNotFound) {
 		t.Errorf("Expected error to be '%v', but got '%v'", ErrNotFound, err)
 	}

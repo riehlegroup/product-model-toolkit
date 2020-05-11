@@ -10,7 +10,7 @@ import (
 	"github.com/osrgroup/product-model-toolkit/model"
 )
 
-var p = &model.Product{ID: "001", Name: "Prod A"}
+var p = &model.Product{ID: 1, Name: "Prod A"}
 
 func TestFindAllProducts(t *testing.T) {
 	db := new(DB)
@@ -37,7 +37,7 @@ func TestFindProductByID(t *testing.T) {
 	db := new(DB)
 	db.AddSampleData()
 
-	prod, err := db.FindProductByID("2")
+	prod, err := db.FindProductByID(2)
 	if err != nil {
 		t.Errorf("Expected error to be nil, but got %v", err)
 	}
@@ -46,7 +46,7 @@ func TestFindProductByID(t *testing.T) {
 		t.Error("Expected product to be nil")
 	}
 
-	if prod.ID != "2" {
+	if prod.ID != 2 {
 		t.Errorf("Expected product ID to be 2, but got %v", prod.ID)
 	}
 }
@@ -55,7 +55,7 @@ func TestFindProductByIDNotFound(t *testing.T) {
 	db := new(DB)
 	db.AddSampleData()
 
-	_, err := db.FindProductByID("3")
+	_, err := db.FindProductByID(3)
 	if err.Error() != ErrNotFound.Error() {
 		t.Errorf("Expected error to be ErrNotFound, but got %v", err)
 	}

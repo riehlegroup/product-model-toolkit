@@ -20,13 +20,13 @@ type Repository interface {
 	// FindAllProducts returns a list of all products saved in db.
 	FindAllProducts() (*[]model.Product, error)
 	// FindProductByID returns the product with the given ID.
-	FindProductByID(id string) (*model.Product, error)
+	FindProductByID(id int) (*model.Product, error)
 }
 
 // Service  provides product querying operations.
 type Service interface {
 	FindAllProducts() (*[]model.Product, error)
-	FindProductByID(id string) (*model.Product, error)
+	FindProductByID(id int) (*model.Product, error)
 }
 
 type service struct {
@@ -44,6 +44,6 @@ func (s *service) FindAllProducts() (*[]model.Product, error) {
 }
 
 // FindProductByID returns the product with the given ID.
-func (s *service) FindProductByID(id string) (*model.Product, error) {
+func (s *service) FindProductByID(id int) (*model.Product, error) {
 	return s.r.FindProductByID(id)
 }
