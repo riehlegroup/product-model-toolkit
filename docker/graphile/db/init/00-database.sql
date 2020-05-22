@@ -10,6 +10,10 @@ CREATE TABLE public.product (
     name TEXT,
     version TEXT,
     vcs TEXT,
+    description TEXT,
+    comment TEXT,
+    homepage_url TEXT,
+    external_ref TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

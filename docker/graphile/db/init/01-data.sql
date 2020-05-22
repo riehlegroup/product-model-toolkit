@@ -6,9 +6,9 @@
 \connect product_model;
 
 /*Create some dummy products*/
-INSERT INTO public.product (name, version, vcs) VALUES
-('First product', '0.1.0', 'github.com/first-product'),
-('Second product', '0.2.0', 'github.com/second-product');
+INSERT INTO public.product (name, version, vcs, description, comment, homepage_url, external_ref) VALUES
+('First product', '0.1.0', 'github.com/first-product', 'first product description', 'no comment','http://github.com/first-product', null),
+('Second product', '0.2.0', 'github.com/second-product', 'second product description','critical product', 'http://prod.dev', 'prod.io/dev');
 
 /*Create some dummy components*/
 INSERT INTO public.component (name, version, package, license, product_id) VALUES 
