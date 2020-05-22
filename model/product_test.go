@@ -11,33 +11,29 @@ import (
 )
 
 var prod = Product{
-	ID:      1,
-	Name:    "Product-Model-Tookit",
-	Version: "0.1.0",
-	Info: Info{
-		HomepageURL:       "osr.cs.fau.de/",
-		Description:       "Manage OSS dependencies in software products",
-		ExternalReference: "https://github.com/osrgroup/product-model-toolkit",
-		Comment:           "WIP",
-	},
-	VCS:        "https://github.com/osrgroup/product-model-toolkit",
-	UsageTypes: []UsageType{OnPremise, CloudService},
+	ID:                1,
+	Name:              "Product-Model-Tookit",
+	Version:           "0.1.0",
+	HomepageURL:       "osr.cs.fau.de/",
+	Description:       "Manage OSS dependencies in software products",
+	ExternalReference: "https://github.com/osrgroup/product-model-toolkit",
+	Comment:           "WIP",
+	VCS:               "https://github.com/osrgroup/product-model-toolkit",
+	UsageTypes:        []UsageType{OnPremise, CloudService},
 }
 
 const prodStr string = `
   {
 	"id": 1,
 	"name": "Product-Model-Tookit",
-	"info": {
-	  "description": "Manage OSS dependencies in software products",
-	  "comment": "WIP",
-	  "homepage-url": "osr.cs.fau.de/",
-	  "external-ref": "https://github.com/osrgroup/product-model-toolkit"
-	},
+	"description": "Manage OSS dependencies in software products",
+	"comment": "WIP",
+	"homepageUrl": "osr.cs.fau.de/",
+	"externalRef": "https://github.com/osrgroup/product-model-toolkit",
 	"version": "0.1.0",
 	"vcs": "https://github.com/osrgroup/product-model-toolkit",
 	"components": null,
-	"usage-types": [
+	"usageTypes": [
 	  "on-premise",
 	  "cloud-service"
 	]
