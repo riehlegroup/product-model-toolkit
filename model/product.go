@@ -7,16 +7,19 @@ package model
 // Product represents a software product and its main properties.
 // It is the root element in the product architecture model.
 type Product struct {
-	ID             int           `json:"id"`
-	Name           string        `json:"name,omitempty"`
-	Info           Info          `json:"info,omitempty"`
-	Version        string        `json:"version,omitempty"`
-	VCS            string        `json:"vcs,omitempty"`
-	ClearingState  interface{}   `json:"-"` // TODO: Specify type
-	RootDep        []*Dependency `json:"-"`
-	Components     []Component   `json:"components"`
-	Infrastructure `json:"-"`
-	UsageTypes     []UsageType `json:"usage-types,omitempty"`
+	ID                int           `json:"id"`
+	Name              string        `json:"name,omitempty"`
+	Version           string        `json:"version,omitempty"`
+	VCS               string        `json:"vcs,omitempty"`
+	Description       string        `json:"description,omitempty"`
+	Comment           string        `json:"comment,omitempty"`
+	HomepageURL       string        `json:"homepageUrl,omitempty"`
+	ExternalReference string        `json:"externalRef,omitempty"`
+	ClearingState     interface{}   `json:"-"` // TODO: Specify type
+	RootDep           []*Dependency `json:"-"`
+	Components        []Component   `json:"components"`
+	Infrastructure    `json:"-"`
+	UsageTypes        []UsageType `json:"usageTypes,omitempty"`
 }
 
 // Copyright represents a copyright statement.
