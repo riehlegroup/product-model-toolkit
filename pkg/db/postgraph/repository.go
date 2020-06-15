@@ -134,3 +134,29 @@ func (r *repo) SaveProduct(prod *model.Product) error {
 	fmt.Printf("Created product with id %v", res.CreateProduct.Product.ID)
 	return nil
 }
+
+// DeleteProduct deletes a product with the given ID from the DB
+func (r *repo) DeleteProduct(id int) error {
+	req := graphql.NewRequest(`
+	mutation DelMutation($id: Int!) {
+		__typename
+		deleteProductById(input: {id: $id}) {
+		  product {
+			id
+		  }
+		}
+	  }
+	  `)
+
+	req.Var("id", id)
+
+	var res interface{}
+
+	if err := r.client.Run(context.Background(), req, &res); err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	fmt.Printf("Deleted product with id %v", id)
+	return nil
+}
