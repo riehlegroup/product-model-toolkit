@@ -9,6 +9,8 @@ import (
 	"log"
 	"os"
 	"testing"
+
+	"github.com/osrgroup/product-model-toolkit/pkg/convert"
 )
 
 var exampleDoc []byte
@@ -41,7 +43,7 @@ func readExampleDoc() ([]byte, error) {
 }
 
 func TestConvert(t *testing.T) {
-	c := &Composer{}
+	var c convert.Converter = new(Composer)
 	p, err := c.Convert(exampleDoc)
 
 	t.Run("not error", func(t *testing.T) {
