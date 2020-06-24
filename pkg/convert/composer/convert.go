@@ -5,11 +5,11 @@
 package composer
 
 import (
-	"bytes"
 	"encoding/json"
 	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
+	"github.com/osrgroup/product-model-toolkit/pkg/convert"
 )
 
 // Composer represents a PHP Composer converter
@@ -28,7 +28,7 @@ type composerDoc struct {
 
 // Convert converts a PHP Composer representation into a Product Model representation.
 func (Composer) Convert(doc []byte) (*model.Product, error) {
-	body := trimUTF8prefix(doc)
+	body := convert.TrimUTF8prefix(doc)
 	var result composerDoc
 	err := json.Unmarshal(body, &result)
 	if err != nil {
@@ -54,8 +54,4 @@ func extractComponents(input *composerDoc) []model.Component {
 	}
 
 	return comps
-}
-
-func trimUTF8prefix(doc []byte) []byte {
-	return bytes.TrimPrefix(doc, []byte("\xef\xbb\xbf"))
 }

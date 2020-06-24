@@ -13,6 +13,8 @@ import (
 	"github.com/osrgroup/product-model-toolkit/pkg/convert"
 )
 
+const testFile = "test/example.json"
+
 var exampleDoc []byte
 
 // TestMain runs before all tests once
@@ -20,14 +22,14 @@ func TestMain(m *testing.M) {
 	var err error
 	exampleDoc, err = readExampleDoc()
 	if err != nil {
-		log.Fatal("Unable to read example.json to start tests")
+		log.Fatalf("Unable to read %s to start tests", testFile)
 		os.Exit(-1)
 	}
 	os.Exit(m.Run())
 }
 
 func readExampleDoc() ([]byte, error) {
-	jsonFile, err := os.Open("test/example.json")
+	jsonFile, err := os.Open(testFile)
 	if err != nil {
 		return nil, err
 	}
