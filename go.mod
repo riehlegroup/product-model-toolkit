@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: CC0-1.0
 module github.com/osrgroup/product-model-toolkit
 
-go 1.13
+go 1.14
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
