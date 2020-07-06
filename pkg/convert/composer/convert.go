@@ -20,6 +20,7 @@ type composerDocComp struct {
 	Version     string
 	Description string
 	License     []string
+	Requires    []composerDocComp
 }
 
 type composerDoc struct {
