@@ -25,3 +25,14 @@ func (c *Component) ID() CmpID {
 	id := fmt.Sprintf("%v:%v:%v", c.Pkg, c.Name, c.Version)
 	return CmpID(id)
 }
+
+// ContainsComp reports whether a component with the given component id is present in cmps
+func ContainsComp(cmps []Component, cid CmpID) bool {
+	for _, v := range cmps {
+		if v.ID() == cid {
+			return true
+		}
+	}
+
+	return false
+}
