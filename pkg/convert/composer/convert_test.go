@@ -10,6 +10,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/convert"
 )
 
@@ -71,45 +72,16 @@ func TestConvert(t *testing.T) {
 			t.Errorf("Expected amount of components to be %v, but got %v", 197, len(p.Components))
 		}
 	})
-	t.Run("component name", func(t *testing.T) {
-		first := p.Components[0].Name
-		firstExp := "bluespice/about"
-		last := p.Components[len(p.Components)-1].Name
-		lastExp := "zordius/lightncandy"
 
-		if first != firstExp {
-			t.Errorf("Expected name of first component to be %v, but got %v", firstExp, first)
-		}
-		if last != lastExp {
-			t.Errorf("Expected name of last component to be %v, but got %v", lastExp, last)
+	t.Run("contain first component 'bluespice/about'", func(t *testing.T) {
+		if !model.ContainsComp(p.Components, ":bluespice/about:dev-REL1_31") {
+			t.Errorf("Expected component 'bluespice/about' to be present")
 		}
 	})
 
-	t.Run("component version", func(t *testing.T) {
-		first := p.Components[0].Version
-		firstExp := "dev-REL1_31"
-		last := p.Components[len(p.Components)-1].Version
-		lastExp := "v0.23"
-
-		if first != firstExp {
-			t.Errorf("Expected version of first component to be %v, but got %v", firstExp, first)
-		}
-		if last != lastExp {
-			t.Errorf("Expected version of last component to be %v, but got %v", lastExp, last)
-		}
-	})
-
-	t.Run("component license", func(t *testing.T) {
-		first := p.Components[0].License
-		firstExp := "GPL-3.0-only"
-		last := p.Components[len(p.Components)-1].License
-		lastExp := "MIT"
-
-		if first != firstExp {
-			t.Errorf("Expected license of first component to be %v, but got %v", firstExp, first)
-		}
-		if last != lastExp {
-			t.Errorf("Expected license of last component to be %v, but got %v", lastExp, last)
+	t.Run("contain last component 'zordius/lightncandy'", func(t *testing.T) {
+		if !model.ContainsComp(p.Components, ":zordius/lightncandy:v0.23") {
+			t.Errorf("Expected component 'zordius/lightncandy' to be present")
 		}
 	})
 }
@@ -140,24 +112,59 @@ func TestExtractComponents(t *testing.T) {
 		Installed: []composerDocComp{*a, *b},
 	}
 
-	comps := extractComponents(input)
-	if comps == nil {
-		t.Errorf("Expected extractComponents() result not be nil")
-	}
+	comps := make(mapComp)
+	extractDependencies(&input.Installed, comps)
+
 	if len(comps) != 2 {
 		t.Errorf("Expected to return %v components, but got %v", 2, len(comps))
 	}
-	if comps[0].Name != "CompA" {
-		t.Errorf("Expected name of first component to be %v, but got %v", "CompA", comps[0].Name)
+
+	compA, ok := comps[":CompA:0.4.2"]
+	if !ok {
+		t.Errorf("Expected to find CompA in map")
 	}
-	if comps[0].Version != "0.4.2" {
-		t.Errorf("Expected version of first component to be %v, but got %v", "0.4.2", comps[0].Version)
+	if compA.Name != "CompA" {
+		t.Errorf("Expected name of first component to be %v, but got %v", "CompA", compA.Name)
 	}
-	if comps[0].License != "MIT, Apache-2.0" {
-		t.Errorf("Expected license of first component to be %v, but got %v", "MIT, Apache-2.0", comps[0].License)
+	if compA.Version != "0.4.2" {
+		t.Errorf("Expected version of first component to be %v, but got %v", "0.4.2", compA.Version)
 	}
-	if comps[1].License != "GPL" {
-		t.Errorf("Expected license of second component to be %v, but got %v", "GPL", comps[1].License)
+	if compA.License != "MIT, Apache-2.0" {
+		t.Errorf("Expected license of first component to be %v, but got %v", "MIT, Apache-2.0", compA.License)
 	}
 
+	_, ok = comps[":CompB:1.1.1"]
+	if !ok {
+		t.Errorf("Expected to find CompB in map")
+	}
+}
+
+func TestCompMapToSlice(t *testing.T) {
+	a := model.Component{
+		Name:    "A",
+		Pkg:     "a",
+		Version: "alpha",
+	}
+	b := model.Component{
+		Name:    "B",
+		Pkg:     "b",
+		Version: "beta",
+	}
+
+	m := mapComp{
+		a.ID(): a,
+		b.ID(): b,
+	}
+
+	comps := compMapToSlice(m)
+
+	if len(comps) != 2 {
+		t.Errorf("Expected slice length to be %v, but got %v", 2, len(comps))
+	}
+	if !model.ContainsComp(comps, a.ID()) {
+		t.Errorf("Expected component a to be present in slice")
+	}
+	if !model.ContainsComp(comps, b.ID()) {
+		t.Errorf("Expected component b to be present in slice")
+	}
 }

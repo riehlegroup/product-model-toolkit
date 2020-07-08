@@ -27,6 +27,8 @@ type composerDoc struct {
 	Installed []composerDocComp
 }
 
+type mapComp map[model.CmpID]model.Component
+
 // Convert converts a PHP Composer representation into a Product Model representation.
 func (Composer) Convert(doc []byte) (*model.Product, error) {
 	body := convert.TrimUTF8prefix(doc)
@@ -36,23 +38,35 @@ func (Composer) Convert(doc []byte) (*model.Product, error) {
 		return nil, err
 	}
 
+	compAsMap := make(mapComp, 2*len(result.Installed))
+	extractDependencies(&result.Installed, compAsMap)
+	comps := compMapToSlice(compAsMap)
+
 	return &model.Product{
 		Name:       "unkown",
-		Components: extractComponents(&result),
+		Components: comps,
 	}, nil
 }
 
-func extractComponents(input *composerDoc) []model.Component {
-	var comps []model.Component
-	for _, c := range input.Installed {
+func compMapToSlice(compAsMap mapComp) (compSlice []model.Component) {
+	for _, value := range compAsMap {
+		compSlice = append(compSlice, value)
+	}
+	return
+}
+
+func extractDependencies(input *[]composerDocComp, comps map[model.CmpID]model.Component) {
+	for _, c := range *input {
 		licenses := strings.Join(c.License, ", ")
-		comp := &model.Component{
+		comp := model.Component{
 			Name:    c.Name,
 			Version: c.Version,
 			License: licenses,
 		}
-		comps = append(comps, *comp)
-	}
 
-	return comps
+		_, ok := comps[comp.ID()]
+		if !ok {
+			comps[comp.ID()] = comp
+		}
+	}
 }
