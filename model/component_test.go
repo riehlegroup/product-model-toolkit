@@ -80,6 +80,11 @@ func TestContainsComp(t *testing.T) {
 			want: false,
 		},
 		{
+			name: "empty array",
+			args: args{cmps: []Component{}, cid: "abc"},
+			want: false,
+		},
+		{
 			name: "wrong package name",
 			args: args{cmps: dummyCmps(), cid: "org.test2:CompA:1.0.0"},
 			want: false,
