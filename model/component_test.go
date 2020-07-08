@@ -8,15 +8,39 @@ import (
 	"testing"
 )
 
-func TestID(t *testing.T) {
-	c := &Component{Name: "Product", Pkg: "org.pmt.model", Version: "1.2.3-beta"}
-
-	result := string(c.ID())
-
-	expect := "org.pmt.model:Product:1.2.3-beta"
-
-	if result != expect {
-		t.Errorf("Expected component ID to be '%v', but got '%v'.", expect, result)
+func TestComponent_ID(t *testing.T) {
+	type fields struct {
+		Name    string
+		Pkg     string
+		Version string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   CmpID
+	}{
+		{
+			name:   "myCmp",
+			fields: fields{Name: "myCmp", Pkg: "org.pmt.model", Version: "1.2.3-beta"},
+			want:   "org.pmt.model:myCmp:1.2.3-beta",
+		},
+		{
+			name:   "empty component",
+			fields: fields{},
+			want:   "::",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Component{
+				Name:    tt.fields.Name,
+				Pkg:     tt.fields.Pkg,
+				Version: tt.fields.Version,
+			}
+			if got := c.ID(); got != tt.want {
+				t.Errorf("Component.ID() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
