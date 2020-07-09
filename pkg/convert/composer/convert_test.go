@@ -68,20 +68,32 @@ func TestConvert(t *testing.T) {
 	})
 
 	t.Run("component amount", func(t *testing.T) {
-		if len(p.Components) != 197 {
-			t.Errorf("Expected amount of components to be %v, but got %v", 197, len(p.Components))
+		if len(p.Components) != 386 {
+			t.Errorf("Expected amount of components to be %v, but got %v", 386, len(p.Components))
 		}
 	})
 
-	t.Run("contain first component 'bluespice/about'", func(t *testing.T) {
+	t.Run("contains first component 'bluespice/about'", func(t *testing.T) {
 		if !model.ContainsComp(p.Components, ":bluespice/about:dev-REL1_31") {
 			t.Errorf("Expected component 'bluespice/about' to be present")
 		}
 	})
 
-	t.Run("contain last component 'zordius/lightncandy'", func(t *testing.T) {
+	t.Run("contains last component 'zordius/lightncandy'", func(t *testing.T) {
 		if !model.ContainsComp(p.Components, ":zordius/lightncandy:v0.23") {
 			t.Errorf("Expected component 'zordius/lightncandy' to be present")
+		}
+	})
+
+	t.Run("contains 2nd level dependency 'composer/installers'", func(t *testing.T) {
+		if !model.ContainsComp(p.Components, ":composer/installers:~1.0") {
+			t.Errorf("Expected 2nd level dependency 'composer/installers' to be present")
+		}
+	})
+
+	t.Run("contains 3rd level dependency 'composer-plugin-api'", func(t *testing.T) {
+		if !model.ContainsComp(p.Components, ":composer-plugin-api:^1.0") {
+			t.Errorf("Expected 3rd level dependency 'composer-plugin-api' to be present")
 		}
 	})
 }

@@ -68,5 +68,9 @@ func extractDependencies(input *[]composerDocComp, comps map[model.CmpID]model.C
 		if !ok {
 			comps[comp.ID()] = comp
 		}
+
+		if len(c.Requires) > 0 {
+			extractDependencies(&c.Requires, comps)
+		}
 	}
 }
