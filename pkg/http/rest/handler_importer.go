@@ -24,3 +24,7 @@ func importSPDX(c echo.Context) error {
 
 	return c.String(http.StatusOK, msg)
 }
+
+func importComposer(c echo.Context) error {
+	return errors.New("Not implemented yet")
+}

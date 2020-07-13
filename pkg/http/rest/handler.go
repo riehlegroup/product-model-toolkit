@@ -22,6 +22,7 @@ func Handler(g *echo.Group, q querying.Service) {
 	g.GET("/products", findAllProducts(q))
 	g.GET("/products/:id", findProductByID(q))
 	g.POST("/products/spdx", importSPDX)
+	g.POST("/products/composer", importComposer)
 }
 
 func handleEntryPoint(c echo.Context) error {
