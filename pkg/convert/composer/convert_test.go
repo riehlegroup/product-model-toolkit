@@ -5,8 +5,7 @@
 package composer
 
 import (
-	"io/ioutil"
-	"log"
+	"bytes"
 	"os"
 	"testing"
 
@@ -16,38 +15,15 @@ import (
 
 const testFile = "test/example.json"
 
-var exampleDoc []byte
-
-// TestMain runs before all tests once
-func TestMain(m *testing.M) {
-	var err error
-	exampleDoc, err = readExampleDoc()
-	if err != nil {
-		log.Fatalf("Unable to read %s to start tests", testFile)
-		os.Exit(-1)
-	}
-	os.Exit(m.Run())
-}
-
-func readExampleDoc() ([]byte, error) {
+func TestConvert(t *testing.T) {
 	jsonFile, err := os.Open(testFile)
 	if err != nil {
-		return nil, err
+		t.Fatalf("Unable to read %s to start tests", testFile)
 	}
-
 	defer jsonFile.Close()
 
-	jsonBytes, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return nil, err
-	}
-
-	return jsonBytes, nil
-}
-
-func TestConvert(t *testing.T) {
 	var c convert.Converter = new(Composer)
-	p, err := c.Convert(exampleDoc)
+	p, err := c.Convert(jsonFile)
 
 	t.Run("not error", func(t *testing.T) {
 		if err != nil {
@@ -100,7 +76,7 @@ func TestConvert(t *testing.T) {
 
 func TestConvert_Empty(t *testing.T) {
 	c := &Composer{}
-	p, err := c.Convert([]byte{})
+	p, err := c.Convert(bytes.NewReader(nil))
 	if err == nil {
 		t.Error("Expeted returning an error for empty doc")
 	}

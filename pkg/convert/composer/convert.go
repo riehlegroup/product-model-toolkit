@@ -5,7 +5,9 @@
 package composer
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
@@ -30,8 +32,12 @@ type composerDoc struct {
 type mapComp map[model.CmpID]model.Component
 
 // Convert converts a PHP Composer representation into a Product Model representation.
-func (Composer) Convert(doc []byte) (*model.Product, error) {
-	body := convert.TrimUTF8prefix(doc)
+func (Composer) Convert(input io.Reader) (*model.Product, error) {
+
+	byteInput := new(bytes.Buffer)
+	byteInput.ReadFrom(input)
+
+	body := convert.TrimUTF8prefix(byteInput.Bytes())
 	var result composerDoc
 	err := json.Unmarshal(body, &result)
 	if err != nil {

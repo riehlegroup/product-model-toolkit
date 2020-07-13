@@ -5,7 +5,6 @@
 package rest
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"net/http"
@@ -32,11 +31,7 @@ func importComposer(c echo.Context) error {
 	r := c.Request().Body
 
 	var conv convert.Converter = new(composer.Composer)
-
-	data := new(bytes.Buffer)
-	data.ReadFrom(r)
-
-	prod, err := conv.Convert(data.Bytes())
+	prod, err := conv.Convert(r)
 	if err != nil {
 		msg := fmt.Sprintf("Error while parsing Composer JSON body: %v", err)
 		c.Error(errors.New(msg))

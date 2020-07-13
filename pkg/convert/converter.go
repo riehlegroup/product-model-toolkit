@@ -6,6 +6,7 @@ package convert
 
 import (
 	"bytes"
+	"io"
 
 	"github.com/osrgroup/product-model-toolkit/model"
 )
@@ -13,9 +14,10 @@ import (
 // Converter is the interface all converter implementations need to fulfill.
 type Converter interface {
 	// Convert converts a doc to the product model representation.
-	Convert([]byte) (*model.Product, error)
+	Convert(io.Reader) (*model.Product, error)
 }
 
+// TrimUTF8prefix returns doc without UTF8 prefix string
 func TrimUTF8prefix(doc []byte) []byte {
 	return bytes.TrimPrefix(doc, []byte("\xef\xbb\xbf"))
 }
