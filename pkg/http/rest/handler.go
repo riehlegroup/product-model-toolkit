@@ -5,15 +5,12 @@
 package rest
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
-	"github.com/spdx/tools-golang/tvloader"
 )
 
 // Handler handle all request for the given route group.
@@ -70,16 +67,4 @@ func findProductByID(q querying.Service) echo.HandlerFunc {
 
 		return c.JSON(http.StatusOK, prod)
 	}
-}
-
-func importSPDX(c echo.Context) error {
-	r := c.Request().Body
-	doc, err := tvloader.Load2_1(r)
-	if err != nil {
-		msg := fmt.Sprintf("Error while parsing SPDX body: %v", err)
-		c.Error(errors.New(msg))
-	}
-	msg := fmt.Sprintf("Successfully parsed SDPX document.\nFound %v packages", len(doc.Packages))
-
-	return c.String(http.StatusOK, msg)
 }
