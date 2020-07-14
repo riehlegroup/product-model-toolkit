@@ -9,20 +9,21 @@ import (
 	"strconv"
 
 	"github.com/labstack/echo/v4"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing"
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
 // Handler handle all request for the given route group.
-func Handler(g *echo.Group, q querying.Service) {
+func Handler(g *echo.Group, qSrv *querying.Service, iSrv *importing.Service) {
 	g.GET("/", handleEntryPoint)
 	g.GET("/version", handleVersion)
 	g.GET("/health", handleHealth)
 
-	g.GET("/products", findAllProducts(q))
-	g.GET("/products/:id", findProductByID(q))
-	g.POST("/products/spdx", importSPDX)
-	g.POST("/products/composer", importComposer)
+	g.GET("/products", findAllProducts(*qSrv))
+	g.GET("/products/:id", findProductByID(*qSrv))
+	g.POST("/products/spdx", importSPDX(*iSrv))
+	g.POST("/products/composer", importComposer(*iSrv))
 }
 
 func handleEntryPoint(c echo.Context) error {

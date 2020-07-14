@@ -11,6 +11,7 @@ import (
 
 	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
 	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing"
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
@@ -30,8 +31,9 @@ func main() {
 	// repo := postgraph.NewRepo("http://localhost:5433/graphql")
 
 	querying := querying.NewService(repo)
+	importing := importing.NewService()
 
-	r := rest.NewSrv("127.0.0.1:8081", &querying)
+	r := rest.NewSrv("127.0.0.1:8081", &querying, &importing)
 	go r.Start()
 	defer r.Shutdown()
 }

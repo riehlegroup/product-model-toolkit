@@ -12,6 +12,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing"
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 )
 
@@ -21,7 +22,7 @@ type Instance struct {
 }
 
 // NewSrv creates a new REST server.
-func NewSrv(address string, qSrv *querying.Service) *Instance {
+func NewSrv(address string, qSrv *querying.Service, iSrv *importing.Service) *Instance {
 	e := echo.New()
 
 	// Middleware
@@ -30,7 +31,7 @@ func NewSrv(address string, qSrv *querying.Service) *Instance {
 
 	// Routes
 	v1 := e.Group("/api/v1")
-	Handler(v1, *qSrv)
+	Handler(v1, qSrv, iSrv)
 
 	return &Instance{
 		httpSrv: e,
