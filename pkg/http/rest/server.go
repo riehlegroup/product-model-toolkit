@@ -22,7 +22,7 @@ type Instance struct {
 }
 
 // NewSrv creates a new REST server.
-func NewSrv(address string, qSrv *querying.Service, iSrv *importing.Service) *Instance {
+func NewSrv(address string, qSrv querying.Service, iSrv importing.Service) *Instance {
 	e := echo.New()
 
 	// Middleware

@@ -15,15 +15,15 @@ import (
 )
 
 // Handler handle all request for the given route group.
-func Handler(g *echo.Group, qSrv *querying.Service, iSrv *importing.Service) {
+func Handler(g *echo.Group, qSrv querying.Service, iSrv importing.Service) {
 	g.GET("/", handleEntryPoint)
 	g.GET("/version", handleVersion)
 	g.GET("/health", handleHealth)
 
-	g.GET("/products", findAllProducts(*qSrv))
-	g.GET("/products/:id", findProductByID(*qSrv))
-	g.POST("/products/spdx", importSPDX(*iSrv))
-	g.POST("/products/composer", importComposer(*iSrv))
+	g.GET("/products", findAllProducts(qSrv))
+	g.GET("/products/:id", findProductByID(qSrv))
+	g.POST("/products/spdx", importSPDX(iSrv))
+	g.POST("/products/composer", importComposer(iSrv))
 }
 
 func handleEntryPoint(c echo.Context) error {

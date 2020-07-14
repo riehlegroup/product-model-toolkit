@@ -19,26 +19,25 @@ import (
 var gitCommit string
 
 func main() {
-	usedFlag := initFlags()
-
-	if usedFlag {
+	if checkFlags() {
 		os.Exit(0)
 	}
 
 	repo := new(memory.DB)
 	repo.AddSampleData()
-	// USe Postgraphile as DB backend
+	// Use Postgraphile as DB backend
 	// repo := postgraph.NewRepo("http://localhost:5433/graphql")
 
-	querying := querying.NewService(repo)
-	importing := importing.NewService()
-
-	r := rest.NewSrv("127.0.0.1:8081", &querying, &importing)
+	r := rest.NewSrv(
+		"127.0.0.1:8081",
+		querying.NewService(repo),
+		importing.NewService(),
+	)
 	go r.Start()
 	defer r.Shutdown()
 }
 
-func initFlags() bool {
+func checkFlags() bool {
 	version := flag.Bool("v", false, "show version")
 
 	flag.Parse()
