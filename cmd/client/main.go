@@ -17,17 +17,13 @@ import (
 var gitCommit string
 
 type flags struct {
-	version    *bool
-	lstScanner *bool
-	scanner    string
-	inDir      string
-	set        bool
+	scanner string
+	inDir   string
 }
 
 func main() {
-	flg := initFlags()
-	did := printInfos(&flg)
-	if did {
+	flg, abort := checkFlags()
+	if abort {
 		os.Exit(0)
 	}
 
@@ -38,38 +34,32 @@ func main() {
 
 }
 
-func initFlags() flags {
+func checkFlags() (flags, bool) {
 	version := flag.Bool("v", false, "show version")
+
 	lstScanner := flag.Bool("l", false, "list all available scanner")
+
 	scanner := flag.String("s", "", "scanner to to use from list of available scanner")
 	wd, _ := os.Getwd()
 	inDir := flag.String("i", wd, "input dir to scan. Default is current working directory")
 
 	flag.Parse()
 
-	set := flag.NFlag() > 0
+	if *version {
+		printVersion()
+	}
+
+	if *lstScanner {
+		listScanner()
+	}
+
+	abortAfterFlags := *version || *lstScanner
 
 	return flags{
-		version,
-		lstScanner,
-		*scanner,
-		*inDir,
-		set,
-	}
-}
-
-func printInfos(flg *flags) bool {
-	if *flg.version {
-		printVersion()
-		return true
-	}
-
-	if *flg.lstScanner {
-		listScanner()
-		return true
-	}
-
-	return false
+			*scanner,
+			*inDir,
+		},
+		abortAfterFlags
 }
 
 func printVersion() {
