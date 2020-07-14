@@ -54,11 +54,12 @@ func (Composer) Convert(input io.Reader) (*model.Product, error) {
 	}, nil
 }
 
-func compMapToSlice(compAsMap mapComp) (compSlice []model.Component) {
+func compMapToSlice(compAsMap mapComp) []model.Component {
+	compSlice := make([]model.Component, 0, len(compAsMap))
 	for _, value := range compAsMap {
 		compSlice = append(compSlice, value)
 	}
-	return
+	return compSlice
 }
 
 func extractDependencies(input *[]composerDocComp, comps map[model.CmpID]model.Component) {
