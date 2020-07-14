@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/convert"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
 )
 
 const testFile = "test/example.json"

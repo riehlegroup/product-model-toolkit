@@ -10,8 +10,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/osrgroup/product-model-toolkit/pkg/convert"
-	"github.com/osrgroup/product-model-toolkit/pkg/convert/composer"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert/composer"
 	"github.com/spdx/tools-golang/tvloader"
 )
 

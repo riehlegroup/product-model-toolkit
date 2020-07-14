@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/convert"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
 )
 
 // Composer represents a PHP Composer converter
