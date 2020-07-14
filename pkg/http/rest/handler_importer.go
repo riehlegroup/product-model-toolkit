@@ -10,6 +10,7 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/osrgroup/product-model-toolkit/pkg/importing"
+	"github.com/pkg/errors"
 )
 
 func importSPDX(iSrv importing.Service) echo.HandlerFunc {
@@ -18,11 +19,13 @@ func importSPDX(iSrv importing.Service) echo.HandlerFunc {
 
 		doc, err := iSrv.SPDX(r)
 		if err != nil {
-			c.Error(err)
+			c.Error(errors.Wrap(err, "Unable to perform SPDX import"))
 		}
 
-		msg := fmt.Sprintf("Successfully parsed SDPX document.\nFound %v packages", len(doc.Packages))
-		return c.String(http.StatusOK, msg)
+		return c.String(
+			http.StatusOK,
+			fmt.Sprintf("Successfully parsed SDPX document.\nFound %v packages", len(doc.Packages)),
+		)
 	}
 }
 
@@ -32,10 +35,12 @@ func importComposer(iSrv importing.Service) echo.HandlerFunc {
 
 		prod, err := iSrv.Composer(r)
 		if err != nil {
-			c.Error(err)
+			c.Error(errors.Wrap(err, "Unable to perform Composer import"))
 		}
 
-		msg := fmt.Sprintf("Successfully parsed Composer JSON.\nFound %v packages", len(prod.Components))
-		return c.String(http.StatusOK, msg)
+		return c.String(
+			http.StatusOK,
+			fmt.Sprintf("Successfully parsed Composer JSON.\nFound %v packages", len(prod.Components)),
+		)
 	}
 }
