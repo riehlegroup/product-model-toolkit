@@ -63,11 +63,11 @@ func checkFlags() (flags, bool) {
 }
 
 func printVersion() {
-	fmt.Println("PMT Client")
-	fmt.Println("----------")
-	fmt.Println("Version: " + version.Name())
-	fmt.Println("Git commit: " + gitCommit)
-	fmt.Println("----------")
+	fmt.Printf(
+		"PMT Client\n----------\nVersion: %s\nGit commit: %s\n",
+		version.Name(),
+		gitCommit,
+	)
 }
 
 func listScanner() {
