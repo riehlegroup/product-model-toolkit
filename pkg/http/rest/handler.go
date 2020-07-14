@@ -12,6 +12,7 @@ import (
 	"github.com/osrgroup/product-model-toolkit/pkg/importing"
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
+	"github.com/pkg/errors"
 )
 
 // Handler handle all request for the given route group.
@@ -39,15 +40,14 @@ func handleHealth(c echo.Context) error {
 		Status string `json:"status"`
 	}
 
-	up := status{Status: "UP"}
-	return c.JSON(http.StatusOK, up)
+	return c.JSON(http.StatusOK, status{Status: "UP"})
 }
 
 func findAllProducts(q querying.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		prods, err := q.FindAllProducts()
 		if err != nil {
-			c.Error(err)
+			c.Error(errors.Wrap(err, "Unable to find all products"))
 		}
 
 		return c.JSON(http.StatusOK, prods)
@@ -56,15 +56,15 @@ func findAllProducts(q querying.Service) echo.HandlerFunc {
 
 func findProductByID(q querying.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id := c.Param("id")
-		idstr, err := strconv.Atoi(id)
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			c.Error(err)
+			c.Error(errors.Wrapf(err, "Unable to convert query param id with value '%v' to int", idStr))
 		}
 
-		prod, err := q.FindProductByID(idstr)
+		prod, err := q.FindProductByID(id)
 		if err != nil {
-			c.Error(err)
+			c.Error(errors.Wrapf(err, "Unable to find product with id %v", id))
 		}
 
 		return c.JSON(http.StatusOK, prod)
