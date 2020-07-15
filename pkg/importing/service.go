@@ -18,7 +18,7 @@ import (
 
 // Service  provides BOM import operations.
 type Service interface {
-	Composer(io.Reader) (*model.Product, error)
+	ComposerRead(io.Reader) (*model.Product, error)
 	SPDX(io.Reader) (*spdx.Document2_1, error)
 }
 
@@ -30,7 +30,7 @@ func NewService() Service {
 }
 
 // Composer import a Composer representation of the BOM.
-func (service) Composer(input io.Reader) (*model.Product, error) {
+func (service) ComposerRead(input io.Reader) (*model.Product, error) {
 	var c convert.Converter = new(composer.Composer)
 	prod, err := c.Convert(input)
 	if err != nil {

@@ -33,7 +33,7 @@ func importComposer(iSrv importing.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		r := c.Request().Body
 
-		prod, err := iSrv.Composer(r)
+		prod, err := iSrv.ComposerRead(r)
 		if err != nil {
 			c.Error(errors.Wrap(err, "Unable to perform Composer import"))
 		}

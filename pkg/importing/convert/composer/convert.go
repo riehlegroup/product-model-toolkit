@@ -49,7 +49,7 @@ func (Composer) Convert(input io.Reader) (*model.Product, error) {
 	comps := compMapToSlice(compAsMap)
 
 	return &model.Product{
-		Name:       "unkown",
+		Name:       "new Product",
 		Components: comps,
 	}, nil
 }
