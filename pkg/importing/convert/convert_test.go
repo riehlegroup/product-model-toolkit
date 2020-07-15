@@ -7,8 +7,6 @@ package convert
 import "testing"
 
 func TestTrimUTF8prefix(t *testing.T) {
-	const UTF8Prefix = "\xef\xbb\xbf"
-
 	data := []byte{0xef, 0xbb, 0xbf, 6, 7, 8, 9, 10}
 
 	result := TrimUTF8prefix(data)
