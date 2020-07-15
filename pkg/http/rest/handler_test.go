@@ -6,6 +6,7 @@ package rest
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,11 +14,19 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing"
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
 const basePath = "/api/v1"
+
+func TestHandler(t *testing.T) {
+	e := echo.New()
+	v1 := e.Group("/api/v1")
+
+	Handler(v1, querying.NewService(&mockDB{}), importing.NewService())
+}
 
 func TestHandleEntryPoint(t *testing.T) {
 	e := echo.New()
@@ -89,9 +98,6 @@ func TestFindAllProducts(t *testing.T) {
 
 	handler := findAllProducts(q)
 	err := handler(c)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("Expected status code to be %v, but got %v", http.StatusOK, rec.Code)
@@ -108,6 +114,21 @@ func TestFindAllProducts(t *testing.T) {
 	}
 }
 
+func TestFindAllProducts_Error(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, basePath+"/products", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	q := querying.NewService(&mockDB{})
+	handler := findAllProducts(q)
+	handler(c)
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status code to be %v, but got %v", http.StatusInternalServerError, rec.Code)
+	}
+}
+
 func TestFindProductByID(t *testing.T) {
 	e := echo.New()
 	req := httptest.NewRequest(http.MethodGet, basePath+"/products/:id", nil)
@@ -120,17 +141,14 @@ func TestFindProductByID(t *testing.T) {
 	q := inMemQueryingService()
 
 	handler := findProductByID(q)
-	err := handler(c)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
+	handler(c)
 
 	if rec.Code != http.StatusOK {
 		t.Errorf("Expected status code to be %v, but got %v", http.StatusOK, rec.Code)
 	}
 
 	var prod model.Product
-	err = json.Unmarshal(rec.Body.Bytes(), &prod)
+	err := json.Unmarshal(rec.Body.Bytes(), &prod)
 	if err != nil {
 		t.Errorf("Expected unmarshaling JSON without an error, but got %v", err.Error())
 	}
@@ -141,9 +159,63 @@ func TestFindProductByID(t *testing.T) {
 	}
 }
 
+func TestFindProductByID_NotExisting(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, basePath+"/products/:id", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetParamNames("id")
+	c.SetParamValues("473638")
+
+	q := inMemQueryingService()
+
+	handler := findProductByID(q)
+	err := handler(c)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if rec.Code != http.StatusNotFound {
+		t.Errorf("Expected status code to be %v, but got %v", http.StatusNotFound, rec.Code)
+	}
+}
+
+func TestFindProductByID_Error(t *testing.T) {
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, basePath+"/products/:id", nil)
+	rec := httptest.NewRecorder()
+
+	c := e.NewContext(req, rec)
+	c.SetParamNames("id")
+	c.SetParamValues("$!*")
+
+	q := inMemQueryingService()
+
+	handler := findProductByID(q)
+	err := handler(c)
+	if err != nil {
+		t.Errorf(err.Error())
+	}
+
+	if rec.Code != http.StatusInternalServerError {
+		t.Errorf("Expected status code to be %v, but got %v", http.StatusInternalServerError, rec.Code)
+	}
+}
+
 func inMemQueryingService() querying.Service {
 	repo := new(memory.DB)
 	repo.AddSampleData()
 
 	return querying.NewService(repo)
+}
+
+type mockDB struct{}
+
+func (db *mockDB) FindAllProducts() (*[]model.Product, error) {
+	return nil, errors.New("some error")
+}
+
+func (db *mockDB) FindProductByID(id int) (*model.Product, error) {
+	return nil, errors.New("some error")
 }

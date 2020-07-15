@@ -16,3 +16,9 @@ func TestIsSemanticVersion(t *testing.T) {
 		t.Errorf("Expected version to be in semantic version style, but got %s", Name())
 	}
 }
+
+func TestName(t *testing.T) {
+	if version != Name() {
+		t.Error("Expected Name() to return version")
+	}
+}

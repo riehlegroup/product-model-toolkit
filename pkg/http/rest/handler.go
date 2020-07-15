@@ -5,6 +5,7 @@
 package rest
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -64,7 +65,10 @@ func findProductByID(q querying.Service) echo.HandlerFunc {
 
 		prod, err := q.FindProductByID(id)
 		if err != nil {
-			c.Error(errors.Wrapf(err, "Unable to find product with id %v", id))
+
+			c.String(
+				http.StatusNotFound,
+				fmt.Sprintf("Unablable fo find product with ID %v", id))
 		}
 
 		return c.JSON(http.StatusOK, prod)
