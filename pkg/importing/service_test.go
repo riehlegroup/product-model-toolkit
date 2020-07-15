@@ -5,6 +5,7 @@
 package importing
 
 import (
+	"bytes"
 	"os"
 	"testing"
 )
@@ -34,5 +35,14 @@ func TestComposerRead(t *testing.T) {
 
 	if len(p.Components) != 386 {
 		t.Errorf("Expected amount of components to be %v, but got %v", 386, len(p.Components))
+	}
+}
+
+func TestComposerRead_Empty(t *testing.T) {
+	s := NewService()
+
+	_, err := s.ComposerRead(bytes.NewReader(nil))
+	if err == nil {
+		t.Error("Expected ComposerRead() to return error for empty input")
 	}
 }
