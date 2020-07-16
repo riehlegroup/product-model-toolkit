@@ -17,6 +17,10 @@ install: ## Install all Go dependencies.
 test: ## Run all tests.
 	go test -race -coverprofile=coverage.out ./...
 
+.PHONY: cover
+cover: ## Show coverage from coverage.out
+	go tool cover -func=coverage.out
+
 .PHONY: build
 build: build-client build-server ## Build client and server application.
 
