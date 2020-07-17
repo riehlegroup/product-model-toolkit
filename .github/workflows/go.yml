@@ -36,7 +36,9 @@ jobs:
       run: diff -u <(echo -n) <(gofmt -d ./)
     
     - name: Test
-      run: make test
+      run: |
+        make test
+        make cover
 
     - name: Build
       run: make build
