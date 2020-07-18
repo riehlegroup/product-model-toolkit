@@ -6,7 +6,7 @@ package model
 
 import "fmt"
 
-// Component represents a unit of compositon of the product, e.g. class, lib, module.
+// Component represents a unit of composition of the product, e.g. class, lib, module.
 type Component struct {
 	UID       string `json:"id"`
 	Name      string `json:"name,omitempty"`
