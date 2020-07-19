@@ -82,8 +82,8 @@ func TestSaveProduct(t *testing.T) {
 func TestSaveProductAlreadyExist(t *testing.T) {
 	db := new(DB)
 
+	db.SaveProduct(p)
 	err := db.SaveProduct(p)
-	err = db.SaveProduct(p)
 
 	if err != ErrAlreadyExist {
 		t.Errorf("Expected error ErrAlreadyExist, but got %v", err)
