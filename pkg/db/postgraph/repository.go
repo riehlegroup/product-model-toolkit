@@ -28,7 +28,7 @@ func NewRepo(URL string) *repo {
 }
 
 // FindAllProducts returns all Products from the DB.
-func (r *repo) FindAllProducts() (*[]model.Product, error) {
+func (r *repo) FindAllProducts() ([]model.Product, error) {
 	req := graphql.NewRequest(`
 	query AllProds {
 		allProducts {
@@ -57,11 +57,11 @@ func (r *repo) FindAllProducts() (*[]model.Product, error) {
 		return nil, err
 	}
 
-	return &res.AllProducts.Nodes, nil
+	return res.AllProducts.Nodes, nil
 }
 
 // FindProductByID return the Product with the given ID from the DB.
-func (r *repo) FindProductByID(id int) (*model.Product, error) {
+func (r *repo) FindProductByID(id int) (model.Product, error) {
 	req := graphql.NewRequest(`
 	query Prod($id: Int!) {
 		productById(id: $id) {
@@ -84,10 +84,10 @@ func (r *repo) FindProductByID(id int) (*model.Product, error) {
 	}
 
 	if err := r.client.Run(context.Background(), req, &res); err != nil {
-		return nil, ErrNotFound
+		return model.Product{}, ErrNotFound
 	}
 
-	return &res.ProductByID, nil
+	return res.ProductByID, nil
 }
 
 // SaveProduct store a Prodact to the DB.

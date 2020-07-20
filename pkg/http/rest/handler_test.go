@@ -212,10 +212,10 @@ func inMemQueryingService() querying.Service {
 
 type mockDB struct{}
 
-func (db *mockDB) FindAllProducts() (*[]model.Product, error) {
+func (db *mockDB) FindAllProducts() ([]model.Product, error) {
 	return nil, errors.New("some error")
 }
 
-func (db *mockDB) FindProductByID(id int) (*model.Product, error) {
-	return nil, errors.New("some error")
+func (db *mockDB) FindProductByID(id int) (model.Product, error) {
+	return model.Product{}, errors.New("some error")
 }

@@ -16,7 +16,7 @@ func TestFindAllProducts(t *testing.T) {
 	db := new(DB)
 
 	prods, _ := db.FindAllProducts()
-	size := len(*prods)
+	size := len(prods)
 	if size != 0 {
 		t.Errorf("Expected product array size to be 0, but got %v", size)
 	}
@@ -27,7 +27,7 @@ func TestFindAllProductsWithSampleData(t *testing.T) {
 	db.AddSampleData()
 
 	prods, _ := db.FindAllProducts()
-	size := len(*prods)
+	size := len(prods)
 	if size != 2 {
 		t.Errorf("Expected product array size to be 2, but got %v", size)
 	}
@@ -40,10 +40,6 @@ func TestFindProductByID(t *testing.T) {
 	prod, err := db.FindProductByID(2)
 	if err != nil {
 		t.Errorf("Expected error to be nil, but got %v", err)
-	}
-
-	if prod == nil {
-		t.Error("Expected product to be nil")
 	}
 
 	if prod.ID != 2 {

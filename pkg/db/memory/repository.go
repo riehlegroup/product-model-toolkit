@@ -23,23 +23,23 @@ type DB struct {
 }
 
 // FindAllProducts returns all Products from the DB.
-func (db *DB) FindAllProducts() (*[]model.Product, error) {
-	return &db.products, nil
+func (db *DB) FindAllProducts() ([]model.Product, error) {
+	return db.products, nil
 }
 
 // FindProductByID return the Product with the given ID from the DB.
-func (db *DB) FindProductByID(id int) (*model.Product, error) {
+func (db *DB) FindProductByID(id int) (model.Product, error) {
 	for i := range db.products {
 		if db.products[i].ID == id {
-			return &db.products[i], nil
+			return db.products[i], nil
 		}
 	}
 
-	return nil, ErrNotFound
+	return model.Product{}, ErrNotFound
 }
 
 // SaveProduct store a Prodact to the DB.
-func (db *DB) SaveProduct(prod *model.Product) error {
+func (db *DB) SaveProduct(prod *model.Product) (error) {
 	found := db.productExists(prod.ID)
 	if !found {
 		db.products = append(db.products, *prod)

@@ -20,8 +20,8 @@ func TestFindAllProducts(t *testing.T) {
 		t.Errorf("Expected error to be nil, but got %v", err)
 	}
 
-	if len(*prods) != 2 {
-		t.Errorf("Expected %v products as result, but go %v", 2, len(*prods))
+	if len(prods) != 2 {
+		t.Errorf("Expected %v products as result, but go %v", 2, len(prods))
 	}
 }
 
