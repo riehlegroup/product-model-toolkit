@@ -8,23 +8,38 @@ import (
 	"testing"
 )
 
-var (
-	cmp1 *Component = &Component{Pkg: "com.test", Name: "Cmp1", Version: "1.0.0"}
-	cmp2 *Component = &Component{Pkg: "com.test", Name: "Cmp2", Version: "2.0.0"}
-)
+func TestAddRelation(t *testing.T) {
+	g := NewDepGraph()
 
-func TestNextTrue(t *testing.T) {
-	d := &Dependency{Type: StaticLinked, From: cmp1, To: cmp2}
+	g.AddDependency("a", "b", StaticLinked)
+	g.AddDependency("a", "c", StaticLinked)
+	g.AddDependency("c", "d", DynamicLinked)
 
-	if !d.Next() {
-		t.Error("Expected dependency to have next element")
+	a := g.Deps["a"]
+	if len(a) != 2 {
+		t.Errorf("Expected amount of dependencies from a to be %v, but got %v", 2, len(a))
+	}
+
+	c := g.Deps["c"]
+	if len(c) != 1 {
+		t.Errorf("Expected amount of dependencies from c to be %v, but got %v", 1, len(c))
 	}
 }
 
-func TestNextFalse(t *testing.T) {
-	d := &Dependency{Type: StaticLinked, From: cmp1, To: nil}
+func TestString(t *testing.T) {
+	g := NewDepGraph()
+	g.AddDependency("a", "b", StaticLinked)
+	g.AddDependency("c", "d", DynamicLinked)
 
-	if d.Next() {
-		t.Error("Expected dependency to have no next element")
+	a := g.Deps["a"]["b"]
+	aShould := "(a) -> (b) [linking: 'STATIC_LINKED']"
+	if a.String() != aShould {
+		t.Errorf("Expected a.String to be '%v', but got '%v'", aShould, a.String())
+	}
+
+	c := g.Deps["c"]["d"]
+	cShould := "(c) -> (d) [linking: 'DYNAMIC_LINKED']"
+	if a.String() != aShould {
+		t.Errorf("Expected a.String to be '%v', but got '%v'", cShould, c.String())
 	}
 }

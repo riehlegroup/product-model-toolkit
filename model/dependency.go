@@ -4,26 +4,47 @@
 
 package model
 
+import "fmt"
+
+// DepGraph represents a component dependency graph.
+type DepGraph struct {
+	Deps map[CmpID]map[CmpID]Dependency `json:"dependencies, omitempty"`
+}
+
 // Dependency represents the relationship between two components.
 type Dependency struct {
-	Type DepType
-	From *Component
-	To   *Component
+	From    CmpID
+	To      CmpID
+	Linking LinkingType
 }
 
-// Next returns true if dependency points to a component.
-func (d *Dependency) Next() bool {
-	return d.To != nil
-}
+// LinkingType represents the type of linking between dependencies, e.g. static linking.
+type LinkingType string
 
-// DepType represents the type of a dependency, e.g. static linking.
-type DepType string
+// NewDepGraph create a new component dependency graph.
+func NewDepGraph() *DepGraph {
+	return &DepGraph{
+		Deps: make(map[CmpID]map[CmpID]Dependency),
+	}
+}
 
 const (
-	StaticLinked  DepType = "STATIC_LINKED"
-	DynamicLinked DepType = "DYNAMIC_LINKED"
+	// StaticLinked represents static linking between components
+	StaticLinked LinkingType = "STATIC_LINKED"
+	// DynamicLinked represents dynamic linking between components
+	DynamicLinked LinkingType = "DYNAMIC_LINKED"
 )
 
-type Iterator interface {
-	Next() bool
+// String returns a string representation of a dependency.
+func (d *Dependency) String() string {
+	return fmt.Sprintf("(%s) -> (%s) [linking: '%s']", d.From, d.To, d.Linking)
+}
+
+// AddDependency adds a new dependency between two components.
+func (g *DepGraph) AddDependency(from, to CmpID, linking LinkingType) {
+	if _, ok := g.Deps[from]; !ok {
+		g.Deps[from] = make(map[CmpID]Dependency)
+	}
+
+	g.Deps[from][to] = Dependency{From: from, To: to, Linking: linking}
 }
