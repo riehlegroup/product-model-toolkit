@@ -60,7 +60,7 @@ func TestFindProductByIDNotFound(t *testing.T) {
 func TestSaveProduct(t *testing.T) {
 	db := new(DB)
 
-	err := db.SaveProduct(p)
+	_, err := db.SaveProduct(p)
 	if err != nil {
 		t.Errorf("Expected error to be nil, but got %v", err)
 	}
@@ -79,7 +79,7 @@ func TestSaveProductAlreadyExist(t *testing.T) {
 	db := new(DB)
 
 	db.SaveProduct(p)
-	err := db.SaveProduct(p)
+	_, err := db.SaveProduct(p)
 
 	if err != ErrAlreadyExist {
 		t.Errorf("Expected error ErrAlreadyExist, but got %v", err)

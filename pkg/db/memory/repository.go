@@ -6,6 +6,7 @@ package memory
 
 import (
 	"errors"
+	"math/rand"
 
 	"github.com/osrgroup/product-model-toolkit/model"
 )
@@ -39,14 +40,19 @@ func (db *DB) FindProductByID(id int) (model.Product, error) {
 }
 
 // SaveProduct store a Prodact to the DB.
-func (db *DB) SaveProduct(prod *model.Product) (error) {
+func (db *DB) SaveProduct(prod *model.Product) (model.Product, error) {
+	if prod.ID == 0 {
+		prod.ID = rand.Intn(2147483647)
+	}
+
 	found := db.productExists(prod.ID)
 	if !found {
 		db.products = append(db.products, *prod)
-		return nil
+
+		return *prod, nil
 	}
 
-	return ErrAlreadyExist
+	return model.Product{}, ErrAlreadyExist
 }
 
 func (db *DB) productExists(id int) bool {

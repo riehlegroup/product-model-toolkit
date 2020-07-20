@@ -91,7 +91,7 @@ func (r *repo) FindProductByID(id int) (model.Product, error) {
 }
 
 // SaveProduct store a Prodact to the DB.
-func (r *repo) SaveProduct(prod *model.Product) error {
+func (r *repo) SaveProduct(prod *model.Product) (model.Product, error) {
 	req := graphql.NewRequest(`
 	mutation ProdMutation ($name: String!, $version: String!, $vcs: String, $comment: String, $description: String, $externalRef: String, $homepageUrl: String) {
 		__typename
@@ -105,6 +105,14 @@ func (r *repo) SaveProduct(prod *model.Product) error {
 			comment: $comment}}) {
 		  product {
 			id
+			createdAt
+			name
+			vcs
+			version
+			description
+			homepageUrl
+			externalRef
+			comment
 		  }
 		}
 	  }
@@ -120,19 +128,17 @@ func (r *repo) SaveProduct(prod *model.Product) error {
 
 	var res struct {
 		CreateProduct struct {
-			Product struct {
-				ID int
-			}
+			Product model.Product
 		}
 	}
 
 	if err := r.client.Run(context.Background(), req, &res); err != nil {
 		fmt.Println(err)
-		return err
+		return model.Product{}, err
 	}
 
 	fmt.Printf("Created product with id %v", res.CreateProduct.Product.ID)
-	return nil
+	return res.CreateProduct.Product, nil
 }
 
 // DeleteProduct deletes a product with the given ID from the DB
