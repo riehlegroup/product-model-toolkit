@@ -34,6 +34,7 @@ type Config struct {
 var Available = [...]Tool{
 	Licensee,
 	Scancode,
+	ComposerDummy,
 }
 
 // Default is the default scanner tools that shall be used if no particular tool is selected.

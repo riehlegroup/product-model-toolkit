@@ -65,7 +65,7 @@ func TestFromStr_DefaultCase(t *testing.T) {
 func TestAvailable_NotEmpty(t *testing.T) {
 	size := len(Available)
 
-	if size != 2 {
+	if size != 3 {
 		t.Errorf("Expected size to be 2, but got %v", size)
 	}
 }
