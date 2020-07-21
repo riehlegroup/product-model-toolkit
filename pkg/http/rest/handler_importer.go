@@ -7,6 +7,8 @@ package rest
 import (
 	"fmt"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/osrgroup/product-model-toolkit/pkg/importing"
@@ -38,9 +40,19 @@ func importComposer(iSrv importing.Service) echo.HandlerFunc {
 			c.Error(errors.Wrap(err, "Unable to perform Composer import"))
 		}
 
+		loc := productLocation(c.Path(), prod.ID)
+		c.Response().Header().Set(echo.HeaderLocation, loc)
+
 		return c.String(
-			http.StatusOK,
-			fmt.Sprintf("Successfully parsed Composer JSON.\nFound %v packages", len(prod.Components)),
+			http.StatusCreated,
+			fmt.Sprintf("Successfully parsed Composer JSON.\nFound %v packages\n", len(prod.Components)),
 		)
 	}
+}
+
+func productLocation(path string, id int) string {
+	i := strings.LastIndex(path, "/")
+	prodPath := path[:i+1]
+
+	return fmt.Sprintf("%s%s", prodPath, strconv.Itoa(id))
 }

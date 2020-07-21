@@ -8,6 +8,8 @@ import (
 	"bytes"
 	"os"
 	"testing"
+
+	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
 )
 
 const testFile = "convert/composer/test/example.json"
@@ -19,7 +21,8 @@ func TestComposerRead(t *testing.T) {
 	}
 	defer jsonFile.Close()
 
-	s := NewService()
+	repo := new(memory.DB)
+	s := NewService(repo)
 	p, err := s.ComposerRead(jsonFile)
 	if err != nil {
 		t.Errorf("Expected to read composer file without exception, but got %v", err)
@@ -39,7 +42,8 @@ func TestComposerRead(t *testing.T) {
 }
 
 func TestComposerRead_Empty(t *testing.T) {
-	s := NewService()
+	repo := new(memory.DB)
+	s := NewService(repo)
 
 	_, err := s.ComposerRead(bytes.NewReader(nil))
 	if err == nil {

@@ -31,7 +31,7 @@ func main() {
 	r := rest.NewSrv(
 		"127.0.0.1:8081",
 		querying.NewService(repo),
-		importing.NewService(),
+		importing.NewService(repo),
 	)
 	go r.Start()
 	defer r.Shutdown()

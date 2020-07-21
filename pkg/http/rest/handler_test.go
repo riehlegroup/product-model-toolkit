@@ -25,7 +25,8 @@ func TestHandler(t *testing.T) {
 	e := echo.New()
 	v1 := e.Group("/api/v1")
 
-	Handler(v1, querying.NewService(&mockDB{}), importing.NewService())
+	repo := new(memory.DB)
+	Handler(v1, querying.NewService(&mockDB{}), importing.NewService(repo))
 }
 
 func TestHandleEntryPoint(t *testing.T) {

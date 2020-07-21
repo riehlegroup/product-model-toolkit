@@ -22,15 +22,21 @@ type Service interface {
 	SPDX(io.Reader) (*spdx.Document2_1, error)
 }
 
-type service struct{}
+type service struct {
+	r repository
+}
+
+type repository interface {
+	SaveProduct(prod *model.Product) (model.Product, error)
+}
 
 // NewService creates a querying service with all necessary dependencies.
-func NewService() Service {
-	return &service{}
+func NewService(r repository) Service {
+	return &service{r}
 }
 
 // Composer import a Composer representation of the BOM.
-func (service) ComposerRead(input io.Reader) (*model.Product, error) {
+func (s *service) ComposerRead(input io.Reader) (*model.Product, error) {
 	var c convert.Converter = new(composer.Composer)
 	prod, err := c.Convert(input)
 	if err != nil {
@@ -38,11 +44,17 @@ func (service) ComposerRead(input io.Reader) (*model.Product, error) {
 		return nil, errors.New(msg)
 	}
 
-	return prod, nil
+	pSaved, err := s.r.SaveProduct(prod)
+	if err != nil {
+		msg := fmt.Sprintf("Error while saving the product to the DB: %v", err)
+		return nil, errors.New(msg)
+	}
+
+	return &pSaved, nil
 }
 
 // SPDX import a SPDX representation of the BOM.
-func (service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
+func (s *service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
 	doc, err := tvloader.Load2_1(input)
 	if err != nil {
 		msg := fmt.Sprintf("Error while parsing SPDX body: %v", err)
