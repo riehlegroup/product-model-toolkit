@@ -4,8 +4,8 @@
 
 package scanner
 
-// ComposerDummy represents a dummy container which contains a Composer result artifact.
-var ComposerDummy = Tool{
+// Composer represents a container which produces a Composer result artifact.
+var Composer = Tool{
 	Name:      "Composer",
 	Version:   "dummy",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy",
