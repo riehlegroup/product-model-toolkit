@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -30,6 +31,8 @@ func Run(cfg *scanner.Config, c *rest.Client) {
 	files := findResultFiles(cfg)
 
 	switch cfg.Tool.Name {
+	case scanner.Composer.Name:
+		sendComposerResults(cfg.ResultDir, files, c)
 	default:
 		checkResults(cfg.ResultDir, files)
 	}
@@ -112,4 +115,24 @@ func logServerVersion(c *rest.Client) {
 	}
 
 	log.Printf("[REST-Client] Server version: %s", v)
+}
+
+func sendComposerResults(resDir string, files []fileName, c *rest.Client) {
+	for _, f := range files {
+		path := filepath.Join(resDir, string(f))
+		resFile, err := os.Open(path)
+		if err != nil {
+			log.Printf("[Scanner] Error while reading Composer result files: %s", err)
+			return
+		}
+		defer resFile.Close()
+
+		loc, err := c.PostComposerResult(resFile)
+		if err != nil {
+			log.Printf("[Scanner] Error while sending Composer results to server: %s", err)
+			return
+		}
+
+		log.Printf("[Scanner] Successfully sent Composer results to server. Path to created resource: %s", loc)
+	}
 }
