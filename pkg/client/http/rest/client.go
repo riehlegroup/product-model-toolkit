@@ -15,7 +15,12 @@ import (
 // Client to communicate with Product-Model-Toolkit server.
 type Client struct {
 	baseURL    string
-	HTTPClient *http.Client
+	HTTPClient HTTPClient
+}
+
+// HTTPClient interface to simplify testing
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
 }
 
 // NewClient returns a HTTP client.
@@ -31,7 +36,13 @@ func NewClient(baseURL string) *Client {
 // GetServerVersion returns the semantic version of the PMT server.
 func (c *Client) GetServerVersion() (string, error) {
 	url := fmt.Sprintf("%s/version", c.baseURL)
-	res, err := c.HTTPClient.Get(url)
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return "", err
+	}
+
+	res, err := c.HTTPClient.Do(req)
 	if err != nil {
 		return "", err
 	}
@@ -42,13 +53,21 @@ func (c *Client) GetServerVersion() (string, error) {
 	return buf.String(), nil
 }
 
-// PostComposerResult send result JSON to PMT server.
-func (c *Client) PostComposerResult(input io.Reader) error {
+const locHeader = "Location"
+
+// PostComposerResult send result JSON to PMT server and returns the path to the created resource.
+func (c *Client) PostComposerResult(input io.Reader) (string, error) {
 	url := fmt.Sprintf("%s/products/composer", c.baseURL)
-	_, err := c.HTTPClient.Post(url, "application/json", input)
+
+	req, err := http.NewRequest(http.MethodPost, url, input)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+
+	return res.Header.Get(locHeader), nil
 }
