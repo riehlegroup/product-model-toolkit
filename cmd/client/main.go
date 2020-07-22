@@ -9,12 +9,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
 var gitCommit string
+
+const serverBaseURL = "http://localhost:8081/api/v1"
 
 type flags struct {
 	scanner string
@@ -30,7 +33,10 @@ func main() {
 	scn := scanner.FromStr(flg.scanner)
 	cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
 
-	scanning.Run(cfg)
+	scanning.Run(
+		cfg,
+		rest.NewClient(serverBaseURL),
+	)
 
 }
 

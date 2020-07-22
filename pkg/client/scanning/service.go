@@ -11,11 +11,13 @@ import (
 	"os/exec"
 	"path/filepath"
 
+	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
 )
 
 // Run executes a scan with a scanner tool for a given directory.
-func Run(cfg *scanner.Config) {
+func Run(cfg *scanner.Config, c *rest.Client) {
+	logServerVersion(c)
 	log.Printf("[Scanner] Selected : %v", cfg.Tool.String())
 	log.Printf("[Scanner] Input directory: %v", cfg.InDir)
 	log.Printf("[Scanner] Result directory: %v", cfg.ResultDir)
@@ -26,7 +28,11 @@ func Run(cfg *scanner.Config) {
 		return
 	}
 	files := findResultFiles(cfg)
-	checkResults(cfg.ResultDir, files)
+
+	switch cfg.Tool.Name {
+	default:
+		checkResults(cfg.ResultDir, files)
+	}
 }
 
 func execDockerCall(cfg *scanner.Config) error {
@@ -96,4 +102,14 @@ func contains(slice []string, val string) bool {
 		}
 	}
 	return false
+}
+
+func logServerVersion(c *rest.Client) {
+	v, err := c.GetServerVersion()
+	if err != nil {
+		log.Printf("[REST-Client] Unable to read server version: %s", err)
+		return
+	}
+
+	log.Printf("[REST-Client] Server version: %s", v)
 }
