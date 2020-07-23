@@ -42,6 +42,8 @@ func NewSrv(address string, qSrv querying.Service, iSrv importing.Service) *Inst
 
 // Start starts the REST server.
 func (srv *Instance) Start() {
+	time.AfterFunc(300*time.Millisecond, srv.printRoutes)
+
 	srv.httpSrv.Start(srv.Addr())
 }
 
@@ -63,7 +65,7 @@ func (srv *Instance) Addr() string {
 }
 
 // PrintRoutes prints all available routes to the standard logger.
-func (srv *Instance) PrintRoutes() {
+func (srv *Instance) printRoutes() {
 	var r string
 	for _, v := range srv.httpSrv.Routes() {
 		r += fmt.Sprintf("\t%s\t%s\n", v.Method, v.Path)
