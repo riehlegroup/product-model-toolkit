@@ -6,6 +6,7 @@ package rest
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"time"
@@ -59,4 +60,14 @@ func (srv *Instance) Shutdown() {
 // Addr return the address with port of the REST server.
 func (srv *Instance) Addr() string {
 	return srv.addr
+}
+
+// PrintRoutes prints all available routes to the standard logger.
+func (srv *Instance) PrintRoutes() {
+	var r string
+	for _, v := range srv.httpSrv.Routes() {
+		r += fmt.Sprintf("\t%s\t%s\n", v.Method, v.Path)
+	}
+
+	fmt.Printf("Available routes:\n%s\n", r)
 }

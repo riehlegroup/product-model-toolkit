@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
 	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
@@ -35,6 +36,9 @@ func main() {
 	)
 	go r.Start()
 	defer r.Shutdown()
+
+	time.Sleep(300 * time.Millisecond)
+	r.PrintRoutes()
 }
 
 func checkFlags() bool {
