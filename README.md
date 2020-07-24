@@ -9,6 +9,7 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 Product Model Toolkit for Managing Open Source Dependencies in Products
 
 ![Build](https://github.com/osrgroup/product-model-toolkit/workflows/Go/badge.svg)
+[![Go Report Card](https://goreportcard.com/badge/github.com/osrgroup/product-model-toolkit)](https://goreportcard.com/report/github.com/osrgroup/product-model-toolkit)
 [![codebeat badge](https://codebeat.co/badges/2fef65f3-8f0b-4a11-abf9-d8d0955daf1c)](https://codebeat.co/projects/github-com-osrgroup-product-model-toolkit-master)
 [![go.mod](https://img.shields.io/github/go-mod/go-version/osrgroup/product-model-toolkit)](go.mod)
 ![REUSE Compliance](https://github.com/osrgroup/product-model-toolkit/workflows/REUSE%20Compliance/badge.svg)
