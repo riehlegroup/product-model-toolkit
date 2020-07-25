@@ -39,7 +39,7 @@ func TestConvert(t *testing.T) {
 
 	t.Run("product name", func(t *testing.T) {
 		if p.Name != "new Product" {
-			t.Errorf("Expected amount of components to be %v, but got %v", "unkown", p.Name)
+			t.Errorf("Expected amount of components to be %v, but got %v", "new Product", p.Name)
 		}
 	})
 
