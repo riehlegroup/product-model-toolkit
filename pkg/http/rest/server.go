@@ -17,6 +17,7 @@ import (
 	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 )
 
+// Instance is a REST server
 type Instance struct {
 	httpSrv *echo.Echo
 	addr    string
