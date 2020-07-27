@@ -11,13 +11,13 @@ type UsageType string
 
 const (
 	// OnPremise represents a on-premise installation of the product.
-	OnPremise    UsageType = "on-premise"
-	// CloudService represents a usage of the product as cloud service.  
-	CloudService           = "cloud-service"
+	OnPremise UsageType = "on-premise"
+	// CloudService represents a usage of the product as cloud service.
+	CloudService = "cloud-service"
 	// Library represents a usage as library for other products.
-	Library                = "library"
+	Library = "library"
 	// Internal represents a internal usage of the products.
-	Internal               = "internal"
+	Internal = "internal"
 )
 
 func (ut UsageType) isValid() error {
