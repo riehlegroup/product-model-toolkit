@@ -79,6 +79,7 @@ func printVersion() {
 func listScanner() {
 	fmt.Println("Available license scanner:")
 	for _, scn := range scanner.Available {
-		fmt.Printf("%+v\n", scn)
+		fmt.Printf("----------\nName:    %s\nVersion: %s\nImage:   %s\n", scn.Name, scn.Version, scn.DockerImg)
 	}
+	fmt.Printf("----------\n")
 }
