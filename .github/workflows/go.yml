@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 name: Go
-on: [push]
+on: [push, workflow_dispatch]
 jobs:
 
   build:
