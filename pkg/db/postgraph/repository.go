@@ -7,7 +7,7 @@ package postgraph
 import (
 	"context"
 	"errors"
-	"fmt"
+	"log"
 
 	"github.com/machinebox/graphql"
 	"github.com/osrgroup/product-model-toolkit/model"
@@ -133,11 +133,11 @@ func (r *repo) SaveProduct(prod *model.Product) (model.Product, error) {
 	}
 
 	if err := r.client.Run(context.Background(), req, &res); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return model.Product{}, err
 	}
 
-	fmt.Printf("Created product with id %v", res.CreateProduct.Product.ID)
+	log.Printf("Created product with id %v", res.CreateProduct.Product.ID)
 	return res.CreateProduct.Product, nil
 }
 
@@ -159,10 +159,10 @@ func (r *repo) DeleteProduct(id int) error {
 	var res interface{}
 
 	if err := r.client.Run(context.Background(), req, &res); err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return err
 	}
 
-	fmt.Printf("Deleted product with id %v", id)
+	log.Printf("Deleted product with id %v", id)
 	return nil
 }
