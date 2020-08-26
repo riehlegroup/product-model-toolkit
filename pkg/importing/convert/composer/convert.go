@@ -68,7 +68,7 @@ func extractDependencies(input *[]composerDocComp, comps map[model.CmpID]model.C
 		comp := model.Component{
 			Name:    c.Name,
 			Version: c.Version,
-			License: licenses,
+			License: model.License{DeclaredLicense: licenses},
 		}
 
 		_, ok := comps[comp.ID()]

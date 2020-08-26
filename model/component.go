@@ -8,11 +8,11 @@ import "fmt"
 
 // Component represents a unit of composition of the product, e.g. class, lib, module.
 type Component struct {
-	UID       string `json:"id"`
-	Name      string `json:"name,omitempty"`
-	Pkg       string `json:"package,omitempty"`
-	Version   string `json:"version,omitempty"`
-	License   string `json:"license,omitempty"`
+	UID       string  `json:"id"`
+	Name      string  `json:"name,omitempty"`
+	Pkg       string  `json:"package,omitempty"`
+	Version   string  `json:"version,omitempty"`
+	License   License `json:"license,omitempty"`
 	Copyright `json:"-"`
 	Artifact  `json:"-"`
 }

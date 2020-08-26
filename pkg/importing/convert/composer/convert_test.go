@@ -27,7 +27,7 @@ func TestConvert(t *testing.T) {
 
 	t.Run("not error", func(t *testing.T) {
 		if err != nil {
-			t.Errorf("Expeted convert func to not return an error, but got %v", err.Error())
+			t.Errorf("Expected convert func to not return an error, but got %v", err.Error())
 		}
 	})
 
@@ -78,10 +78,10 @@ func TestConvert_Empty(t *testing.T) {
 	c := &Composer{}
 	p, err := c.Convert(bytes.NewReader(nil))
 	if err == nil {
-		t.Error("Expeted returning an error for empty doc")
+		t.Error("Expected returning an error for empty doc")
 	}
 	if p != nil {
-		t.Error("Expeted resulting product for empty doc to be nil")
+		t.Error("Expected resulting product for empty doc to be nil")
 	}
 }
 
@@ -117,7 +117,7 @@ func TestExtractComponents(t *testing.T) {
 	if compA.Version != "0.4.2" {
 		t.Errorf("Expected version of first component to be %v, but got %v", "0.4.2", compA.Version)
 	}
-	if compA.License != "MIT, Apache-2.0" {
+	if compA.License.DeclaredLicense != "MIT, Apache-2.0" {
 		t.Errorf("Expected license of first component to be %v, but got %v", "MIT, Apache-2.0", compA.License)
 	}
 
