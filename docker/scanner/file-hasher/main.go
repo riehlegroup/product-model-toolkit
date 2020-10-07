@@ -35,6 +35,23 @@ func main() {
 	inputDir, resultFile := getFlagArguments()
 	fmt.Printf("Input dir: %s\nResult file: %s", inputDir, resultFile)
 
+	artifacts, err := getAllArtifacts(inputDir)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	calcHashForEachFile(artifacts)
+
+	for _, item := range artifacts {
+		fmt.Println(item.Path)
+	}
+
+	fmt.Printf("\nTotal artifacts %v\n", len(artifacts))
+
+	writeAsJSONFile(artifacts, resultFile)
+}
+
+func getAllArtifacts(inputDir string) ([]artifact, error) {
 	artifacts := make([]artifact, 0, 30)
 	err := filepath.Walk(inputDir, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
@@ -51,30 +68,23 @@ func main() {
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	calcHashForEachFile(artifacts)
-
-	for _, item := range artifacts {
-		fmt.Println(item.Path)
-	}
-
-	fmt.Printf("\nTotal artifacts %v\n", len(artifacts))
-
-	writeAsJSONFile(artifacts, resultFile)
+	return artifacts, nil
 }
 
 func calcHashForEachFile(artifacts []artifact) {
 	for index, item := range artifacts {
-		if !item.IsDir {
-			hash, err := calcHash(item.Path)
-			if err != nil {
-				continue
-			}
-
-			artifacts[index].Hash = hash
+		if item.IsDir {
+			continue
 		}
+		hash, err := calcHash(item.Path)
+		if err != nil {
+			continue
+		}
+
+		artifacts[index].Hash = hash
 	}
 }
 
@@ -84,20 +94,26 @@ func calcHash(filePath string) (hash, error) {
 		return hash{}, err
 	}
 
-	md5InBytes := md5.Sum(data)
-	md5AsStr := hex.EncodeToString(md5InBytes[:])
-
-	sha1InBytes := sha1.Sum(data)
-	sha1AsStr := hex.EncodeToString(sha1InBytes[:])
-
-	sha256InBytes := sha256.Sum256(data)
-	sha256AsStr := hex.EncodeToString(sha256InBytes[:])
-
 	return hash{
-		MD5:    md5AsStr,
-		SHA1:   sha1AsStr,
-		SHA256: sha256AsStr,
+		MD5:    md5AsStr(data),
+		SHA1:   sha1AsStr(data),
+		SHA256: sha256AsStr(data),
 	}, nil
+}
+
+func md5AsStr(data []byte) string {
+	md5InBytes := md5.Sum(data)
+	return hex.EncodeToString(md5InBytes[:])
+}
+
+func sha1AsStr(data []byte) string {
+	sha1InBytes := sha1.Sum(data)
+	return hex.EncodeToString(sha1InBytes[:])
+}
+
+func sha256AsStr(data []byte) string {
+	sha256InBytes := sha256.Sum256(data)
+	return hex.EncodeToString(sha256InBytes[:])
 }
 
 func (a *artifact) toString() string {
