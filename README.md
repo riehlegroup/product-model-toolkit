@@ -40,7 +40,9 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 │   └── server/
 │       └── main.go......Server application entry point
 ├── docs/................Documentation
-├── docker/..............Dockerfiles for scanner tools 
+├── docker/..............Dockerfiles
+│   ├── graphile/........PostGraphile
+│   └── scanner/.........Scanner tools 
 ├── pkg/.................Library code for client and server
 ├── model/...............The model for representing a software product
 └── README.md
