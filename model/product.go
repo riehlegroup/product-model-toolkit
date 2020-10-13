@@ -28,12 +28,6 @@ type Copyright struct{}
 // Policy represents user/company specific rules for the usage of components and its licenses.
 type Policy struct{}
 
-// Artifact represents a digital artifact like source code files or binaries.
-type Artifact struct {
-	Path   string
-	Hashes []interface{} // TODO: Specify type
-}
-
 // Deliverable represents a subset a product's components that are deliverable.
 type Deliverable struct{} // deployment unit
 
