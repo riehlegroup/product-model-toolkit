@@ -56,3 +56,19 @@ func productLocation(path string, id int) string {
 
 	return fmt.Sprintf("%s%s", prodPath, strconv.Itoa(id))
 }
+
+func importFileHasher(iSrv importing.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		r := c.Request().Body
+
+		prod, err := iSrv.FileHasherImport(r)
+		if err != nil {
+			c.Error(errors.Wrap(err, "Unable to perform File-Hasher import"))
+		}
+
+		return c.String(
+			http.StatusCreated,
+			fmt.Sprintf("Successfully parsed File-Hasher JSON.\n Found %v packages\n", len(prod.Components)),
+		)
+	}
+}

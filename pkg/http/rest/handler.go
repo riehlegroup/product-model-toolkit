@@ -26,6 +26,7 @@ func Handler(g *echo.Group, qSrv querying.Service, iSrv importing.Service) {
 	g.GET("/products/:id", findProductByID(qSrv))
 	g.POST("/products/spdx", importSPDX(iSrv))
 	g.POST("/products/composer", importComposer(iSrv))
+	g.POST("/products/hasher", importFileHasher(iSrv))
 }
 
 func handleEntryPoint(c echo.Context) error {

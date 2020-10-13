@@ -5,13 +5,14 @@
 package importing
 
 import (
-	"errors"
 	"fmt"
 	"io"
 
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
 	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert/composer"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert/hasher"
+	"github.com/pkg/errors"
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/tvloader"
 )
@@ -20,6 +21,7 @@ import (
 type Service interface {
 	ComposerRead(io.Reader) (*model.Product, error)
 	SPDX(io.Reader) (*spdx.Document2_1, error)
+	FileHasherImport(io.Reader) (*model.Product, error)
 }
 
 type service struct {
@@ -62,4 +64,15 @@ func (s *service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
 	}
 
 	return doc, nil
+}
+
+func (s *service) FileHasherImport(input io.Reader) (*model.Product, error) {
+	var c convert.Converter = new(hasher.Hasher)
+
+	prod, err := c.Convert(input)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error while parsing File-Hasher body")
+	}
+
+	return prod, nil
 }
