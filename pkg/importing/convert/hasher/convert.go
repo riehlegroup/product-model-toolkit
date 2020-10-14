@@ -17,26 +17,13 @@ import (
 // Hasher represents a File-Hasher converter
 type Hasher struct{}
 
-type artifact struct {
-	Path  string `json:"path"`
-	Name  string `json:"name"`
-	IsDir bool   `json:"isDir"`
-	Hash  hash   `json:"hashes"`
-}
-
-type hash struct {
-	MD5    string `json:"md5,omitempty"`
-	SHA1   string `json:"sha1,omitempty"`
-	SHA256 string `json:"sha256,omitempty"`
-}
-
 // Convert converts a File-Hasher representation into a Product Model representation.
 func (Hasher) Convert(input io.Reader) (*model.Product, error) {
 	byteInput := new(bytes.Buffer)
 	byteInput.ReadFrom(input)
 
 	body := convert.TrimUTF8prefix(byteInput.Bytes())
-	var result []artifact
+	var result []model.Artifact
 	err := json.Unmarshal(body, &result)
 	if err != nil {
 		return nil, err
@@ -45,7 +32,7 @@ func (Hasher) Convert(input io.Reader) (*model.Product, error) {
 	return nil, nil
 }
 
-func asProductModel(artifacts []artifact) (*model.Product, error) {
+func asProductModel(artifacts []model.Artifact) (*model.Product, error) {
 	if len(artifacts) < 1 {
 		return nil, errors.New("Artifact array should have at least one element")
 	}
@@ -64,9 +51,10 @@ func asProductModel(artifacts []artifact) (*model.Product, error) {
 	}, nil
 }
 
-func asComponent(art artifact) model.Component {
+func asComponent(art model.Artifact) model.Component {
 	return model.Component{
-		Pkg:  art.Path,
-		Name: art.Name,
+		Pkg:      art.Path,
+		Name:     art.Name,
+		Artifact: art,
 	}
 }
