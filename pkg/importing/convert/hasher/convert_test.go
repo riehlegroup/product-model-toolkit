@@ -63,6 +63,13 @@ func TestAsProductModel(t *testing.T) {
 	}
 }
 
+func TestAsProductModel_emptyArtifacts(t *testing.T) {
+	_, err := asProductModel([]model.Artifact{})
+	if err == nil {
+		t.Error("Expected an error with a empty artifact array as argument")
+	}
+}
+
 func TestAsComponent_withDir(t *testing.T) {
 	comp := asComponent(artSRC)
 
