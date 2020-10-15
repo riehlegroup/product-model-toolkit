@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
+	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
@@ -37,9 +38,11 @@ func asProductModel(artifacts []model.Artifact) (*model.Product, error) {
 		return nil, errors.New("Artifact array should have at least one element")
 	}
 
-	var comps []model.Component = make([]model.Component, 0, len(artifacts))
+	basePath := artifacts[0].Path
 
+	var comps []model.Component = make([]model.Component, 0, len(artifacts))
 	for _, artifact := range artifacts[:] {
+		artifact.Path = removeBasePath(artifact.Path, basePath)
 		comp := asComponent(artifact)
 		comps = append(comps, comp)
 
@@ -57,4 +60,13 @@ func asComponent(art model.Artifact) model.Component {
 		Name:     art.Name,
 		Artifact: art,
 	}
+}
+
+// removeBasePath returns the path without the leading base path.
+func removeBasePath(path string, basePath string) string {
+	if basePath == "/" {
+		return path
+	}
+
+	return strings.TrimPrefix(path, basePath)
 }

@@ -13,19 +13,19 @@ import (
 const testFile = "test/example.json"
 
 var artSRC model.Artifact = model.Artifact{
-	Path:  "src",
+	Path:  "/src",
 	Name:  "src",
 	IsDir: true,
 }
 
 var artClient model.Artifact = model.Artifact{
-	Path:  "src/client",
+	Path:  "/src/client",
 	Name:  "client",
 	IsDir: true,
 }
 
 var artMain model.Artifact = model.Artifact{
-	Path:  "src/main.go",
+	Path:  "/src/main.go",
 	Name:  "main.go",
 	IsDir: false,
 	Hash: model.Hash{
@@ -36,7 +36,7 @@ var artMain model.Artifact = model.Artifact{
 }
 
 var artCrawler model.Artifact = model.Artifact{
-	Path:  "src/client/crawler.go",
+	Path:  "/src/client/crawler.go",
 	Name:  "crawler.go",
 	IsDir: false,
 	Hash: model.Hash{
@@ -78,7 +78,7 @@ func TestAsComponent_withDir(t *testing.T) {
 		t.Errorf("Expected component name to be '%v', but got '%v'", expectedName, comp.Name)
 	}
 
-	expectedPath := "src"
+	expectedPath := "/src"
 	if comp.Pkg != expectedPath {
 		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
 	}
@@ -92,7 +92,7 @@ func TestAsComponent_withDirNested(t *testing.T) {
 		t.Errorf("Expected component name to be '%v', but got '%v'", expectedName, comp.Name)
 	}
 
-	expectedPath := "src/client"
+	expectedPath := "/src/client"
 	if comp.Pkg != expectedPath {
 		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
 	}
@@ -106,7 +106,7 @@ func TestAsComponent_withFile(t *testing.T) {
 		t.Errorf("Expected component name to be '%v', but got '%v'", expectedName, comp.Name)
 	}
 
-	expectedPath := "src/main.go"
+	expectedPath := "/src/main.go"
 	if comp.Pkg != expectedPath {
 		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
 	}
@@ -132,7 +132,7 @@ func TestAsComponent_withFileNested(t *testing.T) {
 		t.Errorf("Expected component name to be '%v', but got '%v'", expectedName, comp.Name)
 	}
 
-	expectedPath := "src/client/crawler.go"
+	expectedPath := "/src/client/crawler.go"
 	if comp.Pkg != expectedPath {
 		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
 	}
@@ -147,5 +147,45 @@ func TestAsComponent_withFileNested(t *testing.T) {
 
 	if comp.Artifact.Hash.SHA256 != artCrawler.Hash.SHA256 {
 		t.Errorf("Expected artifact MD5 hash to be '%v', but got '%v'", artCrawler.Hash.SHA256, comp.Artifact.Hash.SHA256)
+	}
+}
+
+func TestRemoveBasePath(t *testing.T) {
+	type args struct {
+		basePath string
+		path     string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{
+			name: "1 Level",
+			args: args{basePath: "/myProj", path: "/myProj/src/main.go"},
+			want: "/src/main.go",
+		},
+		{
+			name: "2 Level",
+			args: args{basePath: "/myProj", path: "/myProj/src/client/crawler.go"},
+			want: "/src/client/crawler.go",
+		},
+		{
+			name: "Root path file",
+			args: args{basePath: "/", path: "/main.go"},
+			want: "/main.go",
+		},
+		{
+			name: "Root path folder with file",
+			args: args{basePath: "/", path: "/src/main.go"},
+			want: "/src/main.go",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := removeBasePath(tt.args.path, tt.args.basePath); got != tt.want {
+				t.Errorf("removeBasePath() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
