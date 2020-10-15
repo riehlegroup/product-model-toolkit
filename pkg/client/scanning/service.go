@@ -32,7 +32,7 @@ func Run(cfg *scanner.Config, c *rest.Client) {
 
 	switch cfg.Tool.Name {
 	case scanner.Composer.Name:
-		sendComposerResults(cfg.ResultDir, files, c)
+		sendResults(cfg.ResultDir, files, c, "/products/composer")
 	default:
 		checkResults(cfg.ResultDir, files)
 	}
@@ -117,22 +117,22 @@ func logServerVersion(c *rest.Client) {
 	log.Printf("[REST-Client] Server version: %s", v)
 }
 
-func sendComposerResults(resDir string, files []fileName, c *rest.Client) {
+func sendResults(resDir string, files []fileName, c *rest.Client, url string) {
 	for _, f := range files {
 		path := filepath.Join(resDir, string(f))
 		resFile, err := os.Open(path)
 		if err != nil {
-			log.Printf("[Scanner] Error while reading Composer result files: %s", err)
+			log.Printf("[Scanner] Error while reading result files: %s", err)
 			return
 		}
 		defer resFile.Close()
 
-		loc, err := c.PostResult("/products/composer", resFile)
+		loc, err := c.PostResult(url, resFile)
 		if err != nil {
-			log.Printf("[Scanner] Error while sending Composer results to server: %s", err)
+			log.Printf("[Scanner] Error while sending results to server [%s]: %s", url, err)
 			return
 		}
 
-		log.Printf("[Scanner] Successfully sent Composer results to server. Path to created resource: %s", loc)
+		log.Printf("[Scanner] Successfully sent results to server. Path to created resource: %s", loc)
 	}
 }
