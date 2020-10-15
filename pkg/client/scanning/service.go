@@ -127,7 +127,7 @@ func sendComposerResults(resDir string, files []fileName, c *rest.Client) {
 		}
 		defer resFile.Close()
 
-		loc, err := c.PostComposerResult(resFile)
+		loc, err := c.PostResult("/products/composer", resFile)
 		if err != nil {
 			log.Printf("[Scanner] Error while sending Composer results to server: %s", err)
 			return

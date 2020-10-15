@@ -55,11 +55,11 @@ func (c *Client) GetServerVersion() (string, error) {
 
 const locHeader = "Location"
 
-// PostComposerResult send result JSON to PMT server and returns the path to the created resource.
-func (c *Client) PostComposerResult(input io.Reader) (string, error) {
-	url := fmt.Sprintf("%s/products/composer", c.baseURL)
+// PostResult send result JSON to PMT server and returns the path to the created resource.
+func (c *Client) PostResult(url string, input io.Reader) (string, error) {
+	completeURL := c.baseURL + url
 
-	req, err := http.NewRequest(http.MethodPost, url, input)
+	req, err := http.NewRequest(http.MethodPost, completeURL, input)
 	if err != nil {
 		return "", err
 	}

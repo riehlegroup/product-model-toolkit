@@ -63,7 +63,7 @@ func TestPostComposerResult(t *testing.T) {
 		HTTPClient: &mockHTTPClient{header: h},
 	}
 
-	loc, _ := c.PostComposerResult(nil)
+	loc, _ := c.PostResult("/products/42", nil)
 
 	if loc != locShould {
 		t.Errorf("Expected location header to be %v, but got %v", locShould, loc)
@@ -76,7 +76,7 @@ func TestPostComposerResult_Error(t *testing.T) {
 		HTTPClient: &mockHTTPClient{withErr: true},
 	}
 
-	_, err := c.PostComposerResult(nil)
+	_, err := c.PostResult("", nil)
 	if err == nil {
 		t.Error("Expected to return error")
 	}
