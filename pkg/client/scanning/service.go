@@ -33,6 +33,8 @@ func Run(cfg *scanner.Config, c *rest.Client) {
 	switch cfg.Tool.Name {
 	case scanner.Composer.Name:
 		sendResults(cfg.ResultDir, files, c, "/products/composer")
+	case scanner.FileHasher.Name:
+		sendResults(cfg.ResultDir, files, c, "/products/hasher")
 	default:
 		checkResults(cfg.ResultDir, files)
 	}
