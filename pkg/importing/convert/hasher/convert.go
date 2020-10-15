@@ -30,7 +30,12 @@ func (Hasher) Convert(input io.Reader) (*model.Product, error) {
 		return nil, err
 	}
 
-	return nil, nil
+	prod, err := asProductModel(result)
+	if err != nil {
+		return nil, err
+	}
+
+	return prod, nil
 }
 
 func asProductModel(artifacts []model.Artifact) (*model.Product, error) {

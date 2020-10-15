@@ -5,9 +5,12 @@
 package hasher
 
 import (
+	"bytes"
+	"os"
 	"testing"
 
 	"github.com/osrgroup/product-model-toolkit/model"
+	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
 )
 
 const testFile = "test/example.json"
@@ -44,6 +47,66 @@ var artCrawler model.Artifact = model.Artifact{
 		SHA1:   "bcd0438536b354f030b259dc8522c9e42903db6d",
 		SHA256: "f2cbdaedc0bbafc56dbc006ee537fb27086929424ec6770576366bc3a45ac379",
 	},
+}
+
+func TestConvert(t *testing.T) {
+	jsonFile, err := os.Open(testFile)
+	if err != nil {
+		t.Fatalf("Unable to read %s to start tests", testFile)
+	}
+	defer jsonFile.Close()
+
+	var c convert.Converter = new(Hasher)
+	p, err := c.Convert(jsonFile)
+
+	t.Run("not error", func(t *testing.T) {
+		if err != nil {
+			t.Errorf("Expected convert func to not return an error, but got %v", err.Error())
+		}
+	})
+
+	t.Run("not nil", func(t *testing.T) {
+		if p == nil {
+			t.Error("Expected product to be not nil")
+		}
+	})
+
+	t.Run("product name", func(t *testing.T) {
+		if p.Name != "new Product" {
+			t.Errorf("Expected amount of components to be %v, but got %v", "new Product", p.Name)
+		}
+	})
+
+	t.Run("component amount", func(t *testing.T) {
+		if len(p.Components) != 18 {
+			t.Errorf("Expected amount of components to be %v, but got %v", 18, len(p.Components))
+		}
+	})
+
+	t.Run("contains base path as first component", func(t *testing.T) {
+		first := p.Components[0]
+		if first.Name != "input" {
+			t.Errorf("Expected first component name to be '%v', but got '%v'", "input", first.Name)
+		}
+	})
+
+	t.Run("contains store_test.go as last component", func(t *testing.T) {
+		last := p.Components[len(p.Components)-1]
+		if last.Name != "store_test.go" {
+			t.Errorf("Expected last component name to be '%v', but got '%v'", "store_test.go", last.Name)
+		}
+	})
+}
+
+func TestConvert_Empty(t *testing.T) {
+	h := &Hasher{}
+	p, err := h.Convert(bytes.NewReader(nil))
+	if err == nil {
+		t.Error("Expected returning an error for empty doc")
+	}
+	if p != nil {
+		t.Error("Expected resulting product for empty doc to be nil")
+	}
 }
 
 func TestAsProductModel(t *testing.T) {
