@@ -74,5 +74,10 @@ func (s *service) FileHasherImport(input io.Reader) (*model.Product, error) {
 		return nil, errors.Wrap(err, "Error while parsing File-Hasher body")
 	}
 
-	return prod, nil
+	pSaved, err := s.r.SaveProduct(prod)
+	if err != nil {
+		return nil, errors.Wrap(err, "Error while saving the product to the DB")
+	}
+
+	return &pSaved, nil
 }
