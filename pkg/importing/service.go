@@ -19,7 +19,7 @@ import (
 
 // Service  provides BOM import operations.
 type Service interface {
-	ComposerRead(io.Reader) (*model.Product, error)
+	ComposerImport(io.Reader) (*model.Product, error)
 	SPDX(io.Reader) (*spdx.Document2_1, error)
 	FileHasherImport(io.Reader) (*model.Product, error)
 }
@@ -37,8 +37,8 @@ func NewService(r repository) Service {
 	return &service{r}
 }
 
-// Composer import a Composer representation of the BOM.
-func (s *service) ComposerRead(input io.Reader) (*model.Product, error) {
+// ComposerImport import a Composer representation of the BOM and store it in the DB.
+func (s *service) ComposerImport(input io.Reader) (*model.Product, error) {
 	var c convert.Converter = new(composer.Composer)
 	prod, err := c.Convert(input)
 	if err != nil {
@@ -66,6 +66,7 @@ func (s *service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
 	return doc, nil
 }
 
+// FileHasherImport import a File-Hasher representation of the BOM and store it in the DB.
 func (s *service) FileHasherImport(input io.Reader) (*model.Product, error) {
 	var c convert.Converter = new(hasher.Hasher)
 
