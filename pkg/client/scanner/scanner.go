@@ -5,7 +5,9 @@
 package scanner
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -31,32 +33,64 @@ type Config struct {
 }
 
 // Available list all available scanner tools that can be used.
-var Available = [...]Tool{
-	Licensee,
-	Scancode,
-	Composer,
-	FileHasher,
-}
+var Available []Tool
 
 // Default is the default scanner tools that shall be used if no particular tool is selected.
-var Default Tool = Licensee
+var Default Tool
 
 // Licensee represents the latest usable Licensee version
-var Licensee = Tool{
-	Name:      "Licensee",
-	Version:   "9.13.0",
-	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
-	Cmd:       `/bin/bash -c "licensee detect /input/ --json > /result/result.json"`,
-	Results:   []string{"result.json"},
-}
+var Licensee Tool
 
 // Scancode represents the latest usable Scancode version
-var Scancode = Tool{
-	Name:      "Scancode",
-	Version:   "3.1.1",
-	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
-	Cmd:       `/bin/bash -c "./scancode --spdx-tv /result/result.spdx /input"`,
-	Results:   []string{"result.spdx"},
+var Scancode Tool
+
+// init reads data from JSON string to identify available scanner tools
+func init() {
+
+	// TODO: Import string from JSON file
+	jsonData := `
+[
+  {
+    "Name": "Licensee",
+    "Version": "9.13.0",
+    "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
+    "Cmd": "/bin/bash -c \"licensee detect /input/ --json > /result/result.json\"",
+    "Results": [
+      "result.json"
+    ]
+  },
+  {
+    "Name": "Scancode",
+    "Version": "3.1.1",
+    "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
+    "Cmd": "/bin/bash -c \"./scancode --spdx-tv /result/result.spdx /input\"",
+    "Results": [
+      "result.spdx"
+    ]
+  }
+]`
+
+	// Decode JSON data and create list of scanner tools
+	var Tools []Tool
+	err := json.Unmarshal([]byte(jsonData), &Tools)
+	if err != nil {
+		log.Println(err)
+	}
+
+	// Assign scanner tools from the list
+	Licensee = Tools[0]
+	Scancode = Tools[1]
+
+	// Assign all available scanner tools
+	Available = []Tool{
+		Licensee,
+		Scancode,
+		Composer,
+		FileHasher,
+	}
+
+	// Assign default scanner tool
+	Default = Licensee
 }
 
 // FromStr returns a tool with the given name. If unable to find a tool with the given name it returns the default tool.
