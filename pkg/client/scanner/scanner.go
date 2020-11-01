@@ -7,7 +7,9 @@ package scanner
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -38,59 +40,25 @@ var Available []Tool
 // Default is the default scanner tools that shall be used if no particular tool is selected.
 var Default Tool
 
-// Licensee represents the latest usable Licensee version
-var Licensee Tool
-
-// Scancode represents the latest usable Scancode version
-var Scancode Tool
-
-// init reads data from JSON string to identify available scanner tools
+// init identifies available scanner tools
 func init() {
 
-	// TODO: Import string from JSON file
-	jsonData := `
-[
-  {
-    "Name": "Licensee",
-    "Version": "9.13.0",
-    "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
-    "Cmd": "/bin/bash -c \"licensee detect /input/ --json > /result/result.json\"",
-    "Results": [
-      "result.json"
-    ]
-  },
-  {
-    "Name": "Scancode",
-    "Version": "3.1.1",
-    "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
-    "Cmd": "/bin/bash -c \"./scancode --spdx-tv /result/result.spdx /input\"",
-    "Results": [
-      "result.spdx"
-    ]
-  }
-]`
+	// Open JSON file and read as a byte array
+	jsonFile, err := os.Open("pkg/client/scanner/scanner_tools.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	defer jsonFile.Close()
 
-	// Decode JSON data and create list of scanner tools
-	var Tools []Tool
-	err := json.Unmarshal([]byte(jsonData), &Tools)
+	// Decode JSON data and populate list of scanner tools
+	err = json.Unmarshal(byteValue, &Available)
 	if err != nil {
 		log.Println(err)
 	}
 
-	// Assign scanner tools from the list
-	Licensee = Tools[0]
-	Scancode = Tools[1]
-
-	// Assign all available scanner tools
-	Available = []Tool{
-		Licensee,
-		Scancode,
-		Composer,
-		FileHasher,
-	}
-
 	// Assign default scanner tool
-	Default = Licensee
+	Default = Available[0]
 }
 
 // FromStr returns a tool with the given name. If unable to find a tool with the given name it returns the default tool.

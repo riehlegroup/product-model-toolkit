@@ -31,9 +31,9 @@ func Run(cfg *scanner.Config, c *rest.Client) {
 	files := findResultFiles(cfg)
 
 	switch cfg.Tool.Name {
-	case scanner.Composer.Name:
+	case "Composer":
 		sendResults(cfg.ResultDir, files, c, "/products/composer")
-	case scanner.FileHasher.Name:
+	case "File-Hasher":
 		sendResults(cfg.ResultDir, files, c, "/products/hasher")
 	default:
 		checkResults(cfg.ResultDir, files)
