@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
@@ -31,6 +32,15 @@ func main() {
 	}
 
 	scn := scanner.FromStr(flg.scanner)
+	if scn.Name == "" {
+		if flg.scanner == "" {
+			log.Println("[Core] No scanner was specified, default scanner Licensee is selected")
+			scn = scanner.FromStr("Licensee")
+		} else {
+			log.Println("[Core] Requested scanner is not available. Use option -l to view available scanners")
+			os.Exit(3)
+		}
+	}
 	cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
 
 	scanning.Run(

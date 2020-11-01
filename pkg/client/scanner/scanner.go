@@ -70,7 +70,7 @@ func FromStr(name string) Tool {
 		}
 	}
 
-	return Default
+	return Tool{}
 }
 
 // String return the name and the version of the tool.
