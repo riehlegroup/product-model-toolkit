@@ -23,43 +23,46 @@ func TestString(t *testing.T) {
 }
 
 func TestFromStr(t *testing.T) {
-	licensee := FromStr("licensee")
-	scancode := FromStr("scancode")
+	licensee, found := FromStr("licensee")
+	scancode, found := FromStr("scancode")
 
-	if licensee.String() != Licensee.String() {
-		t.Errorf("Expected returned tool to be %v, but got %v", Licensee.String(), Licensee.String())
+	if found == false {
+		t.Errorf("Expected returned tool to be %v, but got no tool", "Licensee")
+	} else if licensee.Name != "Licensee" {
+		t.Errorf("Expected returned tool to be %v, but got %v", "Licensee", licensee.Name)
 	}
 
-	if scancode.String() != Scancode.String() {
-		t.Errorf("Expected returned tool to be %v, but got %v", Scancode.String(), scancode.String())
+	if found == false {
+		t.Errorf("Expected returned tool to be %v, but got no tool", "Scancode")
+	} else if scancode.Name != "Scancode" {
+		t.Errorf("Expected returned tool to be %v, but got %v", "Scancode", scancode.Name)
 	}
 }
 
 func TestFromStr_CaseInsensitive(t *testing.T) {
-	licensee := FromStr("lIceNsEE")
-	scancode := FromStr("scANcoDE")
+	licensee, found := FromStr("lIceNsEE")
+	scancode, found := FromStr("scANcoDE")
 
-	if licensee.String() != Licensee.String() {
+	if found == false || licensee.Name != "Licensee" {
 		t.Error("Expected input to work case insensitive")
 	}
 
-	if scancode.String() != Scancode.String() {
+	if found == false || scancode.Name != "Scancode" {
 		t.Error("Expected input to work case insensitive")
 	}
 }
 
 func TestFromStr_DefaultCase(t *testing.T) {
-	empty := FromStr("")
-	unknown := FromStr("unknown tool")
+	empty, found := FromStr("")
+	unknown, found := FromStr("unknown tool")
 
-	if empty.String() != Default.String() {
-		t.Errorf("Expected tool from empty input to be %v, but got %v", Default.String(), empty.String())
+	if found == true {
+		t.Errorf("Expected no tool from empty input, but got %v", empty.String())
 	}
 
-	if unknown.String() != Default.String() {
-		t.Errorf("Expected tool from unknown input to be %v, but got %v", Default.String(), unknown.String())
+	if found == true {
+		t.Errorf("Expected no tool from unknown input, but got %v", unknown.String())
 	}
-
 }
 
 func TestAvailable_NotEmpty(t *testing.T) {

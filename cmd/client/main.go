@@ -31,23 +31,30 @@ func main() {
 		os.Exit(0)
 	}
 
-	scn := scanner.FromStr(flg.scanner)
-	if scn.Name == "" {
-		if flg.scanner == "" {
-			log.Println("[Core] No scanner was specified, default scanner Licensee is selected")
-			scn = scanner.FromStr("Licensee")
-		} else {
-			log.Println("[Core] Requested scanner is not available. Use option -l to view available scanners")
-			os.Exit(3)
-		}
+	notools := scanner.NoTools()
+
+	if notools {
+		log.Println("[Core] No scanner tools available")
+		os.Exit(0)
 	}
+
+	scn, found := scanner.FromStr(flg.scanner)
+
+	if flg.scanner == "" {
+		defaultTool := scanner.Default
+		log.Println("[Core] No scanner tool specified, default scanner tool " + defaultTool.Name + " is selected")
+		scn = defaultTool
+	} else if !found {
+		log.Println("[Core] Requested scanner tool not found. Use option -l to view available scanner tools")
+		os.Exit(0)
+	}
+
 	cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
 
 	scanning.Run(
 		cfg,
 		rest.NewClient(serverBaseURL),
 	)
-
 }
 
 func checkFlags() (flags, bool) {

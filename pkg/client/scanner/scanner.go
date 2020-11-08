@@ -40,37 +40,47 @@ var Available []Tool
 // Default is the default scanner tools that shall be used if no particular tool is selected.
 var Default Tool
 
-// init identifies available scanner tools
+// init loads available scanner tools from config file. It also assigns default tool
 func init() {
 
-	// Open JSON file and read as a byte array
 	jsonFile, err := os.Open("pkg/client/scanner/scanner_tools.json")
 	if err != nil {
 		fmt.Println(err)
+		jsonFile, err = os.Open("./scanner_tools.json")
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(0)
+		}
 	}
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	defer jsonFile.Close()
 
-	// Decode JSON data and populate list of scanner tools
 	err = json.Unmarshal(byteValue, &Available)
 	if err != nil {
 		log.Println(err)
 	}
 
-	// Assign default scanner tool
 	Default = Available[0]
 }
 
-// FromStr returns a tool with the given name. If unable to find a tool with the given name it returns the default tool.
-func FromStr(name string) Tool {
+// NoTools returns true if no scanner tools available
+func NoTools() bool {
+	if len(Available) != 0 {
+		return false
+	}
+	return true
+}
+
+// FromStr returns a tool with the given name. If no tool found, bool return value is set to false
+func FromStr(name string) (Tool, bool) {
 	search := strings.ToLower(name)
 	for _, t := range Available {
 		if strings.ToLower(t.Name) == search {
-			return t
+			return t, true
 		}
 	}
 
-	return Tool{}
+	return Tool{}, false
 }
 
 // String return the name and the version of the tool.
