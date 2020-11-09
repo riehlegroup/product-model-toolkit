@@ -10,6 +10,8 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path"
+	"runtime"
 	"strings"
 )
 
@@ -42,15 +44,12 @@ var Default Tool
 
 // init loads available scanner tools from config file. It also assigns default tool
 func init() {
-
-	jsonFile, err := os.Open("pkg/client/scanner/scanner_tools.json")
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "scanner_tools.json")
+	jsonFile, err := os.Open(dir)
 	if err != nil {
 		fmt.Println(err)
-		jsonFile, err = os.Open("./scanner_tools.json")
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(0)
-		}
+		os.Exit(0)
 	}
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 	defer jsonFile.Close()
@@ -65,13 +64,10 @@ func init() {
 
 // NoTools returns true if no scanner tools available
 func NoTools() bool {
-	if len(Available) != 0 {
-		return false
-	}
-	return true
+	return len(Available) <= 0
 }
 
-// FromStr returns a tool with the given name. If no tool found, bool return value is set to false
+// FromStr returns a tool with the given name and indicates with a bool if the tool could be found
 func FromStr(name string) (Tool, bool) {
 	search := strings.ToLower(name)
 	for _, t := range Available {

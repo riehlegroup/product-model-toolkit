@@ -31,20 +31,20 @@ func main() {
 		os.Exit(0)
 	}
 
-	notools := scanner.NoTools()
+	scn, found := scanner.FromStr(flg.scanner)
 
-	if notools {
+	if scanner.NoTools() {
 		log.Println("[Core] No scanner tools available")
 		os.Exit(0)
 	}
-
-	scn, found := scanner.FromStr(flg.scanner)
 
 	if flg.scanner == "" {
 		defaultTool := scanner.Default
 		log.Println("[Core] No scanner tool specified, default scanner tool " + defaultTool.Name + " is selected")
 		scn = defaultTool
-	} else if !found {
+	}
+
+	if flg.scanner != "" && !found {
 		log.Println("[Core] Requested scanner tool not found. Use option -l to view available scanner tools")
 		os.Exit(0)
 	}
