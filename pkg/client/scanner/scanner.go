@@ -5,7 +5,13 @@
 package scanner
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"path"
+	"runtime"
 	"strings"
 )
 
@@ -31,44 +37,46 @@ type Config struct {
 }
 
 // Available list all available scanner tools that can be used.
-var Available = [...]Tool{
-	Licensee,
-	Scancode,
-	Composer,
-	FileHasher,
-}
+var Available []Tool
 
 // Default is the default scanner tools that shall be used if no particular tool is selected.
-var Default Tool = Licensee
+var Default Tool
 
-// Licensee represents the latest usable Licensee version
-var Licensee = Tool{
-	Name:      "Licensee",
-	Version:   "9.13.0",
-	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
-	Cmd:       `/bin/bash -c "licensee detect /input/ --json > /result/result.json"`,
-	Results:   []string{"result.json"},
+// init loads available scanner tools from config file. It also assigns default tool
+func init() {
+	_, filename, _, _ := runtime.Caller(0)
+	dir := path.Join(path.Dir(filename), "scanner_tools.json")
+	jsonFile, err := os.Open(dir)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(0)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	defer jsonFile.Close()
+
+	err = json.Unmarshal(byteValue, &Available)
+	if err != nil {
+		log.Println(err)
+	}
+
+	Default = Available[0]
 }
 
-// Scancode represents the latest usable Scancode version
-var Scancode = Tool{
-	Name:      "Scancode",
-	Version:   "3.1.1",
-	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
-	Cmd:       `/bin/bash -c "./scancode --spdx-tv /result/result.spdx /input"`,
-	Results:   []string{"result.spdx"},
+// NoTools returns true if no scanner tools available
+func NoTools() bool {
+	return len(Available) <= 0
 }
 
-// FromStr returns a tool with the given name. If unable to find a tool with the given name it returns the default tool.
-func FromStr(name string) Tool {
+// FromStr returns a tool with the given name and indicates with a bool if the tool could be found
+func FromStr(name string) (Tool, bool) {
 	search := strings.ToLower(name)
 	for _, t := range Available {
 		if strings.ToLower(t.Name) == search {
-			return t
+			return t, true
 		}
 	}
 
-	return Default
+	return Tool{}, false
 }
 
 // String return the name and the version of the tool.

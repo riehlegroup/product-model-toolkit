@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
@@ -30,14 +31,23 @@ func main() {
 		os.Exit(0)
 	}
 
-	scn := scanner.FromStr(flg.scanner)
+	if scanner.NoTools() {
+		log.Println("[Core] No scanner tools available")
+		os.Exit(0)
+	}
+
+	scn, found := scanner.FromStr(flg.scanner)
+	if flg.scanner == "" || !found {
+		scn = scanner.Default
+		log.Printf("[Core] Scanner tool not specified or not found, default scanner tool %v is selected instead\n", scn.Name)
+	}
+
 	cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
 
 	scanning.Run(
 		cfg,
 		rest.NewClient(serverBaseURL),
 	)
-
 }
 
 func checkFlags() (flags, bool) {
