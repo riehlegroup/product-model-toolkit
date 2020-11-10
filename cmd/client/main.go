@@ -38,15 +38,10 @@ func main() {
 		os.Exit(0)
 	}
 
-	if flg.scanner == "" {
+	if flg.scanner == "" || !found {
 		defaultTool := scanner.Default
-		log.Println("[Core] No scanner tool specified, default scanner tool " + defaultTool.Name + " is selected")
+		log.Printf("[Core] Scanner tool not specified or not found, default scanner tool %v is selected instead\n", defaultTool.Name)
 		scn = defaultTool
-	}
-
-	if flg.scanner != "" && !found {
-		log.Println("[Core] Requested scanner tool not found. Use option -l to view available scanner tools")
-		os.Exit(0)
 	}
 
 	cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
