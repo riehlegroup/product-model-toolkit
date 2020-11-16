@@ -5,13 +5,14 @@
 package scanning
 
 import (
+	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
 	"reflect"
 	"testing"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
 )
 
-var dummyT1 = scanner.Tool{
+var dummyT1 = plugin.Plugin{
 	Name:      "Licensee",
 	Version:   "9.13.0",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
@@ -19,7 +20,7 @@ var dummyT1 = scanner.Tool{
 	Results:   []string{"result.json", "result.spdx"},
 }
 
-var dummyT2 = scanner.Tool{
+var dummyT2 = plugin.Plugin{
 	Name:      "Abc",
 	Version:   "1.13.9-beta",
 	DockerImg: "docker.pkg.github.com/some-user/some-repo/img:v1.13",
@@ -28,13 +29,13 @@ var dummyT2 = scanner.Tool{
 }
 
 var cfg1 = &scanner.Config{
-	Tool:      dummyT1,
+	Plugin:    dummyT1,
 	InDir:     "/input",
 	ResultDir: "/result",
 }
 
 var cfg2 = &scanner.Config{
-	Tool:      dummyT2,
+	Plugin:    dummyT2,
 	InDir:     "/in",
 	ResultDir: "/out",
 }
