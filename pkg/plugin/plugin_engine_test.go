@@ -2,23 +2,23 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package scanner
+package plugin
 
 import "testing"
 
 func TestString(t *testing.T) {
-	tool1 := &Tool{Name: "myName", Version: "0.0.0"}
+	plugin1 := &Plugin{Name: "myName", Version: "0.0.0"}
 	expected1 := "myName (0.0.0)"
 
-	tool2 := &Tool{Name: "otherName", Version: "2.2.2-beta"}
+	plugin2 := &Plugin{Name: "otherName", Version: "2.2.2-beta"}
 	expected2 := "otherName (2.2.2-beta)"
 
-	if tool1.String() != expected1 {
-		t.Errorf("Expected String representation to be '%s', but got '%s'", expected1, tool1.String())
+	if plugin1.String() != expected1 {
+		t.Errorf("Expected string representation to be '%s', but got '%s'", expected1, plugin1.String())
 	}
 
-	if tool2.String() != expected2 {
-		t.Errorf("Expected String representation to be '%s', but got '%s'", expected2, tool2.String())
+	if plugin2.String() != expected2 {
+		t.Errorf("Expected string representation to be '%s', but got '%s'", expected2, plugin2.String())
 	}
 }
 
@@ -27,15 +27,15 @@ func TestFromStr(t *testing.T) {
 	scancode, found := FromStr("scancode")
 
 	if found == false {
-		t.Errorf("Expected returned tool to be %v, but got no tool", "Licensee")
+		t.Errorf("Expected returned plugin to be %v, but got no plugin", "Licensee")
 	} else if licensee.Name != "Licensee" {
-		t.Errorf("Expected returned tool to be %v, but got %v", "Licensee", licensee.Name)
+		t.Errorf("Expected returned plugin to be %v, but got %v", "Licensee", licensee.Name)
 	}
 
 	if found == false {
-		t.Errorf("Expected returned tool to be %v, but got no tool", "Scancode")
+		t.Errorf("Expected returned plugin to be %v, but got no plugin", "Scancode")
 	} else if scancode.Name != "Scancode" {
-		t.Errorf("Expected returned tool to be %v, but got %v", "Scancode", scancode.Name)
+		t.Errorf("Expected returned plugin to be %v, but got %v", "Scancode", scancode.Name)
 	}
 }
 
@@ -54,14 +54,14 @@ func TestFromStr_CaseInsensitive(t *testing.T) {
 
 func TestFromStr_DefaultCase(t *testing.T) {
 	empty, found := FromStr("")
-	unknown, found := FromStr("unknown tool")
+	unknown, found := FromStr("unknown plugin")
 
 	if found == true {
-		t.Errorf("Expected no tool from empty input, but got %v", empty.String())
+		t.Errorf("Expected no plugin from empty input, but got %v", empty.String())
 	}
 
 	if found == true {
-		t.Errorf("Expected no tool from unknown input, but got %v", unknown.String())
+		t.Errorf("Expected no plugin from unknown input, but got %v", unknown.String())
 	}
 }
 

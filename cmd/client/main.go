@@ -13,6 +13,7 @@ import (
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
+	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
@@ -31,18 +32,18 @@ func main() {
 		os.Exit(0)
 	}
 
-	if scanner.NoTools() {
-		log.Println("[Core] No scanner tools available")
+	if plugin.NoPlugins() {
+		log.Println("[Core] No scanner plugins available")
 		os.Exit(0)
 	}
 
-	scn, found := scanner.FromStr(flg.scanner)
+	scn, found := plugin.FromStr(flg.scanner)
 	if flg.scanner == "" || !found {
-		scn = scanner.Default
-		log.Printf("[Core] Scanner tool not specified or not found, default scanner tool %v is selected instead\n", scn.Name)
+		scn = plugin.Default
+		log.Printf("[Core] Scanner plugin not specified or not found, default scanner plugin %v is selected\n", scn.Name)
 	}
 
-	cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
+	cfg := &scanner.Config{Plugin: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
 
 	scanning.Run(
 		cfg,
@@ -88,7 +89,7 @@ func printVersion() {
 
 func listScanner() {
 	fmt.Println("Available license scanner:")
-	for _, scn := range scanner.Available {
+	for _, scn := range plugin.Available {
 		fmt.Printf("----------\nName:    %s\nVersion: %s\nImage:   %s\n", scn.Name, scn.Version, scn.DockerImg)
 	}
 	fmt.Printf("----------\n")

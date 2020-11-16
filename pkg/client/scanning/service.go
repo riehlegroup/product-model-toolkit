@@ -19,7 +19,7 @@ import (
 // Run executes a scan with a scanner tool for a given directory.
 func Run(cfg *scanner.Config, c *rest.Client) {
 	logServerVersion(c)
-	log.Printf("[Scanner] Selected : %v", cfg.Tool.String())
+	log.Printf("[Scanner] Selected : %v", cfg.Plugin.String())
 	log.Printf("[Scanner] Input directory: %v", cfg.InDir)
 	log.Printf("[Scanner] Result directory: %v", cfg.ResultDir)
 
@@ -30,7 +30,7 @@ func Run(cfg *scanner.Config, c *rest.Client) {
 	}
 	files := findResultFiles(cfg)
 
-	switch cfg.Tool.Name {
+	switch cfg.Plugin.Name {
 	case "Composer":
 		sendResults(cfg.ResultDir, files, c, "/products/composer")
 	case "File-Hasher":
@@ -54,7 +54,7 @@ func execDockerCall(cfg *scanner.Config) error {
 
 // execStr returns a command string for a Docker execution by the OS.
 func execStr(cfg *scanner.Config) string {
-	return fmt.Sprintf("docker run --rm -v %s:/input -v %s:/result %s %s", cfg.InDir, cfg.ResultDir, cfg.Tool.DockerImg, cfg.Tool.Cmd)
+	return fmt.Sprintf("docker run --rm -v %s:/input -v %s:/result %s %s", cfg.InDir, cfg.ResultDir, cfg.Plugin.DockerImg, cfg.Plugin.Cmd)
 }
 
 type fileName string
@@ -71,7 +71,7 @@ func findResultFiles(cfg *scanner.Config) []fileName {
 		names = append(names, fileName(e.Name()))
 	}
 
-	expected := cfg.Tool.Results
+	expected := cfg.Plugin.Results
 	return findFiles(names, expected)
 }
 
