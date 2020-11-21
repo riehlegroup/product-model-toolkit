@@ -101,8 +101,8 @@ func GetRegistryAuth() (string, error) {
 		}
 		authStr = base64.URLEncoding.EncodeToString(encodedJSON)
 		return authStr, nil
-	} else if os.Getenv("GITHUB_TOKEN") != "" { // TODO: check required
-		authStr = os.Getenv("GITHUB_TOKEN")
+	} else if "${GITHUB_TOKEN}" != "" { // TODO: check required
+		authStr = "${GITHUB_TOKEN}"
 		return authStr, nil
 	}
 
