@@ -5,11 +5,10 @@
 package scanning
 
 import (
-	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
 	"reflect"
 	"testing"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
+	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
 )
 
 var dummyT1 = plugin.Plugin{
@@ -28,13 +27,13 @@ var dummyT2 = plugin.Plugin{
 	Results:   []string{"my-result.spdx"},
 }
 
-var cfg1 = &scanner.Config{
+var cfg1 = &plugin.Config{
 	Plugin:    dummyT1,
 	InDir:     "/input",
 	ResultDir: "/result",
 }
 
-var cfg2 = &scanner.Config{
+var cfg2 = &plugin.Config{
 	Plugin:    dummyT2,
 	InDir:     "/in",
 	ResultDir: "/out",
@@ -42,7 +41,7 @@ var cfg2 = &scanner.Config{
 
 func Test_execStr(t *testing.T) {
 	type args struct {
-		cfg *scanner.Config
+		cfg *plugin.Config
 	}
 	tests := []struct {
 		name string

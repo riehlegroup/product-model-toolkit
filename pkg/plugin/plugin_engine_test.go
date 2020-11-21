@@ -4,7 +4,9 @@
 
 package plugin
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestString(t *testing.T) {
 	plugin1 := &Plugin{Name: "myName", Version: "0.0.0"}

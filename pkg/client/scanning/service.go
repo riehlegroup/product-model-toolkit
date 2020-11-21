@@ -13,17 +13,17 @@ import (
 	"path/filepath"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
+	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
 )
 
 // Run executes a scan with a scanner tool for a given directory.
-func Run(cfg *scanner.Config, c *rest.Client) {
+func Run(cfg *plugin.Config, c *rest.Client) {
 	logServerVersion(c)
 	log.Printf("[Scanner] Selected : %v", cfg.Plugin.String())
 	log.Printf("[Scanner] Input directory: %v", cfg.InDir)
 	log.Printf("[Scanner] Result directory: %v", cfg.ResultDir)
 
-	err := execDockerCall(cfg)
+	err := plugin.StartContainer(cfg)
 	if err != nil {
 		log.Printf("[Scanner] Error during Docker execution: %v", err.Error())
 		return
@@ -40,7 +40,7 @@ func Run(cfg *scanner.Config, c *rest.Client) {
 	}
 }
 
-func execDockerCall(cfg *scanner.Config) error {
+func execDockerCall(cfg *plugin.Config) error {
 	dockerCmd := execStr(cfg)
 	log.Println("[Docker] ", dockerCmd)
 
@@ -53,13 +53,13 @@ func execDockerCall(cfg *scanner.Config) error {
 }
 
 // execStr returns a command string for a Docker execution by the OS.
-func execStr(cfg *scanner.Config) string {
+func execStr(cfg *plugin.Config) string {
 	return fmt.Sprintf("docker run --rm -v %s:/input -v %s:/result %s %s", cfg.InDir, cfg.ResultDir, cfg.Plugin.DockerImg, cfg.Plugin.Cmd)
 }
 
 type fileName string
 
-func findResultFiles(cfg *scanner.Config) []fileName {
+func findResultFiles(cfg *plugin.Config) []fileName {
 	infos, err := ioutil.ReadDir(cfg.ResultDir)
 	if err != nil {
 		log.Printf("[Docker] Error during checking files: %v", err)

@@ -11,7 +11,6 @@ import (
 	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
@@ -43,7 +42,7 @@ func main() {
 		log.Printf("[Core] Scanner plugin not specified or not found, default scanner plugin %v is selected\n", scn.Name)
 	}
 
-	cfg := &scanner.Config{Plugin: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
+	cfg := &plugin.Config{Plugin: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
 
 	scanning.Run(
 		cfg,
@@ -57,6 +56,7 @@ func checkFlags() (flags, bool) {
 	lstScanner := flag.Bool("l", false, "list all available scanner")
 
 	scanner := flag.String("s", "", "scanner to to use from list of available scanner")
+
 	wd, _ := os.Getwd()
 	inDir := flag.String("i", wd, "input dir to scan. Default is current working directory")
 
