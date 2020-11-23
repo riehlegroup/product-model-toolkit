@@ -23,7 +23,7 @@ func Run(cfg *plugin.Config, c *rest.Client) {
 	log.Printf("[Scanner] Input directory: %v", cfg.InDir)
 	log.Printf("[Scanner] Result directory: %v", cfg.ResultDir)
 
-	err := plugin.StartContainer(cfg)
+	err := plugin.ExecPlugin(cfg)
 	if err != nil {
 		log.Printf("[Scanner] Error during Docker execution: %v", err.Error())
 		return

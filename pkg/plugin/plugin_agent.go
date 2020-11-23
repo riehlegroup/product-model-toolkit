@@ -22,42 +22,9 @@ import (
 	"github.com/docker/docker/pkg/stdcopy"
 )
 
-func StartContainer(cfg *Config) error {
-	ctx := context.Background()
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
-	if err != nil {
-		return err
-	}
-
-	authStr, err := GetRegistryAuth()
-	if err != nil {
-		return err
-	}
-
-	reader, err := cli.ImagePull(ctx, cfg.DockerImg, types.ImagePullOptions{RegistryAuth: authStr})
-	if err != nil {
-		return err
-	}
-	io.Copy(os.Stdout, reader)
-
-	containerCmd := GenerateCmd(cfg)
-
-	resp, err := cli.ContainerCreate(ctx,
-		&container.Config{
-			Image: cfg.DockerImg,
-			Cmd:   containerCmd,
-			Tty:   false,
-		},
-		&container.HostConfig{
-			Mounts: []mount.Mount{
-				{
-					Type:   mount.TypeBind,
-					Source: cfg.InDir,
-					Target: "/input",
-				},
-			},
-			NetworkMode: "host",
-		}, nil, "")
+// ExecPlugin executes the plugin and returns nil if successful
+func ExecPlugin(cfg *Config) error {
+	resp, ctx, cli, err := PrepareContainer(cfg)
 	if err != nil {
 		return err
 	}
@@ -87,6 +54,51 @@ func StartContainer(cfg *Config) error {
 	return nil
 }
 
+// PrepareContainer pulls image from container registry and prepares container for execution
+func PrepareContainer(cfg *Config) (container.ContainerCreateCreatedBody, context.Context, *client.Client, error) {
+	var resp container.ContainerCreateCreatedBody
+	ctx := context.Background()
+	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
+	if err != nil {
+		return resp, ctx, cli, err
+	}
+
+	authStr, err := GetRegistryAuth()
+	if err != nil {
+		return resp, ctx, cli, err
+	}
+
+	reader, err := cli.ImagePull(ctx, cfg.DockerImg, types.ImagePullOptions{RegistryAuth: authStr})
+	if err != nil {
+		return resp, ctx, cli, err
+	}
+	io.Copy(os.Stdout, reader)
+
+	containerCmd := GenerateCmd(cfg)
+
+	resp, err = cli.ContainerCreate(ctx,
+		&container.Config{
+			Image: cfg.DockerImg,
+			Cmd:   containerCmd,
+			Tty:   false,
+		},
+		&container.HostConfig{
+			Mounts: []mount.Mount{
+				{
+					Type:   mount.TypeBind,
+					Source: cfg.InDir,
+					Target: "/input",
+				},
+			},
+			NetworkMode: "host",
+		}, nil, "")
+	if err != nil {
+		return resp, ctx, cli, err
+	}
+
+	return resp, ctx, cli, err
+}
+
 // GetRegistryAuth returns authentication string required to pull container from container registry
 func GetRegistryAuth() (string, error) {
 	var authStr string
@@ -101,7 +113,9 @@ func GetRegistryAuth() (string, error) {
 		}
 		authStr = base64.URLEncoding.EncodeToString(encodedJSON)
 		return authStr, nil
-	} else if "${GITHUB_TOKEN}" != "" { // TODO: check required
+	}
+
+	if "${GITHUB_TOKEN}" != "" {
 		authStr = "${GITHUB_TOKEN}"
 		return authStr, nil
 	}
@@ -113,14 +127,11 @@ func GetRegistryAuth() (string, error) {
 // GenerateCmd returns a string with complete command to be executed in the container
 func GenerateCmd(cfg *Config) []string {
 	bashCmd := strings.Split(cfg.Cmd[0:strings.Index(cfg.Cmd, "-c")+2], " ")
-	curlCmd := fmt.Sprintf("&& curl -F name=%s -F result=@/result/%s http://localhost:8082/save",
-		cfg.Name,
-		cfg.Results[0])
+	curlCmd := fmt.Sprintf("&& for i in /result/*; do curl -F name=%s -F result=@$i http://localhost:8082/save; done", cfg.Name)
 	completeCmd := fmt.Sprintf("%s %s %s",
 		"mkdir /result &&",
 		cfg.Cmd[strings.Index(cfg.Cmd, "-c")+3:len(cfg.Cmd)],
 		curlCmd)
 
-	fmt.Println(append(bashCmd, completeCmd))
 	return append(bashCmd, completeCmd)
 }
