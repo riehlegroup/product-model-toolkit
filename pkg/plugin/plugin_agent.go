@@ -29,8 +29,6 @@ func ExecPlugin(cfg *Config) error {
 		return err
 	}
 
-	go StartServer(cfg)
-
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return err
 	}
@@ -74,7 +72,12 @@ func PrepareContainer(cfg *Config) (container.ContainerCreateCreatedBody, contex
 	}
 	io.Copy(os.Stdout, reader)
 
-	containerCmd := GenerateCmd(cfg)
+	err = StartPluginServer(cfg)
+	if err != nil {
+		return resp, ctx, cli, err
+	}
+
+	containerCmd := GenerateCmd(cfg, GetPortNumber())
 
 	resp, err = cli.ContainerCreate(ctx,
 		&container.Config{
@@ -125,9 +128,9 @@ func GetRegistryAuth() (string, error) {
 }
 
 // GenerateCmd returns a string with complete command to be executed in the container
-func GenerateCmd(cfg *Config) []string {
+func GenerateCmd(cfg *Config, portNumber int) []string {
 	bashCmd := strings.Split(cfg.Cmd[0:strings.Index(cfg.Cmd, "-c")+2], " ")
-	curlCmd := fmt.Sprintf("&& for i in /result/*; do curl -F name=%s -F result=@$i http://localhost:8082/save; done", cfg.Name)
+	curlCmd := fmt.Sprintf("&& for i in /result/*; do curl -F name=%s -F result=@$i http://[::]:%d/save; done", cfg.Name, portNumber)
 	completeCmd := fmt.Sprintf("%s %s %s",
 		"mkdir /result &&",
 		cfg.Cmd[strings.Index(cfg.Cmd, "-c")+3:len(cfg.Cmd)],

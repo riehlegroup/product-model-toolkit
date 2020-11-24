@@ -5,9 +5,11 @@
 package plugin
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"mime/multipart"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -15,15 +17,39 @@ import (
 	"github.com/labstack/echo"
 )
 
+var listener net.Listener
+
 var pluginCfg *Config
 
 var results []multipart.File
 
-func StartServer(cfg *Config) {
+func StartPluginServer(cfg *Config) error {
+	if listener != nil {
+		return errors.New("plugin server already started")
+	}
+
 	pluginCfg = cfg
+
+	l, err := net.Listen("tcp", ":0")
+	if err != nil {
+		return err
+	}
+	listener = l
+
 	server := echo.New()
 	server.POST("/save", SaveResult)
-	server.Logger.Fatal(server.Start(":8082"))
+	server.Listener = l
+	go StartEchoServer(*server)
+
+	return nil
+}
+
+func StartEchoServer(server echo.Echo) {
+	server.Logger.Fatal(server.Start(""))
+}
+
+func GetPortNumber() int {
+	return listener.Addr().(*net.TCPAddr).Port
 }
 
 // SaveResult saves the received result file in a list
