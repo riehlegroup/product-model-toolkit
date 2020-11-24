@@ -32,7 +32,7 @@ func TestGenerateCmd(t *testing.T) {
 		ResultDir: "/result/dir/",
 	}
 
-	result := GenerateCmd(&cfg)
+	result := GenerateCmd(&cfg, 55555)
 
 	// TODO
 	fmt.Println(result)
