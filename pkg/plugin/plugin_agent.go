@@ -118,11 +118,6 @@ func GetRegistryAuth() (string, error) {
 		return authStr, nil
 	}
 
-	if "${GITHUB_TOKEN}" != "" {
-		authStr = "${GITHUB_TOKEN}"
-		return authStr, nil
-	}
-
 	log.Println("No authentication credentials provided, please check if environment variables are set")
 	return "", errors.New("no authentication credentials provided")
 }
