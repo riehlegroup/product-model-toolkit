@@ -89,15 +89,14 @@ When you start the server it will show you all available REST endpoints.
 
 Base path: `http://[hostname]:[port]/api/v1`
 
-| Method | Path               | Description                           |
-|--------|--------------------|---------------------------------------|
-| GET    | /                  | Get all routes                        |
-| GET    | /version           | Get version of server                 |
-| GET    | /health            | Check if server is available          |
-| GET    | /products          | Get all stored products               |
-| GET    | /products/:id      | Get a product by its ID               |
-| POST   | /products/spdx     | Import a product from SPDX file       |
-| POST   | /products/composer | Import a product from a Composer file |
+| Method | Path                      | Description                           |
+|--------|---------------------------|---------------------------------------|
+| GET    | /                         | Get all routes                        |
+| GET    | /version                  | Get version of server                 |
+| GET    | /health                   | Check if server is available          |
+| GET    | /products                 | Get all stored products               |
+| GET    | /products/:id             | Get a product by its ID               |
+| POST   | /products/import/:scanner | Import a product from scanner results |
 
 ## License Crawler
 
