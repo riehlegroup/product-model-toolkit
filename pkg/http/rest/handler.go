@@ -24,9 +24,7 @@ func Handler(g *echo.Group, qSrv querying.Service, iSrv importing.Service) {
 
 	g.GET("/products", findAllProducts(qSrv))
 	g.GET("/products/:id", findProductByID(qSrv))
-	g.POST("/products/spdx", importSPDX(iSrv))
-	g.POST("/products/composer", importComposer(iSrv))
-	g.POST("/products/hasher", importFileHasher(iSrv))
+	g.POST("/products/import/:scanner", importFromScanner(iSrv))
 }
 
 func handleEntryPoint(c echo.Context) error {
@@ -61,15 +59,14 @@ func findProductByID(q querying.Service) echo.HandlerFunc {
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			c.Error(errors.Wrapf(err, "Unable to convert query param id with value '%v' to int", idStr))
+			c.Error(errors.Wrap(err, fmt.Sprintf("Unable to convert query param id with value '%v' to int", idStr)))
 		}
 
 		prod, err := q.FindProductByID(id)
 		if err != nil {
-
 			c.String(
 				http.StatusNotFound,
-				fmt.Sprintf("Unablable fo find product with ID %v", id))
+				fmt.Sprintf("Unable fo find product with ID %v", id))
 		}
 
 		return c.JSON(http.StatusOK, prod)
