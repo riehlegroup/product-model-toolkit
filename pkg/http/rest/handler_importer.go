@@ -11,33 +11,43 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/importing"
 	"github.com/pkg/errors"
 )
 
-func importSPDX(iSrv importing.Service) echo.HandlerFunc {
+func importFromScanner(iSrv importing.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		scanner := strings.ToLower(c.Param("scanner"))
 		r := c.Request().Body
 
-		doc, err := iSrv.SPDX(r)
-		if err != nil {
-			c.Error(errors.Wrap(err, "Unable to perform SPDX import"))
+		if scanner == "scancode" || scanner == "spdx" {
+			doc, err := iSrv.SPDX(r)
+			if err != nil {
+				c.Error(errors.Wrap(err, "Unable to perform SPDX import"))
+			}
+
+			return c.String(
+				http.StatusOK,
+				fmt.Sprintf("Successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
+			)
 		}
 
-		return c.String(
-			http.StatusOK,
-			fmt.Sprintf("Successfully parsed SDPX document.\nFound %v packages", len(doc.Packages)),
-		)
-	}
-}
+		var prod *model.Product
+		var err error
+		switch scanner {
+		case "composer":
+			prod, err = iSrv.ComposerImport(r)
+		case "file-hasher":
+			prod, err = iSrv.FileHasherImport(r)
+		default:
+			return c.String(
+				http.StatusOK,
+				fmt.Sprintf("Received result file with content length %d, but will not import content, because there is no importer for the scanner '%s'", c.Request().ContentLength, scanner))
+		}
 
-func importComposer(iSrv importing.Service) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		r := c.Request().Body
-
-		prod, err := iSrv.ComposerImport(r)
 		if err != nil {
-			c.Error(errors.Wrap(err, "Unable to perform Composer import"))
+			c.Error(errors.Wrap(err, fmt.Sprintf("Unable to perform import for scanner %s", scanner)))
 		}
 
 		loc := productLocation(c.Path(), prod.ID)
@@ -45,7 +55,7 @@ func importComposer(iSrv importing.Service) echo.HandlerFunc {
 
 		return c.String(
 			http.StatusCreated,
-			fmt.Sprintf("Successfully parsed Composer JSON.\nFound %v packages\n", len(prod.Components)),
+			fmt.Sprintf("Successfully parsed content from scanner %s.\n Found %v packages\n", scanner, len(prod.Components)),
 		)
 	}
 }
@@ -55,20 +65,4 @@ func productLocation(path string, id int) string {
 	prodPath := path[:i+1]
 
 	return fmt.Sprintf("%s%s", prodPath, strconv.Itoa(id))
-}
-
-func importFileHasher(iSrv importing.Service) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		r := c.Request().Body
-
-		prod, err := iSrv.FileHasherImport(r)
-		if err != nil {
-			c.Error(errors.Wrap(err, "Unable to perform File-Hasher import"))
-		}
-
-		return c.String(
-			http.StatusCreated,
-			fmt.Sprintf("Successfully parsed File-Hasher JSON.\n Found %v packages\n", len(prod.Components)),
-		)
-	}
 }
