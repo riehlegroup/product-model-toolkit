@@ -8,11 +8,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"mime/multipart"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -39,13 +41,15 @@ func StartPluginServer(cfg *Config) error {
 	server := echo.New()
 	server.POST("/save", SaveResult)
 	server.Listener = l
-	go StartEchoServer(*server)
+
+	go func() {
+		server.Logger.Fatal(server.Start(""))
+	}()
+
+	log.Println("[Plugin server] Waiting 2 seconds for REST API to start")
+	time.Sleep(2 * time.Second)
 
 	return nil
-}
-
-func StartEchoServer(server echo.Echo) {
-	server.Logger.Fatal(server.Start(""))
 }
 
 func GetPortNumber() int {
@@ -76,7 +80,7 @@ func SaveResult(c echo.Context) error {
 	return c.HTML(http.StatusOK, fmt.Sprintf("Result file %s received from %s\n", result.Filename, name))
 }
 
-// GetResults returns all result files in a list
+// GetResults returns all result files as a list
 func GetResults() []multipart.File {
 	return results
 }
