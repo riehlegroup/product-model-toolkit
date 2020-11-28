@@ -28,16 +28,10 @@ func Run(cfg *plugin.Config, c *rest.Client) {
 		log.Printf("[Scanner] Error during Docker execution: %v", err.Error())
 		return
 	}
-	files := findResultFiles(cfg)
 
-	switch cfg.Plugin.Name {
-	case "Composer":
-		sendResults(cfg.ResultDir, files, c, "/products/composer")
-	case "File-Hasher":
-		sendResults(cfg.ResultDir, files, c, "/products/hasher")
-	default:
-		checkResults(cfg.ResultDir, files)
-	}
+	files := findResultFiles(cfg)
+	postPath := fmt.Sprintf("/products/import/%s", cfg.Plugin.Name)
+	sendResults(cfg.ResultDir, files, c, postPath)
 }
 
 func execDockerCall(cfg *plugin.Config) error {
@@ -88,15 +82,6 @@ func findFiles(names []fileName, expected []string) []fileName {
 	log.Printf("[Scanner] Found %v of %v expected result files: %v", len(found), len(expected), found)
 
 	return found
-}
-
-func checkResults(resDir string, files []fileName) {
-	for _, f := range files {
-		log.Printf("[Scanner] Content of result file %v", f)
-		path := filepath.Join(resDir, string(f))
-		data, _ := ioutil.ReadFile(path)
-		log.Printf("\n%s", data)
-	}
 }
 
 // contains return true if the given value is present in the given array.
