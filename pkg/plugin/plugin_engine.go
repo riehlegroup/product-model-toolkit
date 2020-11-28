@@ -90,16 +90,3 @@ func GetIndexFromStr(name string) int {
 func (p *Plugin) String() string {
 	return fmt.Sprintf("%s (%s)", p.Name, p.Version)
 }
-
-// Unload
-func Unload(name string) bool {
-	pos := GetIndexFromStr(name)
-	if pos == -1 {
-		return false
-	}
-	Available = append(Available[:pos], Available[pos+1:]...)
-
-	// TODO: update json config file
-
-	return true
-}
