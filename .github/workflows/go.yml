@@ -39,9 +39,6 @@ jobs:
       run: |
         make test
         make cover
-      env:
-        USER: ${{ secrets.USER }}
-        TOKEN: ${{ secrets.TOKEN }}
 
     - name: Build
       run: make build
@@ -49,5 +46,5 @@ jobs:
     - name: Run client
       run: ./pmtclient
       env:
-        USER: ${{ secrets.USER }}
-        TOKEN: ${{ secrets.TOKEN }}
+        DOCKER_USER: ${{ secrets.USER }}
+        DOCKER_TOKEN: ${{ secrets.TOKEN }}
