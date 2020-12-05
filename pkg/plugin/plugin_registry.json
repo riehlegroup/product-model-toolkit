@@ -21,7 +21,7 @@
     "Name": "Composer",
     "Version": "dummy",
     "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy",
-    "Cmd": "/bin/sh -c \"cp example.json result/example.json\"",
+    "Cmd": "/bin/sh -c cp example.json result/example.json",
     "Results": [
       "example.json"
     ]
@@ -30,7 +30,7 @@
     "Name": "File-Hasher",
     "Version": "latest",
     "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/file-hasher:latest",
-    "Cmd": "/bin/sh -c \"./fh -i /input -o /result/result.json\"",
+    "Cmd": "/bin/sh -c ./fh -i /input -o /result/result.json",
     "Results": [
       "result.json"
     ]

@@ -16,6 +16,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -95,10 +96,12 @@ func PrepareContainer(cfg *Config) (container.ContainerCreateCreatedBody, contex
 	}
 
 	reader, err := cli.ImagePull(ctx, cfg.DockerImg, types.ImagePullOptions{RegistryAuth: authStr})
-	if err != nil {
-		return resp, ctx, cli, err
+	if err == nil {
+		io.Copy(os.Stdout, reader)
 	}
-	io.Copy(os.Stdout, reader)
+	if err != nil {
+		log.Printf("[Plugin agent] Unable to pull image from container registry, got following error: %v\n", err)
+	}
 
 	resp, err = containerCreate(ctx, cli, cfg)
 	if err != nil {
@@ -158,30 +161,35 @@ func GetShell(cfg *Config) string {
 
 // ExecAllPluginCmd executes all required command lines in the container
 func ExecAllPluginCmd(ctx context.Context, containerID string, cfg *Config) error {
+	logFile, err := CreateLogFile()
+	if err != nil {
+		return err
+	}
+
 	currentCmd := "echo test"
-	currentOutput := "test"
-	err := ExecPluginCmd(ctx, containerID, cfg, currentCmd, currentOutput, true)
+	expectedOutput := "test\n"
+	err = ExecPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, true, logFile)
 	if err != nil {
 		return err
 	}
 
 	currentCmd = "mkdir /result"
-	currentOutput = ""
-	err = ExecPluginCmd(ctx, containerID, cfg, currentCmd, currentOutput, false)
+	expectedOutput = ""
+	err = ExecPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
 	if err != nil {
 		return err
 	}
 
 	currentCmd = cfg.Cmd[strings.Index(cfg.Cmd, "-c")+3 : len(cfg.Cmd)]
-	currentOutput = ""
-	err = ExecPluginCmd(ctx, containerID, cfg, currentCmd, currentOutput, false)
+	expectedOutput = ""
+	err = ExecPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
 	if err != nil {
 		return err
 	}
 
-	currentCmd = fmt.Sprintf("for i in /result/*; do curl -F name=%s -F result=@$i http://[::]:%d/save; done", cfg.Name, GetPortNumber())
-	currentOutput = ""
-	err = ExecPluginCmd(ctx, containerID, cfg, currentCmd, currentOutput, false)
+	currentCmd = fmt.Sprintf("for i in /result/*; do curl -F name=%s -F result=@$i http://127.0.0.1:%d/save; done", cfg.Name, GetPortNumber())
+	expectedOutput = ""
+	err = ExecPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
 	if err != nil {
 		return err
 	}
@@ -189,8 +197,17 @@ func ExecAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 	return nil
 }
 
+func CreateLogFile() (string, error) {
+	file, err := ioutil.TempFile("", time.Now().Format("pmt_container_output_20060102150405_*.log"))
+	if err != nil {
+		return "", err
+	}
+
+	return file.Name(), nil
+}
+
 // ExecPluginCmd executes the command line and checks if successful
-func ExecPluginCmd(ctx context.Context, containerID string, cfg *Config, cmd string, output string, outputCheck bool) error {
+func ExecPluginCmd(ctx context.Context, containerID string, cfg *Config, cmd string, output string, outputCheck bool, logFile string) error {
 	log.Printf("[Plugin agent] Executing command line \"%v\" in container\n", cmd)
 
 	idResponse, err := ExecContainerCmd(ctx, containerID, PrepareCmd(cfg, cmd))
@@ -203,6 +220,12 @@ func ExecPluginCmd(ctx context.Context, containerID string, cfg *Config, cmd str
 	if err != nil {
 		log.Printf("[Plugin agent] Unable to get output of executed command line \"%v\"\n", cmd)
 		return err
+	}
+	if execResponse.StdOut != "" {
+		WriteToLogFile(logFile, cmd, "stdout", execResponse.StdOut)
+	}
+	if execResponse.StdErr != "" {
+		WriteToLogFile(logFile, cmd, "stderr", execResponse.StdErr)
 	}
 
 	if outputCheck == true && execResponse.StdOut != output {
@@ -283,10 +306,25 @@ func GetExecResponse(ctx context.Context, idResponse types.IDResponse) (ExecResp
 		return execResponse, err
 	}
 
-	execResponse.StdOut = strings.TrimSuffix(string(stdout), "\n")
-	execResponse.StdErr = strings.TrimSuffix(string(stderr), "\n")
+	execResponse.StdOut = string(stdout)
+	execResponse.StdErr = string(stderr)
 	execResponse.ExitCode = res.ExitCode
 	return execResponse, nil
+}
+
+func WriteToLogFile(logFile string, cmd string, stream string, text string) error {
+	src, err := os.OpenFile(logFile, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	_, err = src.WriteString(fmt.Sprintf("%s for %s\n%s\n", stream, cmd, text))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // StopContainer stops the specified container
