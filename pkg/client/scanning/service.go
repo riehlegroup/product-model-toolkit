@@ -5,12 +5,11 @@
 package scanning
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
@@ -29,9 +28,8 @@ func Run(cfg *plugin.Config, c *rest.Client) {
 		return
 	}
 
-	files := findResultFiles(cfg)
 	postPath := fmt.Sprintf("/products/import/%s", cfg.Plugin.Name)
-	sendResults(cfg.ResultDir, files, c, postPath)
+	sendResults(plugin.GetResults(), c, postPath)
 }
 
 func execDockerCall(cfg *plugin.Config) error {
@@ -104,17 +102,9 @@ func logServerVersion(c *rest.Client) {
 	log.Printf("[REST-Client] Server version: %s", v)
 }
 
-func sendResults(resDir string, files []fileName, c *rest.Client, url string) {
+func sendResults(files [][]byte, c *rest.Client, url string) {
 	for _, f := range files {
-		path := filepath.Join(resDir, string(f))
-		resFile, err := os.Open(path)
-		if err != nil {
-			log.Printf("[Scanner] Error while reading result files: %s", err)
-			return
-		}
-		defer resFile.Close()
-
-		loc, err := c.PostResult(url, resFile)
+		loc, err := c.PostResult(url, bytes.NewReader(f))
 		if err != nil {
 			log.Printf("[Scanner] Error while sending results to server [%s]: %s", url, err)
 			return

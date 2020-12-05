@@ -297,12 +297,12 @@ func StopContainer(containerID string) error {
 		return err
 	}
 
-	fmt.Printf("[Plugin agent] Stopping container %v... \n", containerID[:10])
+	log.Printf("[Plugin agent] Stopping container %v... \n", containerID[:10])
 	err = cli.ContainerStop(ctx, containerID, nil)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("[Plugin agent] Container %v stopped successfully\n", containerID[:10])
+	log.Printf("[Plugin agent] Container %v stopped successfully\n", containerID[:10])
 	return nil
 }

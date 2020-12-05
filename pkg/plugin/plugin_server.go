@@ -5,11 +5,11 @@
 package plugin
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"log"
-	"mime/multipart"
 	"net"
 	"net/http"
 	"os"
@@ -23,7 +23,7 @@ var listener net.Listener
 
 var pluginCfg *Config
 
-var results []multipart.File
+var results [][]byte
 
 func StartPluginServer(cfg *Config) error {
 	if listener != nil {
@@ -70,9 +70,13 @@ func SaveResult(c echo.Context) error {
 	}
 	defer src.Close()
 
-	results = append(results, src)
+	buf := bytes.NewBuffer(nil)
+	if _, err := io.Copy(buf, src); err != nil {
+		return err
+	}
+	results = append(results, buf.Bytes())
 
-	err = WriteFile(src, result.Filename)
+	err = WriteFile(buf.Bytes(), result.Filename)
 	if err != nil {
 		return err
 	}
@@ -81,12 +85,12 @@ func SaveResult(c echo.Context) error {
 }
 
 // GetResults returns all result files as a list
-func GetResults() []multipart.File {
+func GetResults() [][]byte {
 	return results
 }
 
 // WriteFile saves the file locally to the specified path
-func WriteFile(file multipart.File, filename string) error {
+func WriteFile(fileContent []byte, filename string) error {
 	if _, err := os.Stat(pluginCfg.ResultDir); os.IsNotExist(err) {
 		err := os.Mkdir(pluginCfg.ResultDir, 0755)
 		if err != nil {
@@ -100,7 +104,7 @@ func WriteFile(file multipart.File, filename string) error {
 	}
 	defer dst.Close()
 
-	if _, err = io.Copy(dst, file); err != nil {
+	if _, err = io.Copy(dst, bytes.NewReader(fileContent)); err != nil {
 		return err
 	}
 
