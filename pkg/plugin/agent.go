@@ -194,6 +194,8 @@ func ExecAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 		return err
 	}
 
+	log.Printf("[Plugin agent] All commands were executed, check logfile %v for outputs of executed command lines\n", logFile)
+
 	return nil
 }
 
