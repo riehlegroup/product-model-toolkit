@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 
@@ -40,7 +41,13 @@ func main() {
 		log.Printf("[Core] Unable to find scanner plugin with name '%s'; fallback to default scanner with name '%s'", flg.scanner, scn.Name)
 	}
 
-	cfg := &plugin.Config{Plugin: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
+	tempDir, err := ioutil.TempDir("", "pm-*")
+	if err != nil {
+		log.Print("[Core] Unable to create a temporary directory\nUnable to proceed")
+		os.Exit(-1)
+	}
+
+	cfg := &plugin.Config{Plugin: scn, InDir: flg.inDir, ResultDir: tempDir}
 
 	scanning.Run(
 		cfg,
