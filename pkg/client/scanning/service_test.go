@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/plugin"
 )
 
 var dummyT1 = plugin.Plugin{

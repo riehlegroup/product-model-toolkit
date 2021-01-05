@@ -12,7 +12,7 @@ import (
 	"os/exec"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/plugin"
 )
 
 // Run executes a scan with a scanner tool for a given directory.

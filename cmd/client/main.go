@@ -11,8 +11,8 @@ import (
 	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/plugin"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
-	"github.com/osrgroup/product-model-toolkit/pkg/plugin"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
