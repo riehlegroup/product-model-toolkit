@@ -11,7 +11,7 @@ import (
 
 func TestGetRegistryAuth(t *testing.T) {
 	setAuthEnv()
-	authStr, err := GetRegistryAuth()
+	authStr, err := getRegistryAuth()
 	if err != nil {
 		t.Errorf("Expected no error, but got: %v", err)
 	}
@@ -27,7 +27,7 @@ func TestGetRegistryAuth(t *testing.T) {
 func TestGetRegistryAuth_MissingEnv(t *testing.T) {
 	unsetAuthEnv()
 
-	_, err := GetRegistryAuth()
+	_, err := getRegistryAuth()
 	if err == nil {
 		t.Errorf("Expected to return error when auth env is not present")
 	}
@@ -40,7 +40,7 @@ func TestGetShell(t *testing.T) {
 		},
 	}
 
-	sh := GetShell(cfg)
+	sh := getShell(cfg)
 	expected := "/bin/sh"
 	if sh != expected {
 		t.Errorf("Expected returned shell to be '%s', but got '%s'", expected, sh)

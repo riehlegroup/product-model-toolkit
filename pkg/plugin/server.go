@@ -25,7 +25,7 @@ var pluginCfg *Config
 
 var results [][]byte
 
-func StartPluginServer(cfg *Config) error {
+func startPluginServer(cfg *Config) error {
 	if listener != nil {
 		return errors.New("plugin server already started")
 	}
@@ -39,7 +39,7 @@ func StartPluginServer(cfg *Config) error {
 	listener = l
 
 	server := echo.New()
-	server.POST("/save", SaveResult)
+	server.POST("/save", saveResult)
 	server.Listener = l
 
 	go func() {
@@ -52,12 +52,12 @@ func StartPluginServer(cfg *Config) error {
 	return nil
 }
 
-func GetPortNumber() int {
+func getPortNumber() int {
 	return listener.Addr().(*net.TCPAddr).Port
 }
 
-// SaveResult saves the received result file in a list
-func SaveResult(c echo.Context) error {
+// saveResult saves the received result file in a list
+func saveResult(c echo.Context) error {
 	name := c.FormValue("name")
 	result, err := c.FormFile("result")
 	if err != nil {
@@ -76,7 +76,7 @@ func SaveResult(c echo.Context) error {
 	}
 	results = append(results, buf.Bytes())
 
-	err = WriteFile(buf.Bytes(), result.Filename)
+	err = writeFile(buf.Bytes(), result.Filename)
 	if err != nil {
 		return err
 	}
@@ -89,8 +89,8 @@ func GetResults() [][]byte {
 	return results
 }
 
-// WriteFile saves the file locally to the specified path
-func WriteFile(fileContent []byte, filename string) error {
+// writeFile saves the file locally to the specified path
+func writeFile(fileContent []byte, filename string) error {
 	if _, err := os.Stat(pluginCfg.ResultDir); os.IsNotExist(err) {
 		err := os.Mkdir(pluginCfg.ResultDir, 0755)
 		if err != nil {
