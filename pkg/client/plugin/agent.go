@@ -194,13 +194,13 @@ func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 		return err
 	}
 
-	log.Printf("[Plugin agent] All commands were executed, check logfile %v for outputs of executed command lines\n", logFile)
+	log.Printf("[Plugin agent] All commands were executed, check log file %v for outputs of executed command lines\n", logFile)
 
 	return nil
 }
 
 func createLogFile() (string, error) {
-	file, err := ioutil.TempFile("", time.Now().Format("pmt_container_output_20060102150405_*.log"))
+	file, err := ioutil.TempFile("", fmt.Sprintf("pmt_container_output_%v_*.log", time.Now().Format("2006-01-02_15-04-05")))
 	if err != nil {
 		return "", err
 	}
