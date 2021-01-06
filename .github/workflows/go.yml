@@ -46,5 +46,5 @@ jobs:
     - name: Run client
       run: ./pmtclient
       env:
-        DOCKER_USER: $GITHUB_ACTOR
+        DOCKER_USER: user
         DOCKER_TOKEN: ${{ secrets.GITHUB_TOKEN }}
