@@ -6,6 +6,7 @@ package plugin
 
 import (
 	"os"
+	"reflect"
 	"testing"
 )
 
@@ -55,4 +56,38 @@ func setAuthEnv() {
 func unsetAuthEnv() {
 	os.Unsetenv(envDockerUser)
 	os.Unsetenv(envDockerToken)
+}
+
+func Test_prepareCmd(t *testing.T) {
+	config1 := &Config{
+		Plugin: Plugin{
+			Cmd: "/bin/sh -c test",
+		},
+	}
+	config2 := &Config{
+		Plugin: Plugin{
+			Cmd: "/bin/bash -c test",
+		},
+	}
+
+	type args struct {
+		cfg *Config
+		cmd string
+	}
+	tests := []struct {
+		name string
+		args args
+		want []string
+	}{
+		{name: "test#1", args: args{cfg: config1, cmd: "test"}, want: []string{"/bin/sh", "-c", "test"}},
+		{name: "test#2", args: args{cfg: config2, cmd: "test"}, want: []string{"/bin/bash", "-c", "test"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := prepareCmd(tt.args.cfg, tt.args.cmd); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("prepareCmd() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
