@@ -8,6 +8,10 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 This package implements the plugin architecture for the client application as part of an ongoing master thesis at the Professorship for Open Source Software at the Friedrich-Alexander-University Erlangen-Nuremberg. The goal is to provide a universal approach that facilitates the integration of scanner tools, which are defined as plugins.
 
+## Architecture Overview
+
+![Architecture concept](docs/plugin_arch_overview.png)
+
 ## Requirements
 
 ### Authenticating to GitHub Packages
