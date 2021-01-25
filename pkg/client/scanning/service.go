@@ -29,7 +29,7 @@ func Run(cfg *plugin.Config, c *rest.Client) {
 	}
 
 	postPath := fmt.Sprintf("/products/import/%s", cfg.Plugin.Name)
-	sendResults(plugin.GetResults(), c, postPath)
+	sendResults(plugin.GetResultFiles(), c, postPath)
 }
 
 func execDockerCall(cfg *plugin.Config) error {

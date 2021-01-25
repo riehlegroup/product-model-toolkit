@@ -47,12 +47,12 @@ func ExecPlugin(cfg *Config) error {
 		return err
 	}
 
-	err = startPluginServer(cfg)
+	err = execAllPluginCmd(ctx, resp.ID, cfg)
 	if err != nil {
 		return err
 	}
 
-	err = execAllPluginCmd(ctx, resp.ID, cfg)
+	err = getResultsFromContainer(cfg, cli, ctx, resp.ID)
 	if err != nil {
 		return err
 	}
@@ -181,13 +181,6 @@ func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 	}
 
 	currentCmd = cfg.Cmd[strings.Index(cfg.Cmd, "-c")+3 : len(cfg.Cmd)]
-	expectedOutput = ""
-	err = execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
-	if err != nil {
-		return err
-	}
-
-	currentCmd = fmt.Sprintf("for i in /result/*; do curl -F name=%s -F result=@$i http://127.0.0.1:%d/save; done", cfg.Name, getPortNumber())
 	expectedOutput = ""
 	err = execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
 	if err != nil {
