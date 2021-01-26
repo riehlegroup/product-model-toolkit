@@ -5,36 +5,34 @@
 package scanning
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
 	"os/exec"
-	"path/filepath"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/plugin"
 )
 
 // Run executes a scan with a scanner tool for a given directory.
-func Run(cfg *scanner.Config, c *rest.Client) {
+func Run(cfg *plugin.Config, c *rest.Client) {
 	logServerVersion(c)
-	log.Printf("[Scanner] Selected : %v", cfg.Tool.String())
+	log.Printf("[Scanner] Selected : %v", cfg.Plugin.String())
 	log.Printf("[Scanner] Input directory: %v", cfg.InDir)
 	log.Printf("[Scanner] Result directory: %v", cfg.ResultDir)
 
-	err := execDockerCall(cfg)
+	err := plugin.ExecPlugin(cfg)
 	if err != nil {
 		log.Printf("[Scanner] Error during Docker execution: %v", err.Error())
 		return
 	}
 
-	files := findResultFiles(cfg)
-	postPath := fmt.Sprintf("/products/import/%s", cfg.Tool.Name)
-	sendResults(cfg.ResultDir, files, c, postPath)
+	postPath := fmt.Sprintf("/products/import/%s", cfg.Plugin.Name)
+	sendResults(plugin.GetResultFiles(), c, postPath)
 }
 
-func execDockerCall(cfg *scanner.Config) error {
+func execDockerCall(cfg *plugin.Config) error {
 	dockerCmd := execStr(cfg)
 	log.Println("[Docker] ", dockerCmd)
 
@@ -47,13 +45,13 @@ func execDockerCall(cfg *scanner.Config) error {
 }
 
 // execStr returns a command string for a Docker execution by the OS.
-func execStr(cfg *scanner.Config) string {
-	return fmt.Sprintf("docker run --rm -v %s:/input -v %s:/result %s %s", cfg.InDir, cfg.ResultDir, cfg.Tool.DockerImg, cfg.Tool.Cmd)
+func execStr(cfg *plugin.Config) string {
+	return fmt.Sprintf("docker run --rm -v %s:/input -v %s:/result %s %s", cfg.InDir, cfg.ResultDir, cfg.Plugin.DockerImg, cfg.Plugin.Cmd)
 }
 
 type fileName string
 
-func findResultFiles(cfg *scanner.Config) []fileName {
+func findResultFiles(cfg *plugin.Config) []fileName {
 	infos, err := ioutil.ReadDir(cfg.ResultDir)
 	if err != nil {
 		log.Printf("[Docker] Error during checking files: %v", err)
@@ -65,7 +63,7 @@ func findResultFiles(cfg *scanner.Config) []fileName {
 		names = append(names, fileName(e.Name()))
 	}
 
-	expected := cfg.Tool.Results
+	expected := cfg.Plugin.Results
 	return findFiles(names, expected)
 }
 
@@ -104,17 +102,9 @@ func logServerVersion(c *rest.Client) {
 	log.Printf("[REST-Client] Server version: %s", v)
 }
 
-func sendResults(resDir string, files []fileName, c *rest.Client, url string) {
+func sendResults(files [][]byte, c *rest.Client, url string) {
 	for _, f := range files {
-		path := filepath.Join(resDir, string(f))
-		resFile, err := os.Open(path)
-		if err != nil {
-			log.Printf("[Scanner] Error while reading result files: %s", err)
-			return
-		}
-		defer resFile.Close()
-
-		loc, err := c.PostResult(url, resFile)
+		loc, err := c.PostResult(url, bytes.NewReader(f))
 		if err != nil {
 			log.Printf("[Scanner] Error while sending results to server [%s]: %s", url, err)
 			return

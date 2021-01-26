@@ -12,4 +12,6 @@ RUN pwd
 
 FROM alpine:latest
 
+RUN apk --no-cache add curl
+
 COPY --from=builder /go/fh fh
