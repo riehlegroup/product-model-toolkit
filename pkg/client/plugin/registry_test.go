@@ -8,36 +8,62 @@ import (
 	"testing"
 )
 
-const registryFileStr = `
-[
-  {
-    "Name": "Licensee",
-    "Version": "9.13.0",
-    "DockerImg": "docker.pkg.github.com/cmgl/product-model-toolkit/scanner-licensee:9.13.0",
-    "Cmd": "/bin/bash -c licensee detect /input/ --json > /result/result.json",
-    "Results": [
-      "result.json"
-    ]
-  },
-  {
-    "Name": "Scancode",
-    "Version": "3.1.1",
-    "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
-    "Cmd": "/bin/bash -c ./scancode --spdx-tv /result/result.spdx /input",
-    "Results": [
-      "result.spdx"
-    ]
-  },
-  {
-    "Name": "Composer",
-    "Version": "dummy",
-    "DockerImg": "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy",
-    "Cmd": "/bin/sh -c cp example.json result/example.json",
-    "Results": [
-      "example.json"
-    ]
-  }
+const registryFileStrYaml = `
+version: R1.0
+plugins:
+- name: Licensee
+  version: 9.13.0
+  dockerimg: docker.pkg.github.com/cmgl/product-model-toolkit/scanner-licensee:9.13.0
+  cmd: /bin/bash -c licensee detect /input/ --json > /result/result.json
+  results:
+  - result.json
+- name: Scancode
+  version: 3.1.1
+  dockerimg: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1
+  cmd: /bin/bash -c ./scancode --spdx-tv /result/result.spdx /input
+  results:
+  - result.spdx
+- name: Composer
+  version: dummy
+  dockerimg: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy
+  cmd: /bin/sh -c cp example.json result/example.json
+  results:
+  - example.json
+`
+
+const registryFileStrJson = `
+{
+"Version":"R1.0",
+"Plugins":[
+{
+"Name":"Licensee",
+"Version":"9.13.0",
+"DockerImg":"docker.pkg.github.com/cmgl/product-model-toolkit/scanner-licensee:9.13.0",
+"Cmd":"/bin/bash -c licensee detect /input/ --json \u003e /result/result.json",
+"Results":[
+"result.json"
 ]
+},
+{
+"Name":"Scancode",
+"Version":"3.1.1",
+"DockerImg":"docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
+"Cmd":"/bin/bash -c ./scancode --spdx-tv /result/result.spdx /input",
+"Results":[
+"result.spdx"
+]
+},
+{
+"Name":"Composer",
+"Version":"dummy",
+"DockerImg":"docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy",
+"Cmd":"/bin/sh -c cp example.json result/example.json",
+"Results":[
+"example.json"
+]
+}
+]
+}
 `
 
 func TestIsEmpty(t *testing.T) {
@@ -47,16 +73,22 @@ func TestIsEmpty(t *testing.T) {
 		t.Error("Expected isEmpty() to return true for empty registry")
 	}
 
-	populatedReg := generateRegistry()
+	populatedReg := generateRegistryFromYamlFile()
 	isEmpty = populatedReg.IsEmpty()
 	if isEmpty == true {
-		t.Error("Expected isEmpty() for populated registry to return false")
+		t.Error("Expected isEmpty() for populated registry (from yaml file) to return false")
+	}
+
+	populatedReg = generateRegistryFromJsonFile()
+	isEmpty = populatedReg.IsEmpty()
+	if isEmpty == true {
+		t.Error("Expected isEmpty() for populated registry (from json file) to return false")
 	}
 }
 
-func TestDoImportFromFile(t *testing.T) {
-	handler := strings.NewReader(registryFileStr)
-	plugins, err := doImportFromFile(handler)
+func TestDoImportFromYamlFile(t *testing.T) {
+	handler := []byte(registryFileStrYaml)
+	plugins, err := doImportFromYamlFile(handler)
 	if err != nil {
 		t.Errorf("Expected import from file without err, but got %s", err.Error())
 	}
@@ -66,9 +98,33 @@ func TestDoImportFromFile(t *testing.T) {
 	}
 }
 
-func TestDoImportFromFile_EmptyFile(t *testing.T) {
+func TestDoImportFromJsonFile(t *testing.T) {
+	handler := strings.NewReader(registryFileStrJson)
+	plugins, err := doImportFromJsonFile(handler)
+	if err != nil {
+		t.Errorf("Expected import from file without err, but got %s", err.Error())
+	}
+
+	if len(plugins) != 3 {
+		t.Errorf("Expected plugins length of imported registry to be 3, but got %v", len(plugins))
+	}
+}
+
+func TestDoImportFromYamlFile_EmptyFile(t *testing.T) {
+	handler := []byte("")
+	plugins, err := doImportFromYamlFile(handler)
+	if err == nil {
+		t.Error("Expected import ro return error for empty string input")
+	}
+
+	if len(plugins) != 0 {
+		t.Errorf("Expected plugins length of empty registry to be 0, but got %v", len(plugins))
+	}
+}
+
+func TestDoImportFromJsonFile_EmptyFile(t *testing.T) {
 	handler := strings.NewReader("")
-	plugins, err := doImportFromFile(handler)
+	plugins, err := doImportFromJsonFile(handler)
 	if err == nil {
 		t.Error("Expected import ro return error for empty string input")
 	}
@@ -79,7 +135,7 @@ func TestDoImportFromFile_EmptyFile(t *testing.T) {
 }
 
 func TestFromStr(t *testing.T) {
-	var reg Register = generateRegistry()
+	var reg Register = generateRegistryFromYamlFile()
 
 	var name string
 	name = "Licensee"
@@ -99,7 +155,7 @@ func TestFromStr(t *testing.T) {
 }
 
 func TestFromStr_CaseInsensitive(t *testing.T) {
-	var reg Register = generateRegistry()
+	var reg Register = generateRegistryFromYamlFile()
 	licensee, found := reg.FromStr("lIceNsEE")
 	scancode, found := reg.FromStr("scANcoDE")
 
@@ -127,7 +183,7 @@ func TestFromStr_EmptyRegistry(t *testing.T) {
 }
 
 func TestAvailable(t *testing.T) {
-	reg := generateRegistry()
+	reg := generateRegistryFromYamlFile()
 	plugins := reg.Available()
 	if len(plugins) != 3 {
 		t.Errorf("Expected length of available plugins to be 3, but got %v", len(plugins))
@@ -135,7 +191,7 @@ func TestAvailable(t *testing.T) {
 }
 
 func TestDefault(t *testing.T) {
-	reg := generateRegistry()
+	reg := generateRegistryFromYamlFile()
 
 	first := reg.Default()
 	expected := "Licensee"
@@ -165,8 +221,15 @@ func checkPluginName(expected, name string, t *testing.T) {
 	}
 }
 
-func generateRegistry() *Registry {
-	plugins, _ := doImportFromFile(strings.NewReader(registryFileStr))
+func generateRegistryFromYamlFile() *Registry {
+	plugins, _ := doImportFromYamlFile([]byte(registryFileStrYaml))
+	return &Registry{
+		plugins: plugins,
+	}
+}
+
+func generateRegistryFromJsonFile() *Registry {
+	plugins, _ := doImportFromJsonFile(strings.NewReader(registryFileStrJson))
 	return &Registry{
 		plugins: plugins,
 	}

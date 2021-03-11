@@ -66,6 +66,9 @@ func importFromYamlFile(file string) ([]Plugin, error) {
 
 // doImportFromYamlFile parses a given YAML registry io stream into []Plugin
 func doImportFromYamlFile(handler []byte) ([]Plugin, error) {
+	if len(handler) == 0 {
+		return []Plugin{}, errors.New("file is empty")
+	}
 	var registryFile RegistryFile
 	if err := yaml.Unmarshal(handler, &registryFile); err != nil {
 		return []Plugin{}, err
