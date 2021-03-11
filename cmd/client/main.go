@@ -58,7 +58,7 @@ func main() {
 func checkFlags() (flags, bool) {
 	version := flag.Bool("v", false, "show version")
 	lstScanner := flag.Bool("l", false, "list all available scanner plugins")
-	regFile := flag.String("r", "plugins.json", "plugin registry file to use")
+	regFile := flag.String("r", "plugins.yml", "plugin registry file to use")
 	scanner := flag.String("s", "", "scanner to to use from list of available scanner")
 
 	wd, _ := os.Getwd()

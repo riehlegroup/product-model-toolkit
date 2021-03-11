@@ -6,10 +6,20 @@ package plugin
 
 import (
 	"encoding/json"
+	"errors"
 	"io"
+	"io/ioutil"
 	"os"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
+
+// RegistryFile represents a plugin registry including its version number
+type RegistryFile struct {
+	Version string
+	Plugins []Plugin
+}
 
 // Registry represents a plugin registry
 type Registry struct {
@@ -26,34 +36,64 @@ type Register interface {
 
 // NewRegistry returns a new plugin registry from a JSON input file
 func NewRegistry(file string) (*Registry, error) {
-	plugins, err := importFromFile(file)
-	if err != nil {
-		return &Registry{}, err
+	if strings.Contains(file, ".yml") {
+		plugins, err := importFromYamlFile(file)
+		if err != nil {
+			return &Registry{}, err
+		}
+		return &Registry{plugins: plugins}, nil
+	}
+	if strings.Contains(file, ".json") {
+		plugins, err := importFromJsonFile(file)
+		if err != nil {
+			return &Registry{}, err
+		}
+		return &Registry{plugins: plugins}, nil
 	}
 
-	return &Registry{plugins: plugins}, nil
+	return &Registry{}, errors.New("unsupported config file format")
 }
 
-// importFromFile parses a given JSON registry file into []Plugin
-func importFromFile(file string) ([]Plugin, error) {
+// importFromYamlFile parses a given YAML registry file into []Plugin
+func importFromYamlFile(file string) ([]Plugin, error) {
+	handle, err := ioutil.ReadFile(file)
+	if err != nil {
+		return []Plugin{}, err
+	}
+
+	return doImportFromYamlFile(handle)
+}
+
+// doImportFromYamlFile parses a given YAML registry io stream into []Plugin
+func doImportFromYamlFile(handler []byte) ([]Plugin, error) {
+	var registryFile RegistryFile
+	if err := yaml.Unmarshal(handler, &registryFile); err != nil {
+		return []Plugin{}, err
+	}
+
+	return registryFile.Plugins, nil
+}
+
+// importFromJsonFile parses a given JSON registry file into []Plugin
+func importFromJsonFile(file string) ([]Plugin, error) {
 	handle, err := os.Open(file)
 	if err != nil {
 		return []Plugin{}, err
 	}
 	defer handle.Close()
 
-	return doImportFromFile(handle)
+	return doImportFromJsonFile(handle)
 }
 
-// doImportFromFile parses a given JSON registry io stream into []Plugin
-func doImportFromFile(handler io.Reader) ([]Plugin, error) {
-	var plugins []Plugin
-	err := json.NewDecoder(handler).Decode(&plugins)
+// doImportFromJsonFile parses a given JSON registry io stream into []Plugin
+func doImportFromJsonFile(handler io.Reader) ([]Plugin, error) {
+	var registryFile RegistryFile
+	err := json.NewDecoder(handler).Decode(&registryFile)
 	if err != nil {
 		return []Plugin{}, err
 	}
 
-	return plugins, nil
+	return registryFile.Plugins, nil
 }
 
 // IsEmpty returns true if no scanner plugins are available
