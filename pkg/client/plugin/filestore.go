@@ -14,7 +14,7 @@ func initializeFilestore(length int) {
 	if len(resultsFilestore) == 0 {
 		resultsFilestore = []filestore{{results: *new([][]byte)}}
 
-		for i := 0; i < length; i++ {
+		for i := 0; i < length-1; i++ {
 			resultsFilestore = append(resultsFilestore, filestore{results: *new([][]byte)})
 		}
 	}

@@ -23,6 +23,14 @@ import (
 	"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 )
 
+type agentCfg struct {
+	cfg *Config
+}
+
+type agent interface {
+	execPlugin(*sync.WaitGroup) error
+}
+
 // execResponse struct represents output of an executed command
 type execResponse struct {
 	StdOut   string
@@ -30,11 +38,15 @@ type execResponse struct {
 	ExitCode int
 }
 
+func createAgent(cfg *Config) agentCfg {
+	return agentCfg{cfg: cfg}
+}
+
 // execPlugin executes the plugin and returns nil if successful
-func execPlugin(wg *sync.WaitGroup, cfg *Config) error {
+func (p agentCfg) execPlugin(wg *sync.WaitGroup) error {
 	defer wg.Done()
 
-	resp, ctx, cli, err := prepareContainer(cfg)
+	resp, ctx, cli, err := prepareContainer(p.cfg)
 	if err != nil {
 		return err
 	}
@@ -51,19 +63,19 @@ func execPlugin(wg *sync.WaitGroup, cfg *Config) error {
 		}
 	}
 
-	err = execAllPluginCmd(ctx, resp.ID, cfg)
+	err = execAllPluginCmd(ctx, resp.ID, p.cfg)
 	if err != nil {
 		return err
 	}
 
 	if coreConfigValues.RestApi == false {
-		err = getResultsFromContainer(cfg, cli, ctx, resp.ID)
+		err = getResultsFromContainer(p.cfg, cli, ctx, resp.ID)
 		if err != nil {
 			return err
 		}
 	}
 
-	err = stopContainer(cfg.Name, resp.ID)
+	err = stopContainer(p.cfg.Name, resp.ID)
 	if err != nil {
 		return err
 	}
@@ -84,7 +96,7 @@ func execPlugin(wg *sync.WaitGroup, cfg *Config) error {
 
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 
-	scanning.SendResults(getResultFiles(cfg.Id), cfg.Name)
+	scanning.SendResults(getResultFiles(p.cfg.Id), p.cfg.Name)
 
 	return nil
 }

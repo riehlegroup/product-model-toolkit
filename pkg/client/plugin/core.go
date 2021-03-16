@@ -70,8 +70,9 @@ func StartCore(tool string, regFile string, inDir string) {
 	for i := 0; i < len(pluginsExec); i++ {
 		wg.Add(1)
 		cfg := &Config{Plugin: pluginsExec[i], InDir: inDir, ResultDir: coreConfigValues.PathDirResults, Id: i}
+		var agent agent = createAgent(cfg)
 		go func() {
-			err := execPlugin(&wg, cfg)
+			err := agent.execPlugin(&wg)
 			if err != nil {
 				log.Printf("[Core] Error during plugin execution: %v", err.Error())
 				return
