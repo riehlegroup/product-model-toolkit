@@ -135,7 +135,7 @@ func containerCreate(ctx context.Context, cli *client.Client, cfg *Config) (cont
 				},
 			},
 			NetworkMode: "host",
-		}, nil, "")
+		}, nil, nil, "")
 }
 
 // execAllPluginCmd executes all necessary commands in the container

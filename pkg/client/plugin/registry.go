@@ -95,6 +95,20 @@ func doImportFromJsonFile(handler io.Reader) (Registry, error) {
 	return registry, nil
 }
 
+// Available returns all plugins in the registry
+func (r *Registry) Available() []Plugin {
+	return r.Plugins
+}
+
+// Default returns the default plugin in the registry
+func (r *Registry) Default() Plugin {
+	if r.IsEmpty() {
+		return Plugin{}
+	}
+
+	return r.Plugins[r.DefaultPlugin]
+}
+
 // IsEmpty returns true if no plugins are available
 func (r *Registry) IsEmpty() bool {
 	return len(r.Plugins) <= 0
@@ -110,18 +124,4 @@ func (r *Registry) FromStr(name string) (Plugin, bool) {
 	}
 
 	return Plugin{}, false
-}
-
-// Available returns all plugins in the registry
-func (r *Registry) Available() []Plugin {
-	return r.Plugins
-}
-
-// Default returns the default plugin in the registry
-func (r *Registry) Default() Plugin {
-	if r.IsEmpty() {
-		return Plugin{}
-	}
-
-	return r.Plugins[r.DefaultPlugin]
 }

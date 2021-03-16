@@ -20,7 +20,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/client"
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 var portNr = -1
