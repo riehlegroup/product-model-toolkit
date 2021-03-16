@@ -7,8 +7,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"log"
 	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
@@ -33,26 +31,9 @@ func main() {
 		os.Exit(0)
 	}
 
-	var pluginRegistry plugin.Register = loadPluginRegistry(flg.regFile)
+	scanning.LogServerVersion(rest.NewClient(serverBaseURL))
 
-	scn, found := pluginRegistry.FromStr(flg.scanner)
-	if !found {
-		scn = pluginRegistry.Default()
-		log.Printf("[Core] Unable to find scanner plugin with name '%s'; fallback to default scanner with name '%s'", flg.scanner, scn.Name)
-	}
-
-	tempDir, err := ioutil.TempDir("", "pm-*")
-	if err != nil {
-		log.Print("[Core] Unable to create a temporary directory\nUnable to proceed")
-		os.Exit(-1)
-	}
-
-	cfg := &plugin.Config{Plugin: scn, InDir: flg.inDir, ResultDir: tempDir}
-
-	scanning.Run(
-		cfg,
-		rest.NewClient(serverBaseURL),
-	)
+	plugin.StartCore(flg.scanner, flg.regFile, flg.inDir)
 }
 
 func checkFlags() (flags, bool) {
@@ -92,21 +73,8 @@ func printVersion() {
 	)
 }
 
-func loadPluginRegistry(file string) *plugin.Registry {
-	pluginRegistry, err := plugin.NewRegistry(file)
-	if err != nil {
-		log.Printf("[Core] Unable to create new plugin registry from file '%s'. Error: %s\nUnable to proceed", file, err.Error())
-		os.Exit(-1)
-	}
-	if pluginRegistry.IsEmpty() {
-		log.Print("[Core] Unable to proceed with empty plugin registry")
-		os.Exit(-1)
-	}
-	return pluginRegistry
-}
-
 func listScanner(regFile string) {
-	pluginRegistry := loadPluginRegistry(regFile)
+	pluginRegistry := plugin.LoadPluginRegistry(regFile)
 	plugins := pluginRegistry.Available()
 	fmt.Printf("Available license scanner from plugin file '%s':\n", regFile)
 	for _, scn := range plugins {

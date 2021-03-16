@@ -7,36 +7,33 @@ package plugin
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"strings"
-	"time"
+	"sync"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 )
 
-// execResponse struct is used to get the output of an executed command line
+// execResponse struct represents output of an executed command
 type execResponse struct {
 	StdOut   string
 	StdErr   string
 	ExitCode int
 }
 
-const envDockerUser = "DOCKER_USER"
-const envDockerToken = "DOCKER_TOKEN"
+// execPlugin executes the plugin and returns nil if successful
+func execPlugin(wg *sync.WaitGroup, cfg *Config) error {
+	defer wg.Done()
 
-// ExecPlugin executes the plugin and returns nil if successful
-func ExecPlugin(cfg *Config) error {
 	resp, ctx, cli, err := prepareContainer(cfg)
 	if err != nil {
 		return err
@@ -47,17 +44,26 @@ func ExecPlugin(cfg *Config) error {
 		return err
 	}
 
+	if coreConfigValues.RestApi == true {
+		err = startServer()
+		if err != nil {
+			return err
+		}
+	}
+
 	err = execAllPluginCmd(ctx, resp.ID, cfg)
 	if err != nil {
 		return err
 	}
 
-	err = getResultsFromContainer(cfg, cli, ctx, resp.ID)
-	if err != nil {
-		return err
+	if coreConfigValues.RestApi == false {
+		err = getResultsFromContainer(cfg, cli, ctx, resp.ID)
+		if err != nil {
+			return err
+		}
 	}
 
-	err = stopContainer(resp.ID)
+	err = stopContainer(cfg.Name, resp.ID)
 	if err != nil {
 		return err
 	}
@@ -78,6 +84,8 @@ func ExecPlugin(cfg *Config) error {
 
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
 
+	scanning.SendResults(getResultFiles(cfg.Id), cfg.Name)
+
 	return nil
 }
 
@@ -90,7 +98,7 @@ func prepareContainer(cfg *Config) (container.ContainerCreateCreatedBody, contex
 		return resp, ctx, cli, err
 	}
 
-	authStr, err := getRegistryAuth()
+	authStr, err := getRemoteRepoAuth()
 	if err != nil {
 		return resp, ctx, cli, err
 	}
@@ -100,7 +108,7 @@ func prepareContainer(cfg *Config) (container.ContainerCreateCreatedBody, contex
 		io.Copy(os.Stdout, reader)
 	}
 	if err != nil {
-		log.Printf("[Plugin agent] Unable to pull image from container registry, got following error: %v\n", err)
+		log.Printf("[Plugin agent] [%v] Unable to pull image from container registry, got following error: %v\n", cfg.Name, err)
 	}
 
 	resp, err = containerCreate(ctx, cli, cfg)
@@ -115,7 +123,7 @@ func containerCreate(ctx context.Context, cli *client.Client, cfg *Config) (cont
 	return cli.ContainerCreate(ctx,
 		&container.Config{
 			Image: cfg.DockerImg,
-			Cmd:   []string{getShell(cfg)},
+			Cmd:   []string{cfg.Shell},
 			Tty:   true,
 		},
 		&container.HostConfig{
@@ -130,38 +138,9 @@ func containerCreate(ctx context.Context, cli *client.Client, cfg *Config) (cont
 		}, nil, "")
 }
 
-// getRegistryAuth returns authentication string required to pull container from container registry
-func getRegistryAuth() (string, error) {
-	user := os.Getenv(envDockerUser)
-	token := os.Getenv(envDockerToken)
-
-	if user == "" || token == "" {
-		log.Println("[Plugin agent] No authentication credentials provided, please check if environment variables are set")
-		return "", errors.New("no authentication credentials provided")
-	}
-
-	authConfig := types.AuthConfig{
-		Username: user,
-		Password: token,
-	}
-
-	encodedJSON, err := json.Marshal(authConfig)
-	if err != nil {
-		return "", err
-	}
-
-	authStr := base64.URLEncoding.EncodeToString(encodedJSON)
-	return authStr, nil
-}
-
-// getShell returns the Unix shell required to run the command lines
-func getShell(cfg *Config) string {
-	return strings.Split(cfg.Cmd, " ")[0]
-}
-
-// execAllPluginCmd executes all required command lines in the container
+// execAllPluginCmd executes all necessary commands in the container
 func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) error {
-	logFile, err := createLogFile()
+	logFile, err := createLogFile(cfg.Name)
 	if err != nil {
 		return err
 	}
@@ -180,66 +159,73 @@ func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 		return err
 	}
 
-	currentCmd = cfg.Cmd[strings.Index(cfg.Cmd, "-c")+3 : len(cfg.Cmd)]
+	currentCmd = cfg.Cmd
 	expectedOutput = ""
 	err = execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[Plugin agent] All commands were executed, check log file %v for outputs of executed command lines\n", logFile)
+	if coreConfigValues.RestApi == true {
+		currentCmd = fmt.Sprintf("for i in /result/*; do curl -F name=%s -F id=%d -F result=@$i http://127.0.0.1:%d/save; done", cfg.Name, cfg.Id, getPortNumber())
+		expectedOutput = ""
+		err = execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Printf("[Plugin agent] [%v] All commands were executed, check log file %v for outputs of executed commands\n", cfg.Name, logFile)
 
 	return nil
 }
 
-func createLogFile() (string, error) {
-	file, err := ioutil.TempFile("", fmt.Sprintf("pmt_container_output_%v_*.log", time.Now().Format("2006-01-02_15-04-05")))
-	if err != nil {
-		return "", err
-	}
-
-	return file.Name(), nil
-}
-
-// execPluginCmd executes the command line and checks if successful
-func execPluginCmd(ctx context.Context, containerID string, cfg *Config, cmd string, output string, outputCheck bool, logFile string) error {
-	log.Printf("[Plugin agent] Executing command line \"%v\" in container\n", cmd)
+// execPluginCmd executes command and checks if successful
+func execPluginCmd(ctx context.Context, containerID string, cfg *Config, cmd string, expectedOutput string, outputCheck bool, logFile string) error {
+	log.Printf("[Plugin agent] [%v] Executing following command in container: %v\n", cfg.Name, cmd)
 
 	idResponse, err := execContainerCmd(ctx, containerID, prepareCmd(cfg, cmd))
 	if err != nil {
-		log.Printf("[Plugin agent] Error when executing command line \"%v\" in container\n", cmd)
+		log.Printf("[Plugin agent] [%v] Error when executing following command in container: %v\n", cfg.Name, cmd)
 		return err
 	}
 
 	execResponse, err := getExecResponse(ctx, idResponse)
 	if err != nil {
-		log.Printf("[Plugin agent] Unable to get output of executed command line \"%v\"\n", cmd)
+		log.Printf("[Plugin agent] [%v] Unable to get output of following executed command: %v\n", cfg.Name, cmd)
 		return err
 	}
 	if execResponse.StdOut != "" {
-		writeToLogFile(logFile, cmd, "stdout", execResponse.StdOut)
+		err = writeToLogFile(logFile, cmd, "stdout", execResponse.StdOut)
+		if err != nil {
+			log.Printf("[Plugin agent] [%v] Unable to write to log file stdout of following executed command: %v\n", cfg.Name, cmd)
+			return err
+		}
 	}
 	if execResponse.StdErr != "" {
-		writeToLogFile(logFile, cmd, "stderr", execResponse.StdErr)
+		err = writeToLogFile(logFile, cmd, "stderr", execResponse.StdErr)
+		if err != nil {
+			log.Printf("[Plugin agent] [%v] Unable to write to log file stderr of following executed command: %v\n", cfg.Name, cmd)
+			return err
+		}
 	}
 
-	if outputCheck == true && execResponse.StdOut != output {
-		log.Printf("[Plugin agent] Incorrect output of executed command line \"%v\", got \"%v\", but expected \"%v\"\n", cmd, execResponse.StdOut, "test")
-		return errors.New("incorrect output of executed command line")
+	if outputCheck == true && execResponse.StdOut != expectedOutput {
+		log.Printf("[Plugin agent] [%v] Incorrect output of executed command: %v; got: %v; expected %v\n", cfg.Name, cmd, execResponse.StdOut, expectedOutput)
+		return errors.New("incorrect output of executed command")
 	}
 
-	log.Printf("[Plugin agent] Command line \"%v\" successfully executed\n", cmd)
+	log.Printf("[Plugin agent] [%v] Following command successfully executed: %v\n", cfg.Name, cmd)
 
 	return nil
 }
 
-// prepareCmd generates the complete command line that specifies the Unix shell
+// prepareCmd generates complete command
 func prepareCmd(cfg *Config, cmd string) []string {
-	bashCmd := strings.Split(cfg.Cmd[0:strings.Index(cfg.Cmd, "-c")+2], " ")
-	return append(bashCmd, cmd)
+	return append([]string{cfg.Shell, "-c"}, cmd)
 }
 
-// execContainerCmd executes the command line in the specified container
+// execContainerCmd executes command in specified container
 func execContainerCmd(ctx context.Context, containerID string, command []string) (types.IDResponse, error) {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -255,7 +241,7 @@ func execContainerCmd(ctx context.Context, containerID string, command []string)
 	return cli.ContainerExecCreate(ctx, containerID, config)
 }
 
-// getExecResponse returns the output of the executed command line
+// getExecResponse returns output of executed command
 func getExecResponse(ctx context.Context, idResponse types.IDResponse) (execResponse, error) {
 	var execResponse execResponse
 
@@ -307,35 +293,20 @@ func getExecResponse(ctx context.Context, idResponse types.IDResponse) (execResp
 	return execResponse, nil
 }
 
-func writeToLogFile(logFile string, cmd string, stream string, text string) error {
-	src, err := os.OpenFile(logFile, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
-	defer src.Close()
-
-	_, err = src.WriteString(fmt.Sprintf("%s for %s\n%s\n", stream, cmd, text))
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// stopContainer stops the specified container
-func stopContainer(containerID string) error {
+// stopContainer stops specified container
+func stopContainer(pluginName string, containerID string) error {
 	ctx := context.Background()
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[Plugin agent] Stopping container %v... \n", containerID[:10])
+	log.Printf("[Plugin agent] [%v] Stopping container: %v...\n", pluginName, containerID[:10])
 	err = cli.ContainerStop(ctx, containerID, nil)
 	if err != nil {
 		return err
 	}
 
-	log.Printf("[Plugin agent] Container %v stopped successfully\n", containerID[:10])
+	log.Printf("[Plugin agent] [%v] Container stopped successfully: %v...\n", pluginName, containerID[:10])
 	return nil
 }
