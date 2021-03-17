@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"regexp"
 	"sync"
 
 	"github.com/docker/docker/api/types"
@@ -157,15 +158,18 @@ func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 		return err
 	}
 
-	currentCmd := "echo test"
-	expectedOutput := "test\n"
-	err = execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, true, logFile)
+	coreCfg, err := loadCoreSystemConfig()
 	if err != nil {
 		return err
 	}
 
-	currentCmd = "mkdir /result"
-	expectedOutput = ""
+	err = compatibilityCheck(ctx, containerID, cfg, logFile, coreCfg)
+	if err != nil {
+		return err
+	}
+
+	currentCmd := "mkdir /result"
+	expectedOutput := ""
 	err = execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, false, logFile)
 	if err != nil {
 		return err
@@ -188,6 +192,28 @@ func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 	}
 
 	log.Printf("[Plugin agent] [%v] All commands were executed, check log file %v for outputs of executed commands\n", cfg.Name, logFile)
+
+	return nil
+}
+
+func compatibilityCheck(ctx context.Context, containerID string, cfg *Config, logFile string, coreCfg coreConfig) error {
+	currentCmd := "echo test"
+	expectedOutput := "^test"
+	err := execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, true, logFile)
+	if err != nil {
+		log.Printf("[Plugin agent] [%v] Plugin is not compatible with core system, failed command: %v\n", cfg.Name, currentCmd)
+		return err
+	}
+
+	if coreCfg.RestApi == true {
+		currentCmd := "curl -V"
+		expectedOutput := "^curl"
+		err := execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, true, logFile)
+		if err != nil {
+			log.Printf("[Plugin agent] [%v] Plugin is not compatible with core system, failed command: %v\n", cfg.Name, currentCmd)
+			return err
+		}
+	}
 
 	return nil
 }
@@ -222,9 +248,15 @@ func execPluginCmd(ctx context.Context, containerID string, cfg *Config, cmd str
 		}
 	}
 
-	if outputCheck == true && execResponse.StdOut != expectedOutput {
-		log.Printf("[Plugin agent] [%v] Incorrect output of executed command: %v; got: %v; expected %v\n", cfg.Name, cmd, execResponse.StdOut, expectedOutput)
-		return errors.New("incorrect output of executed command")
+	if outputCheck == true {
+		match, err := regexp.MatchString(expectedOutput, execResponse.StdOut)
+		if err != nil {
+			return err
+		}
+		if match != true {
+			log.Printf("[Plugin agent] [%v] Incorrect output of executed command: %v; got: %v; expected %v\n", cfg.Name, cmd, execResponse.StdOut, expectedOutput)
+			return errors.New("incorrect output of executed command")
+		}
 	}
 
 	log.Printf("[Plugin agent] [%v] Following command successfully executed: %v\n", cfg.Name, cmd)

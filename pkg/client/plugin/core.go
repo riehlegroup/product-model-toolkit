@@ -35,7 +35,7 @@ const envRemoteRepoUser = "REMOTEREPO_USER"
 const envRemoteRepoPass = "REMOTEREPO_PASS"
 
 func StartCore(tool string, regFile string, inDir string) {
-	coreConfigValues, err := loadCoreSystemConfig()
+	coreCfg, err := loadCoreSystemConfig()
 	if err != nil {
 		log.Printf("[Core] Unable to load core system configuration: %v", err.Error())
 		return
@@ -69,7 +69,7 @@ func StartCore(tool string, regFile string, inDir string) {
 	var wg sync.WaitGroup
 	for i := 0; i < len(pluginsExec); i++ {
 		wg.Add(1)
-		cfg := &Config{Plugin: pluginsExec[i], InDir: inDir, ResultDir: coreConfigValues.PathDirResults, Id: i}
+		cfg := &Config{Plugin: pluginsExec[i], InDir: inDir, ResultDir: coreCfg.PathDirResults, Id: i}
 		var agent agent = createAgent(cfg)
 		go func() {
 			err := agent.execPlugin(&wg)

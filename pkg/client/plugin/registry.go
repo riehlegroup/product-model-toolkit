@@ -33,18 +33,18 @@ type Register interface {
 // NewRegistry returns a new plugin registry from YAML or JSON input file
 func NewRegistry(file string) (*Registry, error) {
 	if strings.Contains(file, ".yml") {
-		plugins, err := importFromYamlFile(file)
+		registry, err := importFromYamlFile(file)
 		if err != nil {
 			return &Registry{}, err
 		}
-		return &plugins, nil
+		return &registry, nil
 	}
 	if strings.Contains(file, ".json") {
-		plugins, err := importFromJsonFile(file)
+		registry, err := importFromJsonFile(file)
 		if err != nil {
 			return &Registry{}, err
 		}
-		return &plugins, nil
+		return &registry, nil
 	}
 
 	return &Registry{}, errors.New("unsupported config file format")
