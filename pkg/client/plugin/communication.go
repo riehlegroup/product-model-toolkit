@@ -52,10 +52,10 @@ func doGetResultsFromContainer(cfg *Config, cli *client.Client, ctx context.Cont
 		return err
 	}
 
-	resultsFilestore[cfg.Id].results = append(resultsFilestore[cfg.Id].results, buf.Bytes())
+	saveResultFile(cfg.Id, buf.Bytes())
 
 	if coreConfigValues.SaveResultsLocally == true {
-		err := writeFile(cfg.Name, buf.Bytes(), file)
+		err := saveResultFileLocally(cfg.Name, buf.Bytes(), file)
 		if err != nil {
 			return err
 		}
@@ -76,7 +76,7 @@ func startServer() error {
 	portNr = l.Addr().(*net.TCPAddr).Port
 
 	server := echo.New()
-	server.POST("/save", saveResultFile)
+	server.POST("/save", receiveResultFile)
 	server.Listener = l
 
 	go func() {
@@ -93,8 +93,8 @@ func getPortNumber() int {
 	return portNr
 }
 
-// saveResultFile saves received result file into resultsFilestore
-func saveResultFile(c echo.Context) error {
+// receiveResultFile saves received result file into resultsFilestore
+func receiveResultFile(c echo.Context) error {
 	name := c.FormValue("name")
 	id, err := strconv.Atoi(c.FormValue("id"))
 	if err != nil {
@@ -116,10 +116,10 @@ func saveResultFile(c echo.Context) error {
 		return err
 	}
 
-	resultsFilestore[id].results = append(resultsFilestore[id].results, buf.Bytes())
+	saveResultFile(id, buf.Bytes())
 
 	if coreConfigValues.SaveResultsLocally == true {
-		err = writeFile(name, buf.Bytes(), result.Filename)
+		err = saveResultFileLocally(name, buf.Bytes(), result.Filename)
 		if err != nil {
 			return err
 		}
@@ -128,8 +128,8 @@ func saveResultFile(c echo.Context) error {
 	return c.HTML(http.StatusOK, fmt.Sprintf("Result file %s received from %s\n", result.Filename, name))
 }
 
-// writeFile saves file locally
-func writeFile(pluginName string, fileContent []byte, filename string) error {
+// saveResultFileLocally saves file locally
+func saveResultFileLocally(pluginName string, fileContent []byte, filename string) error {
 	if coreConfigValues.PathDirResults == "" {
 		return errors.New("cannot save file locally, path to directory unspecified")
 	}

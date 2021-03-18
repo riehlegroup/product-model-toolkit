@@ -20,6 +20,10 @@ func initializeFilestore(length int) {
 	}
 }
 
+func saveResultFile(id int, bytes []byte) {
+	resultsFilestore[id].results = append(resultsFilestore[id].results, bytes)
+}
+
 func getResultFiles(id int) [][]byte {
 	return resultsFilestore[id].results
 }
