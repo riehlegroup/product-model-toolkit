@@ -158,7 +158,7 @@ func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 		return err
 	}
 
-	coreCfg, err := loadCoreSystemConfig()
+	coreCfg, err := loadCoreEngineConfig()
 	if err != nil {
 		return err
 	}
@@ -201,7 +201,7 @@ func compatibilityCheck(ctx context.Context, containerID string, cfg *Config, lo
 	expectedOutput := "^test"
 	err := execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, true, logFile)
 	if err != nil {
-		log.Printf("[Plugin agent] [%v] Plugin is not compatible with core system, failed command: %v\n", cfg.Name, currentCmd)
+		log.Printf("[Plugin agent] [%v] Plugin is not compatible with core engine, failed command: %v\n", cfg.Name, currentCmd)
 		return err
 	}
 
@@ -210,7 +210,7 @@ func compatibilityCheck(ctx context.Context, containerID string, cfg *Config, lo
 		expectedOutput := "^curl"
 		err := execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, true, logFile)
 		if err != nil {
-			log.Printf("[Plugin agent] [%v] Plugin is not compatible with core system, failed command: %v\n", cfg.Name, currentCmd)
+			log.Printf("[Plugin agent] [%v] Plugin is not compatible with core engine, failed command: %v\n", cfg.Name, currentCmd)
 			return err
 		}
 	}

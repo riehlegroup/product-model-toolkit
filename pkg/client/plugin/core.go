@@ -35,9 +35,9 @@ const envRemoteRepoUser = "REMOTEREPO_USER"
 const envRemoteRepoPass = "REMOTEREPO_PASS"
 
 func StartCore(tool string, regFile string, inDir string) {
-	coreCfg, err := loadCoreSystemConfig()
+	coreCfg, err := loadCoreEngineConfig()
 	if err != nil {
-		log.Printf("[Core] Unable to load core system configuration: %v", err.Error())
+		log.Printf("[Core] Unable to load core engine configuration: %v", err.Error())
 		return
 	}
 
@@ -82,12 +82,12 @@ func StartCore(tool string, regFile string, inDir string) {
 	wg.Wait()
 }
 
-func loadCoreSystemConfig() (coreConfig, error) {
+func loadCoreEngineConfig() (coreConfig, error) {
 	if configLoaded == true {
 		return coreConfigValues, nil
 	}
 
-	handle, err := os.Open("pkg/client/plugin/config/core_system_config.json")
+	handle, err := os.Open("pkg/client/plugin/config/core_engine_config.json")
 	if err != nil {
 		return coreConfig{}, err
 	}
