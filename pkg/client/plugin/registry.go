@@ -15,6 +15,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const registryVersion = "R1.0"
+
 // Registry represents a plugin registry
 type Registry struct {
 	Version       string
@@ -37,17 +39,21 @@ func NewRegistry(file string) (*Registry, error) {
 		if err != nil {
 			return &Registry{}, err
 		}
-		return &registry, nil
+		if registry.Version == registryVersion {
+			return &registry, nil
+		}
 	}
 	if strings.Contains(file, ".json") {
 		registry, err := importFromJsonFile(file)
 		if err != nil {
 			return &Registry{}, err
 		}
-		return &registry, nil
+		if registry.Version == registryVersion {
+			return &registry, nil
+		}
 	}
 
-	return &Registry{}, errors.New("unsupported config file format")
+	return &Registry{}, errors.New("unsupported config file format or version")
 }
 
 // importFromYamlFile parses a given YAML registry file into []Plugin
@@ -60,7 +66,7 @@ func importFromYamlFile(file string) (Registry, error) {
 	return doImportFromYamlFile(handle)
 }
 
-// doImportFromYamlFile parses a given YAML registry io stream into []Plugin
+// doImportFromYamlFile parses a given YAML registry byte slice into []Plugin
 func doImportFromYamlFile(handler []byte) (Registry, error) {
 	if len(handler) == 0 {
 		return Registry{}, errors.New("file is empty")
