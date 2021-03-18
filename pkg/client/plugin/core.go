@@ -82,20 +82,20 @@ func StartCore(tool string, regFile string, inDir string) {
 	wg.Wait()
 }
 
-func loadCoreEngineConfig() (coreConfig, error) {
+func loadCoreEngineConfig() (*coreConfig, error) {
 	if configLoaded == true {
-		return coreConfigValues, nil
+		return &coreConfigValues, nil
 	}
 
 	handle, err := os.Open("pkg/client/plugin/config/core_engine_config.json")
 	if err != nil {
-		return coreConfig{}, err
+		return &coreConfig{}, err
 	}
 	defer handle.Close()
 
 	err = json.NewDecoder(handle).Decode(&coreConfigValues)
 	if err != nil {
-		return coreConfig{}, err
+		return &coreConfig{}, err
 	}
 
 	if coreConfigValues.SaveResultsLocally == true && coreConfigValues.PathDirResults == "" {
@@ -116,7 +116,7 @@ func loadCoreEngineConfig() (coreConfig, error) {
 
 	configLoaded = true
 
-	return coreConfigValues, nil
+	return &coreConfigValues, nil
 }
 
 func LoadPluginRegistry(file string) *Registry {

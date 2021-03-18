@@ -39,8 +39,8 @@ type execResponse struct {
 	ExitCode int
 }
 
-func createAgent(cfg *Config) agentCfg {
-	return agentCfg{cfg: cfg}
+func createAgent(cfg *Config) *agentCfg {
+	return &agentCfg{cfg: cfg}
 }
 
 // execPlugin executes the plugin and returns nil if successful
@@ -196,7 +196,7 @@ func execAllPluginCmd(ctx context.Context, containerID string, cfg *Config) erro
 	return nil
 }
 
-func compatibilityCheck(ctx context.Context, containerID string, cfg *Config, logFile string, coreCfg coreConfig) error {
+func compatibilityCheck(ctx context.Context, containerID string, cfg *Config, logFile string, coreCfg *coreConfig) error {
 	currentCmd := "echo test"
 	expectedOutput := "^test"
 	err := execPluginCmd(ctx, containerID, cfg, currentCmd, expectedOutput, true, logFile)
