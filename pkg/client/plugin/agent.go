@@ -142,9 +142,10 @@ func containerCreate(ctx context.Context, cli *client.Client, cfg *Config) (cont
 		&container.HostConfig{
 			Mounts: []mount.Mount{
 				{
-					Type:   mount.TypeBind,
-					Source: cfg.InDir,
-					Target: "/input",
+					Type:     mount.TypeBind,
+					Source:   cfg.InDir,
+					Target:   "/input",
+					ReadOnly: true,
 				},
 			},
 			NetworkMode: "host",
