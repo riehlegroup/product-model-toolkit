@@ -14,7 +14,7 @@ This package implements the plugin architecture in the client application as par
 
 ## How to Use
 
-This README file contains information on how to use the plugin system, for the client application see README file in the root directory
+This README file contains information on how to use the plugin system, for the client application see README file in the root directory.
 
 ### Configuration
 
@@ -35,11 +35,15 @@ dockerimg: registry.example.com/path/to/scannertool:v3.3.3 # Image name/tag incl
 shell: /bin/bash    # Shell inside container
 cmd: scannertool -i /input/ -o /result/result.json # Command that executes the scanner tool
 results:
-  - result.json     # Name of result file
+  - result.json     # Name of result file (add more as needed)
 ```
 #### Registry hostname
 
 If you don't specify the registry hostname in the image name, then Docker's local file system will be searched for that image.
+
+#### Troubleshooting
+
+In case your plugin doesn't provide expected results, check its corresponding log file after execution.
 
 #### File formats
 
@@ -61,3 +65,9 @@ If authentication is necessary to retrieve Docker images from the specified cont
 - `REMOTEREPO_PASS` your password or token (for *GitHub Packages*)
 
 Note: For *GitHub Actions* workflows `GITHUB_TOKEN` is used and no further action is necessary.
+
+## License
+
+Copyright 2021 Cristian Mogildea
+
+For license details see README file in the root directory.
