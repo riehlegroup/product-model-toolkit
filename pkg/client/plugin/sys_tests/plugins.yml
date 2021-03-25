@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: 2021 Cristian Mogildea
+#
+# SPDX-License-Identifier: Apache-2.0
+version: R1.0
+defaultplugin: 2
+plugins:
+  - name: License-Scanner
+    version: 0
+    dockerimg: docker.pkg.github.com/cmgl/product-model-toolkit/systest-license-scanner:0
+    shell: /bin/bash
+    cmd: pathToRepo=/input make run && mv ./results/* /result
+    results:
+      - licenses.csv
+  - name: SimpleContainer_Find
+    version: 0
+    dockerimg: docker.pkg.github.com/cmgl/product-model-toolkit/systest-simplecontainer:0
+    shell: /bin/bash
+    cmd: find /input -type f -printf "%T@ %p\n" | sort -nr | cut -d\  -f2- > /result/result.txt
+    results:
+      - result.txt
+  - name: SimpleContainer_MultipleResultFiles
+    version: 0
+    dockerimg: docker.pkg.github.com/cmgl/product-model-toolkit/systest-simplecontainer:0
+    shell: /bin/bash
+    cmd: touch /result/result1.file && touch /result/result2.file && touch /result/result3.file
+    results:
+      - result1.file
+      - result2.file
+      - result3.file
