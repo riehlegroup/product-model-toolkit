@@ -4,13 +4,18 @@
 
 package plugin
 
+import "errors"
+
 type filestore struct {
 	results [][]byte
 }
 
 var resultsFilestore []filestore
 
-func initializeFilestore(length int) {
+func initializeFilestore(length int) error {
+	if length == 0 {
+		return errors.New("length cannot be zero")
+	}
 	if len(resultsFilestore) == 0 {
 		resultsFilestore = []filestore{{results: *new([][]byte)}}
 
@@ -18,10 +23,17 @@ func initializeFilestore(length int) {
 			resultsFilestore = append(resultsFilestore, filestore{results: *new([][]byte)})
 		}
 	}
+
+	return nil
 }
 
-func saveResultFile(id int, bytes []byte) {
+func saveResultFile(id int, bytes []byte) error {
+	if id > len(resultsFilestore)-1 {
+		return errors.New("id out of bounds")
+	}
 	resultsFilestore[id].results = append(resultsFilestore[id].results, bytes)
+
+	return nil
 }
 
 func getResultFiles(id int) [][]byte {

@@ -52,7 +52,10 @@ func doGetResultsFromContainer(cfg *Config, cli *client.Client, ctx context.Cont
 		return err
 	}
 
-	saveResultFile(cfg.Id, buf.Bytes())
+	err = saveResultFile(cfg.Id, buf.Bytes())
+	if err != nil {
+		return err
+	}
 
 	if coreConfigValues.SaveResultsLocally == true {
 		err := saveResultFileLocally(cfg.Name, buf.Bytes(), file)
@@ -116,7 +119,10 @@ func receiveResultFile(c echo.Context) error {
 		return err
 	}
 
-	saveResultFile(id, buf.Bytes())
+	err = saveResultFile(id, buf.Bytes())
+	if err != nil {
+		return err
+	}
 
 	if coreConfigValues.SaveResultsLocally == true {
 		err = saveResultFileLocally(name, buf.Bytes(), result.Filename)

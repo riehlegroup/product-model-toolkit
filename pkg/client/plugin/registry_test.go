@@ -74,41 +74,9 @@ const registryFileStrJson = `
 }
 `
 
-func TestIsEmpty(t *testing.T) {
-	emptyReg := Registry{}
-	isEmpty := emptyReg.IsEmpty()
-	if isEmpty == false {
-		t.Error("Expected isEmpty() to return true for empty registry")
-	}
-
-	populatedReg := generateRegistryFromYamlFile()
-	isEmpty = populatedReg.IsEmpty()
-	if isEmpty == true {
-		t.Error("Expected isEmpty() for populated registry (from yaml file) to return false")
-	}
-
-	populatedReg = generateRegistryFromJsonFile()
-	isEmpty = populatedReg.IsEmpty()
-	if isEmpty == true {
-		t.Error("Expected isEmpty() for populated registry (from json file) to return false")
-	}
-}
-
 func TestDoImportFromYamlFile(t *testing.T) {
 	handler := []byte(registryFileStrYaml)
 	registry, err := doImportFromYamlFile(handler)
-	if err != nil {
-		t.Errorf("Expected import from file without err, but got %s", err.Error())
-	}
-
-	if len(registry.Plugins) != 3 {
-		t.Errorf("Expected plugins length of imported registry to be 3, but got %v", len(registry.Plugins))
-	}
-}
-
-func TestDoImportFromJsonFile(t *testing.T) {
-	handler := strings.NewReader(registryFileStrJson)
-	registry, err := doImportFromJsonFile(handler)
 	if err != nil {
 		t.Errorf("Expected import from file without err, but got %s", err.Error())
 	}
@@ -130,6 +98,18 @@ func TestDoImportFromYamlFile_EmptyFile(t *testing.T) {
 	}
 }
 
+func TestDoImportFromJsonFile(t *testing.T) {
+	handler := strings.NewReader(registryFileStrJson)
+	registry, err := doImportFromJsonFile(handler)
+	if err != nil {
+		t.Errorf("Expected import from file without err, but got %s", err.Error())
+	}
+
+	if len(registry.Plugins) != 3 {
+		t.Errorf("Expected plugins length of imported registry to be 3, but got %v", len(registry.Plugins))
+	}
+}
+
 func TestDoImportFromJsonFile_EmptyFile(t *testing.T) {
 	handler := strings.NewReader("")
 	registry, err := doImportFromJsonFile(handler)
@@ -139,6 +119,53 @@ func TestDoImportFromJsonFile_EmptyFile(t *testing.T) {
 
 	if len(registry.Plugins) != 0 {
 		t.Errorf("Expected plugins length of empty registry to be 0, but got %v", len(registry.Plugins))
+	}
+}
+
+func TestAvailable(t *testing.T) {
+	reg := generateRegistryFromYamlFile()
+	plugins := reg.Available()
+	if len(plugins) != 3 {
+		t.Errorf("Expected length of available plugins to be 3, but got %v", len(plugins))
+	}
+}
+
+func TestDefault(t *testing.T) {
+	reg := generateRegistryFromYamlFile()
+
+	first := reg.Default()
+	expected := "Licensee"
+	if first.Name != expected {
+		t.Errorf("Expected name of default plugin to be '%s', but got '%s'", expected, first.Name)
+	}
+}
+
+func TestDefault_EmptyRegistry(t *testing.T) {
+	reg := &Registry{}
+
+	first := reg.Default()
+	if first.Name != "" {
+		t.Errorf("Expected to return empty plugin if registry is empty, but got plugin with name '%s'", first.Name)
+	}
+}
+
+func TestIsEmpty(t *testing.T) {
+	emptyReg := Registry{}
+	isEmpty := emptyReg.IsEmpty()
+	if isEmpty == false {
+		t.Error("Expected isEmpty() to return true for empty registry")
+	}
+
+	populatedReg := generateRegistryFromYamlFile()
+	isEmpty = populatedReg.IsEmpty()
+	if isEmpty == true {
+		t.Error("Expected isEmpty() for populated registry (from yaml file) to return false")
+	}
+
+	populatedReg = generateRegistryFromJsonFile()
+	isEmpty = populatedReg.IsEmpty()
+	if isEmpty == true {
+		t.Error("Expected isEmpty() for populated registry (from json file) to return false")
 	}
 }
 
@@ -187,33 +214,6 @@ func TestFromStr_EmptyRegistry(t *testing.T) {
 	_, found = reg.FromStr("")
 	if found == true {
 		t.Error("Expected FromStr() for an empty registry to not return false")
-	}
-}
-
-func TestAvailable(t *testing.T) {
-	reg := generateRegistryFromYamlFile()
-	plugins := reg.Available()
-	if len(plugins) != 3 {
-		t.Errorf("Expected length of available plugins to be 3, but got %v", len(plugins))
-	}
-}
-
-func TestDefault(t *testing.T) {
-	reg := generateRegistryFromYamlFile()
-
-	first := reg.Default()
-	expected := "Licensee"
-	if first.Name != expected {
-		t.Errorf("Expected name of default plugin to be '%s', but got '%s'", expected, first.Name)
-	}
-}
-
-func TestDefault_EmptyRegistry(t *testing.T) {
-	reg := &Registry{}
-
-	first := reg.Default()
-	if first.Name != "" {
-		t.Errorf("Expected to return empty plugin if registry is empty, but got plugin with name '%s'", first.Name)
 	}
 }
 

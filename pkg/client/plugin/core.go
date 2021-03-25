@@ -62,7 +62,11 @@ func StartCore(tool string, regFile string, inDir string) {
 		pluginsExec = []Plugin{scn}
 	}
 
-	initializeFilestore(len(pluginsExec))
+	err = initializeFilestore(len(pluginsExec))
+	if err != nil {
+		log.Printf("[Core] Unable to initialize filestore: %v", err.Error())
+		return
+	}
 
 	log.Printf("[Core] Input directory: %v", inDir)
 
