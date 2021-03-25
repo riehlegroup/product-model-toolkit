@@ -27,7 +27,7 @@ You can configure the core engine using the `core_engine_config.json` configurat
 
 ### Add a new plugin
 
-A plugin consists of a Docker container that encapsulates a scanner tool. You need to ensure that the scanner tool can successfully operate inside the Docker container and must use `/results` path as input and save the result files to `/results` path. You need to specify following metadata of your plugin in the plugin registry configuration file: 
+A plugin consists of a Docker container that encapsulates a scanner tool. You need to ensure that the scanner tool can successfully operate inside the Docker container and must use `/input` path as input and save the result files to `/result` path. You need to specify following metadata of your plugin in the plugin registry configuration file: 
 ```yaml
 name: ScannerTool   # Name of your scanner tool
 version: 3.3.3      # Version
@@ -39,7 +39,7 @@ results:
 ```
 #### Registry hostname
 
-If you don't specify the registry hostname in the image name, then Docker's local file system will be searched for that image.
+If you don't specify the registry hostname in the image name, Docker's local file system will be searched for that image.
 
 #### Troubleshooting
 
@@ -47,7 +47,7 @@ In case your plugin doesn't provide expected results, check its corresponding lo
 
 #### File formats
 
-You can use both *YAML* or *JSON* file formats for your plugin registry configuration file. Use `-r` option and path to your configuration file as parameter. If you indicate `all` as parameter for `-s` option then all plugins inside the plugin registry will be executed.
+You can use both *YAML* or *JSON* file formats for your plugin registry configuration file. Use `-r` option and path to your configuration file as parameter. If you indicate `all` as parameter for `-s` option all plugins inside the plugin registry will be executed.
 
 ## Prerequisites
 
