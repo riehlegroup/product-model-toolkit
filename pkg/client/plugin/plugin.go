@@ -8,11 +8,12 @@ import (
 	"fmt"
 )
 
-// Plugin struct defines a scanner plugin
+// Plugin struct defines a plugin
 type Plugin struct {
 	Name      string
 	Version   string
 	DockerImg string
+	Shell     string
 	Cmd       string
 	Results   []string
 }
@@ -22,6 +23,7 @@ type Config struct {
 	Plugin
 	InDir     string
 	ResultDir string
+	Id        int
 }
 
 // String returns the name and the version of the plugin

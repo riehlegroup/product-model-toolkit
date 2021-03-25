@@ -1,0 +1,11 @@
+{
+  "RestApi": true,
+
+  "RemoteRepoUser": "",
+  "RemoteRepoPass": "",
+
+  "SaveResultsLocally": true,
+  "PathDirResults": "",
+
+  "PathDirLogs": ""
+}

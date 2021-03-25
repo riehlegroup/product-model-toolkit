@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: 2021 Cristian Mogildea
+#
+# SPDX-License-Identifier: Apache-2.0
+version: R1.0
+defaultplugin: 0
+plugins:
+  - name: Licensee
+    version: 9.13.0
+    dockerimg: docker.pkg.github.com/cmgl/product-model-toolkit/scanner-licensee:9.13.0
+    shell: /bin/bash
+    cmd: licensee detect /input/ --json > /result/result.json
+    results:
+      - result.json
+  - name: Scancode
+    version: 3.1.1
+    dockerimg: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1
+    shell: /bin/bash
+    cmd: ./scancode --spdx-tv /result/result.spdx /input
+    results:
+      - result.spdx
+  - name: Composer
+    version: dummy
+    dockerimg: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy
+    shell: /bin/sh
+    cmd: cp example.json result/example.json
+    results:
+      - example.json
+  - name: File-Hasher
+    version: latest
+    dockerimg: docker.pkg.github.com/osrgroup/product-model-toolkit/file-hasher:latest
+    shell: /bin/sh
+    cmd: ./fh -i /input -o /result/result.json
+    results:
+      - result.json
