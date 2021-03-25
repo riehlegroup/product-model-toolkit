@@ -1,5 +1,5 @@
 {
-  "RestApi": false,
+  "RestApi": true,
 
   "RemoteRepoUser": "",
   "RemoteRepoPass": "",
