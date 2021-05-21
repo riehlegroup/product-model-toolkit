@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	port = ":50051"
+	port = ":56985"
 )
 
 type repository interface {
