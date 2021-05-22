@@ -47,7 +47,6 @@ type service struct {
 }
 
 func (s *service) CreateBom(ctx context.Context, req *bomPb.InputValue) (*bomPb.Response, error) {
-
 	product, err := s.repo.Create(req)
 	if err != nil {
 		return nil, err

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
@@ -19,11 +20,11 @@ var bomCmd = &cobra.Command{
 		path, _ := cmd.Flags().GetString("path")
 
 		if typeValue == "" {
-			fmt.Println("The `type` subcommand is compulsory")
+			fmt.Println("The `type` flag is compulsory")
 			return
 		}
 		if path == "" {
-			fmt.Println("The `path` subcommand is compulsory")
+			fmt.Println("The `path` flag is compulsory")
 			return
 
 		}
@@ -35,8 +36,15 @@ var bomCmd = &cobra.Command{
 	},
 }
 
+
+
 func init() {
 	rootCmd.AddCommand(bomCmd)
+	bomCmd.SetUsageTemplate("The `type` and `path` flags are compulsory.\n" +
+		"`type` can be:\n" +
+		"0 which means SPDX\n" +
+		"1 which means Human Readable\n" +
+		"2 which means Custom Reports\n")
 	bomCmd.PersistentFlags().String("type", "", "BoM type")
 	bomCmd.PersistentFlags().String("path", "", "path to the input directory")
 }
@@ -93,7 +101,16 @@ func createBomWithType(path, typeValue string) error {
 		return err
 	}
 
+	// check if the bom is not created
+	if !r.Created {
+		return errors.New("an error occurred during creating the BoM, the input path is invalid")
+	}
+	// if bom is created: store the product into the db
+
+	// then create the spdx/human readable/custom report file
+	// return the generated file location
+
 	// TODO(change)
-	log.Printf("Created: %t", r.Created)
+	log.Printf("Bom created: %t", r.Created)
 	return nil
 }
