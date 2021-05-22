@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package product;
+option go_package = "../model";
 
 import "product.proto";
 

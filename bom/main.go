@@ -7,7 +7,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
-	pb "pmt/pb"
+	pb "pmt/model"
 	"sync"
 )
 

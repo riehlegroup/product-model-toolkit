@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"log"
-	pb "pmt/pb"
+	pb "pmt/model"
 )
 
 // bomCmd represents the bom command

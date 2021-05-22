@@ -8,10 +8,12 @@ WORKDIR /app
 
 ENV GO111MODULE=on
 
-COPY . .
+COPY ./model /usr/local/go/src/pmt/model
+COPY ./cli .
 
-#RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bom
+RUN go mod download
+
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o cli
 
 # Run container
 FROM alpine:latest
@@ -22,4 +24,4 @@ RUN mkdir /app
 WORKDIR /app
 COPY --from=builder /app/bom .
 
-CMD ["./bom"]
+CMD ["./cli"]

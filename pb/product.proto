@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package product;
+option go_package = "../model";
 
 message Filename {
     string file_name = 1;
