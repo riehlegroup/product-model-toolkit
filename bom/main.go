@@ -7,8 +7,7 @@ import (
 	"google.golang.org/grpc/reflection"
 	"log"
 	"net"
-	bomPb "pmt/bom/proto"
-	productPb "pmt/product/proto"
+	pb "pmt/pb"
 	"sync"
 )
 
@@ -17,42 +16,42 @@ const (
 )
 
 type repository interface {
-	Create(*bomPb.InputValue) (*productPb.Product, error)
+	Create(*pb.InputValue) (*pb.Product, error)
 }
 
 type Repository struct {
 	mu sync.RWMutex
-	products []*productPb.Product
+	products []*pb.Product
 }
 
 // Create a new bom
-func (repo *Repository) Create(inputValue *bomPb.InputValue) (*productPb.Product, error) {
+func (repo *Repository) Create(inputValue *pb.InputValue) (*pb.Product, error) {
 	repo.mu.Lock()
 	defer repo.mu.Unlock()
 
 	switch inputValue.Type {
-	case bomPb.InputType_SPDX:
+	case pb.InputType_SPDX:
 		fmt.Println("spdx")
-	case bomPb.InputType_HUMAN:
+	case pb.InputType_HUMAN:
 		fmt.Println("human")
-	case bomPb.InputType_CUSTOM:
+	case pb.InputType_CUSTOM:
 		fmt.Println("custom")
 	}
 
-	return &productPb.Product{}, nil
+	return &pb.Product{}, nil
 }
 
 type service struct {
 	repo repository
 }
 
-func (s *service) CreateBom(ctx context.Context, req *bomPb.InputValue) (*bomPb.Response, error) {
+func (s *service) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Response, error) {
 	product, err := s.repo.Create(req)
 	if err != nil {
 		return nil, err
 	}
 
-	return &bomPb.Response{Created: true, Product: product}, nil
+	return &pb.Response{Created: true, Product: product}, nil
 }
 
 func main() {
@@ -66,7 +65,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	bomPb.RegisterBomServiceServer(s, &service{repo})
+	pb.RegisterBomServiceServer(s, &service{repo})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

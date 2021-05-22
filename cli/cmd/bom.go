@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"google.golang.org/grpc"
 	"log"
-	bomPb "pmt/bom/proto"
+	pb "pmt/pb"
 )
 
 // bomCmd represents the bom command
@@ -50,7 +50,7 @@ func init() {
 }
 
 type BomClient struct {
-	bomPb.BomServiceClient
+	pb.BomServiceClient
 	*grpc.ClientConn
 }
 
@@ -62,7 +62,7 @@ func createGrpcClient() (*BomClient, error) {
 		return nil, err
 	}
 
-	client := bomPb.NewBomServiceClient(conn)
+	client := pb.NewBomServiceClient(conn)
 	bomClient := &BomClient{
 		client,
 		conn,
@@ -70,16 +70,16 @@ func createGrpcClient() (*BomClient, error) {
 	return bomClient, nil
 }
 
-func normaliseTypeValue(typeValue string) bomPb.InputType {
+func normaliseTypeValue(typeValue string) pb.InputType {
 	switch typeValue {
 	case "0":
-		return bomPb.InputType_SPDX
+		return pb.InputType_SPDX
 	case "1":
-		return bomPb.InputType_HUMAN
+		return pb.InputType_HUMAN
 	case "2":
-		return bomPb.InputType_CUSTOM
+		return pb.InputType_CUSTOM
 	default:
-		return bomPb.InputType_SPDX
+		return pb.InputType_SPDX
 	}
 }
 
@@ -91,7 +91,7 @@ func createBomWithType(path, typeValue string) error {
 	defer bomClient.ClientConn.Close()
 
 	normalTypeValue := normaliseTypeValue(typeValue)
-	inputValue := &bomPb.InputValue{
+	inputValue := &pb.InputValue{
 		FileName: path,
 		Type:     normalTypeValue,
 	}

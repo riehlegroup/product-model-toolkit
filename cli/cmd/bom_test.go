@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	product "pmt/bom/proto"
+	pb "pmt/pb"
 	"testing"
 )
 
@@ -12,35 +12,35 @@ func Test_normaliseTypeValue(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want product.InputType
+		want pb.InputType
 	}{
 		{
 			name: "test_1",
 			args: args{
 				typeValue: "Error",
 			},
-			want: product.InputType_SPDX,
+			want: pb.InputType_SPDX,
 		},
 		{
 			name: "test_2",
 			args: args{
 				typeValue: "1",
 			},
-			want: product.InputType_HUMAN,
+			want: pb.InputType_HUMAN,
 		},
 		{
 			name: "test_3",
 			args: args{
 				typeValue: "2",
 			},
-			want: product.InputType_CUSTOM,
+			want: pb.InputType_CUSTOM,
 		},
 		{
 			name: "test_4",
 			args: args{
 				typeValue: "10",
 			},
-			want: product.InputType_SPDX,
+			want: pb.InputType_SPDX,
 		},
 	}
 	for _, tt := range tests {

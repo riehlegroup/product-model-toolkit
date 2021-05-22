@@ -5,7 +5,7 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"os"
-	bomPb "pmt/bom/proto"
+	pb "pmt/pb"
 )
 
 const (
@@ -20,7 +20,7 @@ func main() {
 		log.Fatalf("Did not connect: %v", err)
 	}
 	defer conn.Close()
-	client := bomPb.NewBomServiceClient(conn)
+	client := pb.NewBomServiceClient(conn)
 
 	// Contact the server and print out its response.
 	fileName := defaultFilename
@@ -28,9 +28,9 @@ func main() {
 		fileName = os.Args[1]
 	}
 
-	inputValue := &bomPb.InputValue{
+	inputValue := &pb.InputValue{
 		FileName: fileName,
-		Type:     bomPb.InputType_SPDX, // test
+		Type:     pb.InputType_SPDX, // test
 	}
 
 	r, err := client.CreateBom(context.Background(), inputValue)
