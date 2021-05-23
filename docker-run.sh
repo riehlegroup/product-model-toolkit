@@ -1,3 +1,3 @@
 set -e
-docker build -f docker/Dockerfile.bom -t bom .
-docker build -f docker/Dockerfile.cli -t cli .
+docker build -f docker/bom/Dockerfile -t bom .
+docker build -f docker/cli/Dockerfile -t cli .

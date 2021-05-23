@@ -1,5 +1,6 @@
 .idea/
 */vendor/
-./bom/pb
-./vscode/
+bom/pb
+vscode/
 build/
+data/

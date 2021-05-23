@@ -1,0 +1,32 @@
+version: '3.5'
+
+services:
+  bom:
+    restart: always
+    build:
+      context: .
+      dockerfile: ./docker/bom/Dockerfile
+    depends_on:
+      - datastore
+#     - ?
+    ports:
+      - 56985:56985
+    environment:
+      DB_HOST: "mongodb://datastore:27017" # double check
+#
+#  cli:
+#    build:
+#      context: .
+#      dockerfile: ./docker/cli/Dockerfile
+
+  datastore:
+    image: mongo
+    container_name: "datastore"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./data/db:/data/db # ensures data persistence between restarting
+    ports:
+      - 27017
+    command: mongod --logpath=/dev/null
