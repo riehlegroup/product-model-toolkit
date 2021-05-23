@@ -92,7 +92,7 @@ func createBomWithType(path, typeValue string) error {
 
 	normalTypeValue := normaliseTypeValue(typeValue)
 	inputValue := &pb.InputValue{
-		FileName: path,
+		FilePath: path,
 		Type:     normalTypeValue,
 	}
 
@@ -102,7 +102,7 @@ func createBomWithType(path, typeValue string) error {
 	}
 
 	// check if the bom is not created
-	if !r.Created {
+	if !r.Result.Created {
 		return errors.New("an error occurred during creating the BoM, the input path is invalid")
 	}
 	// if bom is created: store the product into the db
@@ -111,6 +111,6 @@ func createBomWithType(path, typeValue string) error {
 	// return the generated file location
 
 	// TODO(change)
-	log.Printf("Bom created: %t", r.Created)
+	log.Printf("Bom created: %t", r.Result.Created)
 	return nil
 }

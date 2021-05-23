@@ -37,9 +37,14 @@ message License {
 }
 
 message Response {
-    bool created = 1;
+    Result result = 1;
     Product product = 2;
     repeated Product products = 3;
+}
+
+message Result {
+    bool created = 1;
+    string file_path = 2;
 }
 
 message GerRequest {}

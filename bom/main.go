@@ -2,11 +2,14 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"io/ioutil"
 	"log"
 	"net"
+	"os"
 	pb "pmt/model"
 	"sync"
 )
@@ -15,59 +18,12 @@ const (
 	port = ":56985"
 )
 
-type repository interface {
-	Create(*pb.InputValue) (*pb.Product, error)
-	GetAll() []*pb.Product
-}
+const (
+	defaultHost = "datastore:27017"
+)
 
-type Repository struct {
-	mu sync.RWMutex
-	products []*pb.Product
-}
-
-// Create a new bom
-func (repo *Repository) Create(inputValue *pb.InputValue) (*pb.Product, error) {
-	repo.mu.Lock()
-	defer repo.mu.Unlock()
-
-	switch inputValue.Type {
-	case pb.InputType_SPDX:
-		fmt.Println("spdx")
-	case pb.InputType_HUMAN:
-		fmt.Println("human")
-	case pb.InputType_CUSTOM:
-		fmt.Println("custom")
-	}
-
-	return &pb.Product{}, nil
-}
-
-func (repo *Repository) GetAll() []*pb.Product {
-	return repo.products
-}
-
-type bomService struct {
-	repo repository
-}
-
-func (s *bomService) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Response, error) {
-	product, err := s.repo.Create(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb.Response{Created: true, Product: product}, nil
-}
-
-func (s *bomService) GetProducts(ctx context.Context, req *pb.GerRequest) (*pb.Response, error) {
-	products := s.repo.GetAll()
-	return &pb.Response{Products: products}, nil
-}
 
 func main() {
-
-	repo := &Repository{}
-
 	// Set-up our gRPC server.
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
@@ -75,10 +31,24 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	pb.RegisterBomServiceServer(s, &bomService{repo})
-
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
+
+	uri := os.Getenv("DB_HOST")
+	if uri == "" {
+		uri = defaultHost
+	}
+
+	client, err := CreateClient(context.Background(), uri, 0)
+	if err != nil {
+		log.Panic(err)
+	}
+	defer client.Disconnect(context.Background())
+
+	productCollection := client.Database("pmt").Collection("products")
+	repository := &MongoRepository{productCollection}
+
+	pb.RegisterBomServiceServer(s, &bomService{repository})
 
 	log.Println("Running on port:", port)
 	if err := s.Serve(lis); err != nil {

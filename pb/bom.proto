@@ -12,7 +12,7 @@ enum InputType {
 }
 
 message InputValue {
-    string file_name = 1;
+    string file_path = 1;
     InputType type = 2;
 }
 
