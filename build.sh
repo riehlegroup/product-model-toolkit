@@ -1,0 +1,1 @@
+go build -o build/cli ./cli/main.go

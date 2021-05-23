@@ -17,6 +17,7 @@ const (
 
 type repository interface {
 	Create(*pb.InputValue) (*pb.Product, error)
+	GetAll() []*pb.Product
 }
 
 type Repository struct {
@@ -41,17 +42,26 @@ func (repo *Repository) Create(inputValue *pb.InputValue) (*pb.Product, error) {
 	return &pb.Product{}, nil
 }
 
-type service struct {
+func (repo *Repository) GetAll() []*pb.Product {
+	return repo.products
+}
+
+type bomService struct {
 	repo repository
 }
 
-func (s *service) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Response, error) {
+func (s *bomService) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Response, error) {
 	product, err := s.repo.Create(req)
 	if err != nil {
 		return nil, err
 	}
 
 	return &pb.Response{Created: true, Product: product}, nil
+}
+
+func (s *bomService) GetProducts(ctx context.Context, req *pb.GerRequest) (*pb.Response, error) {
+	products := s.repo.GetAll()
+	return &pb.Response{Products: products}, nil
 }
 
 func main() {
@@ -65,7 +75,7 @@ func main() {
 	}
 	s := grpc.NewServer()
 
-	pb.RegisterBomServiceServer(s, &service{repo})
+	pb.RegisterBomServiceServer(s, &bomService{repo})
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

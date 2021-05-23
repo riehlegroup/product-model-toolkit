@@ -36,5 +36,15 @@ message License {
     string concluded_license = 3;
 }
 
-service ProductService {}
+message Response {
+    bool created = 1;
+    Product product = 2;
+    repeated Product products = 3;
+}
+
+message GerRequest {}
+
+service ProductService {
+    rpc GetProducts(GerRequest) returns(Response) {}
+}
 

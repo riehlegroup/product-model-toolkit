@@ -16,11 +16,6 @@ message InputValue {
     InputType type = 2;
 }
 
-message Response {
-    bool created = 1;
-    product.Product product = 2;
-}
-
 service BomService {
-    rpc CreateBom(InputValue) returns (Response) {}
+    rpc CreateBom(InputValue) returns (product.Response) {}
 }
