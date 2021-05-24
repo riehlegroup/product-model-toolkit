@@ -2,16 +2,12 @@ package main
 
 import (
 	"context"
-	"errors"
-	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	"io/ioutil"
 	"log"
 	"net"
 	"os"
 	pb "pmt/model"
-	"sync"
 )
 
 const (
@@ -21,6 +17,8 @@ const (
 const (
 	defaultHost = "datastore:27017"
 )
+
+
 
 
 func main() {
@@ -48,7 +46,7 @@ func main() {
 	productCollection := client.Database("pmt").Collection("products")
 	repository := &MongoRepository{productCollection}
 
-	pb.RegisterBomServiceServer(s, &bomService{repository})
+	pb.RegisterBomServiceServer(s, &handler{repository})
 
 	log.Println("Running on port:", port)
 	if err := s.Serve(lis); err != nil {

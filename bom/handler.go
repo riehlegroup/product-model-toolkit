@@ -1,18 +1,32 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	proto "github.com/golang/protobuf/proto"
+	"github.com/spdx/tools-golang/spdx"
+	"github.com/spdx/tools-golang/tvloader"
+	"io"
 	"io/ioutil"
 	pb "pmt/model"
-	"sync"
-	proto "github.com/golang/protobuf/proto"
 )
 
 type handler struct {
-	mu sync.RWMutex
+	//mu sync.RWMutex
 	repository
+}
+
+// SPDX
+func AsSPDX(input io.Reader) (*spdx.Document2_1, error) {
+	doc, err := tvloader.Load2_1(input)
+	if err != nil {
+		msg := fmt.Sprintf("error while parsing SPDX body: %v", err)
+		return nil, errors.New(msg)
+	}
+
+	return doc, nil
 }
 
 func (h *handler) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Response, error) {
@@ -24,14 +38,19 @@ func (h *handler) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Respon
 
 	product := &pb.Product{}
 	if err := proto.Unmarshal(data, product); err != nil {
-		err := errors.New(fmt.Sprintf("Failed to parse product: %v", err))
+		err := errors.New(fmt.Sprintf("failed to parse product: %v", err))
 		return nil, err
 	}
 
 	// do the logic here (creating BoM!
 	switch req.Type {
 	case pb.InputType_SPDX:
-		//
+		ioReaderData := bytes.NewReader(data)
+		doc, err := AsSPDX(ioReaderData)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println(doc)
 		fmt.Println("spdx")
 	case pb.InputType_HUMAN:
 		//

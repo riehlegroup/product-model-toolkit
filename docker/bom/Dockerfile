@@ -12,8 +12,6 @@ COPY ./model /usr/local/go/src/pmt/model
 COPY ./bom .
 
 RUN go mod download
-RUN go get google.golang.org/protobuf/reflect/protoreflect@v1.25.0
-RUN go get google.golang.org/protobuf/runtime/protoimpl@v1.25.0
 
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bom *.go
 

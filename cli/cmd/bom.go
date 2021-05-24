@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc"
 	"log"
 	pb "pmt/model"
 )
@@ -49,26 +48,6 @@ func init() {
 	bomCmd.PersistentFlags().String("path", "", "path to the input directory")
 }
 
-type BomClient struct {
-	pb.BomServiceClient
-	*grpc.ClientConn
-}
-
-func createGrpcClient() (*BomClient, error) {
-	// Set up a connection to the server.
-	conn, err := grpc.Dial("localhost:56985", grpc.WithInsecure()) // TODO(change the hard coded address)
-	if err != nil {
-		log.Printf("Did not connect: %v\n", err)
-		return nil, err
-	}
-
-	client := pb.NewBomServiceClient(conn)
-	bomClient := &BomClient{
-		client,
-		conn,
-	}
-	return bomClient, nil
-}
 
 func normaliseTypeValue(typeValue string) pb.InputType {
 	switch typeValue {
@@ -84,11 +63,11 @@ func normaliseTypeValue(typeValue string) pb.InputType {
 }
 
 func createBomWithType(path, typeValue string) error {
-	bomClient, err := createGrpcClient()
+	client, err := createGrpcClient()
 	if err != nil {
 		return err
 	}
-	defer bomClient.ClientConn.Close()
+	defer client.ClientConn.Close()
 
 	normalTypeValue := normaliseTypeValue(typeValue)
 	inputValue := &pb.InputValue{
@@ -96,7 +75,7 @@ func createBomWithType(path, typeValue string) error {
 		Type:     normalTypeValue,
 	}
 
-	r, err := bomClient.CreateBom(context.Background(), inputValue)
+	r, err := client.CreateBom(context.Background(), inputValue)
 	if err != nil {
 		return err
 	}
