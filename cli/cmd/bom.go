@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/spf13/cobra"
 	"log"
 	pb "pmt/model"
@@ -18,18 +17,9 @@ var bomCmd = &cobra.Command{
 		typeValue, _ := cmd.Flags().GetString("type")
 		path, _ := cmd.Flags().GetString("path")
 
-		if typeValue == "" {
-			fmt.Println("The `type` flag is compulsory")
-			return
-		}
-		if path == "" {
-			fmt.Println("The `path` flag is compulsory")
-			return
-
-		}
 		err := createBomWithType(typeValue, path)
 		if err != nil {
-			log.Fatalf("an error occurred: %v\n", err)
+			log.Fatalf("error, %v\n", err)
 			return
 		}
 	},
