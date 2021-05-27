@@ -18,9 +18,6 @@ const (
 	defaultHost = "datastore:27017"
 )
 
-
-
-
 func main() {
 	// Set-up our gRPC server.
 	lis, err := net.Listen("tcp", port)

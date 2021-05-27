@@ -5,11 +5,11 @@ import (
 
 	"context"
 	"errors"
-	"log"
-
+	"google.golang.org/grpc"
 	"fmt"
 	"github.com/spf13/cobra"
 	pb "pmt/model"
+	"strings"
 )
 
 var (
@@ -17,37 +17,56 @@ var (
 	importPath string
 )
 
+
 func importCommandHandler(t, p string) error {
-	client, err := createGrpcClient()
+	type Client struct {
+		pb.ImportServiceClient
+		*grpc.ClientConn
+	}
+
+	// Set up a connection to the server.
+	conn, err := grpc.Dial("localhost:56985", grpc.WithInsecure()) // TODO(change the hard coded address)
 	if err != nil {
 		return err
 	}
+
+	// create a new grpc client
+	importServiceClient := pb.NewImportServiceClient(conn)
+	client := &Client{
+		importServiceClient,
+		conn,
+	}
+
+	// handle the error from grpc client phase
+	if err != nil {
+		return err
+	}
+
+	// close the client connection in defer
 	defer client.ClientConn.Close()
-	normalTypeValue := normaliseTypeValue(t)
-	inputValue := &pb.InputValue{
-		FilePath: importPath,
-		Type:     normalTypeValue,
+
+	// create the import value
+	importInput := &pb.ImportInput{
+		Type: strings.ToLower(t),
+		FilePath: strings.ToLower(p),
 	}
 
-	r, err := client.CreateBom(context.Background(), inputValue)
+	// call the create import function of the client
+	r, err := client.CreateImport(context.Background(), importInput)
+
+	// handle possible errors
 	if err != nil {
 		return err
 	}
 
-
-	// check if the bom is not created
-	if !r.Result.Created {
-		return errors.New("an error occurred during creating the BoM, the input path is invalid")
+	// check if the import is done
+	if r.Result.Created {
+		fmt.Println("File successfully imported")
+		return nil
 	}
-	// if bom is created: store the product into the db
 
-	// then create the spdx/human readable/custom report file
-	// return the generated file location
-
-	// TODO(change)
-	log.Printf("Bom created: %t", r.Result.Created)
-	return nil
-
+	// return the result
+	return errors.New("couldn't import the file")
 }
 
 // importCmd represents the import command
@@ -82,17 +101,15 @@ func init() {
 	// make the flags required
 	makeFlagsRequired("type", "path")
 
-	startOfUsage := "\n================= USAGE ====================\n"
-	endOfUsage := "==========================================\n"
+	startOfUsage := "Usage:\n"
 	usageInstructions := []string{
-		"`type` values are spdx, composer or hasher\n",
-		"`path` is the path to the required file\n",
+		"  type: values are spdx, composer or hasher\n",
+		"  path: path to the file\n",
 	}
 
-	usageTemplate := fmt.Sprintf("%v%v%v%v",
+	usageTemplate := fmt.Sprintf("%v%v%v",
 		startOfUsage,
 		usageInstructions[0],
-		usageInstructions[1],
-		endOfUsage)
+		usageInstructions[1])
 	importCmd.SetUsageTemplate(usageTemplate)
 }

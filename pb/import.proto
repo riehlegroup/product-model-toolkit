@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package product;
+option go_package = "../model";
+
+import "product.proto";
+
+message ImportInput {
+    string file_path = 1;
+    string type = 2;
+}
+
+service ImportService {
+    rpc CreateImport(ImportInput) returns (product.Response) {}
+}
