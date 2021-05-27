@@ -15,7 +15,7 @@ import (
 
 type handler struct {
 	//mu sync.RWMutex
-	repository
+	main2.repository
 }
 
 // SPDX
@@ -61,7 +61,7 @@ func (h *handler) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Respon
 	}
 
 	// Save our product
-	if err := h.repository.Create(ctx, MarshalProduct(product)); err != nil {
+	if err := h.repository.Create(ctx, main2.MarshalProduct(product)); err != nil {
 		return nil, err
 	}
 
@@ -75,8 +75,8 @@ func (h *handler) GetProducts(ctx context.Context, req *pb.GerRequest) (*pb.Resp
 	}
 
 	response := &pb.Response{
-		Result:  nil,
-		Products: UnmarshalProductCollection(products),
+		Result:   nil,
+		Products: main2.UnmarshalProductCollection(products),
 	}
 	return response, nil
 }

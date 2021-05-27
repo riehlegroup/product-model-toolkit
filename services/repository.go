@@ -2,32 +2,32 @@ package main
 
 import (
 	"context"
-	pb "pmt/model"
 	"go.mongodb.org/mongo-driver/mongo"
+	pb "pmt/model"
 )
 
 
 type Product struct {
-	ID          string     `json:"id"`
-	Version string `json:"version"`
-	Vcs string `json:"vcs"`
-	Description string     `json:"description"`
-	Comment string `json:"commenet"`
-	HomePageURL string `json:"home_page_url"`
-	ExternalRef string `json:"external_ref"`
-	Components Components `json:"components"`
-	UsageTypes string `json:"usage_types"`
-	ClearingState string `json:"clearing_state"`
-	DepGraph string `json:"dep_graph"`
-	Infrastructure string `json:"infrastructure"`
+	ID             string     `json:"id"`
+	Version        string     `json:"version"`
+	Vcs            string     `json:"vcs"`
+	Description    string     `json:"description"`
+	Comment        string     `json:"commenet"`
+	HomePageURL    string     `json:"home_page_url"`
+	ExternalRef    string     `json:"external_ref"`
+	Components     Components `json:"components"`
+	UsageTypes     string     `json:"usage_types"`
+	ClearingState  string     `json:"clearing_state"`
+	DepGraph       string     `json:"dep_graph"`
+	Infrastructure string     `json:"infrastructure"`
 }
 
 
 type Component struct {
-	ID         string `json:"id"`
-	Name string `json:"name"`
-	Package string `json:"package"`
-	Version string `json:"version"`
+	ID      string  `json:"id"`
+	Name    string  `json:"name"`
+	Package string  `json:"package"`
+	Version string  `json:"version"`
 	License License `json:"license"`
 }
 

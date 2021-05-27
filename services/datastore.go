@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func CreateClient(ctx context.Context, uri string, retry int32) (*mongo.Client, error) {
+func createMongoDbClient(ctx context.Context, uri string, retry int32) (*mongo.Client, error) {
 	conn, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err := conn.Ping(ctx, nil); err != nil {
 		if retry >= 3 {
