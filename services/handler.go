@@ -8,14 +8,14 @@ import (
 	proto "github.com/golang/protobuf/proto"
 	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/tvloader"
+	"pmt/internal/cnst"
 	"io"
 	"io/ioutil"
 	pb "pmt/model"
 )
 
 type handler struct {
-	//mu sync.RWMutex
-	main2.repository
+	repository
 }
 
 // SPDX
@@ -29,39 +29,57 @@ func AsSPDX(input io.Reader) (*spdx.Document2_1, error) {
 	return doc, nil
 }
 
-func (h *handler) CreateBom(ctx context.Context, req *pb.InputValue) (*pb.Response, error) {
-
+func (h *handler) CreateImport(ctx context.Context, req *pb.ImportInput) (*pb.Response, error) {
+	// read the imported file
 	data, err := ioutil.ReadFile(req.FilePath)
+
+	// check the error of reading the file
 	if err != nil {
 		return nil, err
 	}
 
+	// define new product struct
 	product := &pb.Product{}
+
+	// unmarshal the data into product and check the error
 	if err := proto.Unmarshal(data, product); err != nil {
 		err := errors.New(fmt.Sprintf("failed to parse product: %v", err))
 		return nil, err
 	}
 
-	// do the logic here (creating BoM!
+	// switch case over the type of import
 	switch req.Type {
-	case pb.InputType_SPDX:
+	// in case if it is spdx file
+	case cnst.SPDX:
+		// convert data bytes to ioReader format
 		ioReaderData := bytes.NewReader(data)
+
+		// convert the input to the document
 		doc, err := AsSPDX(ioReaderData)
+
+		// check the error of conversion
 		if err != nil {
 			return nil, err
 		}
+
 		fmt.Println(doc)
 		fmt.Println("spdx")
-	case pb.InputType_HUMAN:
+
+	// in case if it is composer file
+	case cnst.Composer:
 		//
-		fmt.Println("human")
-	case pb.InputType_CUSTOM:
+		fmt.Println("composer")
+
+	// in case if it is file-hasher file
+	case cnst.FileHasher:
 		//
-		fmt.Println("custom")
+		fmt.Println("file hasher")
+	default:
+		return nil, errors.New("invalid type")
 	}
 
-	// Save our product
-	if err := h.repository.Create(ctx, main2.MarshalProduct(product)); err != nil {
+	// save the product and check the error
+	if err := h.repository.Create(ctx, MarshalProduct(product)); err != nil {
 		return nil, err
 	}
 
@@ -76,7 +94,7 @@ func (h *handler) GetProducts(ctx context.Context, req *pb.GerRequest) (*pb.Resp
 
 	response := &pb.Response{
 		Result:   nil,
-		Products: main2.UnmarshalProductCollection(products),
+		Products: UnmarshalProductCollection(products),
 	}
 	return response, nil
 }

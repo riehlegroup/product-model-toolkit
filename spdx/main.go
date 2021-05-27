@@ -39,7 +39,7 @@ func main() {
 
 	client, err := CreateClient(context.Background(), uri, 0)
 	if err != nil {
-		log.Panic(err)
+		log.Fatalf("failed to listen: %v", err)
 	}
 	defer client.Disconnect(context.Background())
 

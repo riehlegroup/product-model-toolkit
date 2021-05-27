@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+  datastore:
+    image: mongo
+    container_name: "datastore"
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    volumes:
+      - ./docker/data/db:/data/db # ensures data persistence between restarting
+    ports:
+      - 27017
+    command: mongod --logpath=/dev/null
