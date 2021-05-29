@@ -41,12 +41,30 @@ var rootCmd = &cobra.Command{
 	//Run: func(cmd *cobra.Command, args []string) {},
 }
 
+var versionCmd = &cobra.Command{
+	Use: "version",
+	Short: "Show the version of Product Model Toolkit",
+	Long: "This command will show the current using version of the application",
+	Run: func(cmd *cobra.Command, args []string) {
+		printVersion()
+	},
+}
+
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "Import the component graph",
 	Long: `Import the component graph from spdx, composer or file-hasher`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("reza called")
+		fmt.Println("import called")
+	},
+}
+
+var listImportOptions = &cobra.Command{
+	Use:   "list",
+	Short: "List all available import options",
+	Long: `List all available file types for importing as a product into the PMt`,
+	Run: func(cmd *cobra.Command, args []string) {
+		listAvailableImportOptions()
 	},
 }
 
@@ -59,6 +77,8 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 	rootCmd.AddCommand(importCmd)
+	rootCmd.AddCommand(versionCmd)
+	importCmd.AddCommand(listImportOptions)
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -70,10 +90,10 @@ func init() {
 	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
 
-	importCmd.PersistentFlags().StringVarP(&importType, "type", "t", "", "import file type (required)")
+	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
 	importCmd.MarkPersistentFlagRequired("type")
 
-	importCmd.PersistentFlags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
+	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
 	importCmd.MarkPersistentFlagRequired("path")
 }
 
@@ -156,6 +176,19 @@ func printVersion() {
 	)
 }
 
+
+func listAvailableImportOptions() {
+	availableImportOptions := []string{
+		"spdx",
+		"composer",
+		"file-hasher",
+	}
+		fmt.Println("Available import options:")
+	for key, name := range availableImportOptions {
+		fmt.Printf("%v) %v\n",key+1, name)
+	}
+}
+
 func listScanner() {
 	fmt.Println("Available license scanner:")
 	for _, scn := range scanner.Available {
@@ -163,46 +196,3 @@ func listScanner() {
 	}
 	fmt.Printf("----------\n")
 }
-
-
-/*
-adding new commands
-
-package cmd
-
-import (
-	"fmt"
-
-	"github.com/spf13/cobra"
-)
-
-// rezaCmd represents the reza command
-var rezaCmd = &cobra.Command{
-	Use:   "reza",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("reza called")
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(rezaCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// rezaCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// rezaCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-}
-
- */
