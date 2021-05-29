@@ -26,7 +26,7 @@ func main() {
 	repo := new(memory.DB)
 	repo.AddSampleData()
 	// Use Postgraphile as DB backend
-	// repo := postgraph.NewRepo("http://localhost:5433/graphql")
+	//repo := postgraph.NewRepo("http://localhost:5433/graphql")
 
 	r := rest.NewSrv(
 		"127.0.0.1:8081",

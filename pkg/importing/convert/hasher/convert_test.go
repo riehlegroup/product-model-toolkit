@@ -28,8 +28,8 @@ var artClient model.Artifact = model.Artifact{
 }
 
 var artMain model.Artifact = model.Artifact{
-	Path:  "/src/main.go",
-	Name:  "main.go",
+	Path:  "/src/cli.go",
+	Name:  "cli.go",
 	IsDir: false,
 	Hash: model.Hash{
 		MD5:    "9c433b223840fe0aa7977ca9b7bcde7a",
@@ -164,12 +164,12 @@ func TestAsComponent_withDirNested(t *testing.T) {
 func TestAsComponent_withFile(t *testing.T) {
 	comp := asComponent(artMain)
 
-	expectedName := "main.go"
+	expectedName := "cli.go"
 	if comp.Name != expectedName {
 		t.Errorf("Expected component name to be '%v', but got '%v'", expectedName, comp.Name)
 	}
 
-	expectedPath := "/src/main.go"
+	expectedPath := "/src/cli.go"
 	if comp.Pkg != expectedPath {
 		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
 	}
@@ -225,8 +225,8 @@ func TestRemoveBasePath(t *testing.T) {
 	}{
 		{
 			name: "1 Level",
-			args: args{basePath: "/myProj", path: "/myProj/src/main.go"},
-			want: "/src/main.go",
+			args: args{basePath: "/myProj", path: "/myProj/src/cli.go"},
+			want: "/src/cli.go",
 		},
 		{
 			name: "2 Level",
@@ -235,13 +235,13 @@ func TestRemoveBasePath(t *testing.T) {
 		},
 		{
 			name: "Root path file",
-			args: args{basePath: "/", path: "/main.go"},
-			want: "/main.go",
+			args: args{basePath: "/", path: "/cli.go"},
+			want: "/cli.go",
 		},
 		{
 			name: "Root path folder with file",
-			args: args{basePath: "/", path: "/src/main.go"},
-			want: "/src/main.go",
+			args: args{basePath: "/", path: "/src/cli.go"},
+			want: "/src/cli.go",
 		},
 	}
 	for _, tt := range tests {
