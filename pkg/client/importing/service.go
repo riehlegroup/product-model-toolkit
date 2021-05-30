@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package scanning
+package importing
 
 import (
 	"fmt"
@@ -123,19 +123,20 @@ func sendResults(resDir string, files []fileName, c *rest.Client, url string) {
 	}
 }
 
-func SendImport(importPath string, c *rest.Client, url string) {
+func SendImport(importPath string, c *rest.Client, url string) error {
 
 	resFile, err := os.Open(importPath)
 	if err != nil {
 		log.Printf("[Scanner] Error while reading result files: %s", err)
-		return
+		return err
 	}
 	defer resFile.Close()
 
 	loc, err := c.PostResult(url, resFile)
 	if err != nil {
 		log.Printf("[Scanner] Error while sending results to server [%s]: %s", url, err)
-		return
+		return err
 	}
 	log.Printf("[Scanner] Successfully sent results to server. Path to created resource: %s", loc)
+	return nil
 }

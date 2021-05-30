@@ -5,46 +5,55 @@
 package main
 
 import (
-	"flag"
 	"fmt"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/exporting"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/importing"
+
+	//"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 	"github.com/spf13/cobra"
+	"log"
 	"os"
+	"strings"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
-	//"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
-	//"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
+
+	//"github.com/osrgroup/product-model-toolkit/pkg/client/importing"
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
-
 
 var gitCommit string
 var (
 	importType string
 	importPath string
+
+	exportType string
+	exportPath string
 )
+
 const serverBaseURL = "http://localhost:8081/api/v1"
 
+// Do I need this?
 type flags struct {
 	scanner string
 	inDir   string
 }
 
+// Do I need this?
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "cli",
 	Short: "Product Model Toolkit",
-	Long: `Product Model Toolkit for Managing Open Source Dependencies in Products`,
-	//Run: func(cmd *cobra.Command, args []string) {},
+	Long:  `Product Model Toolkit for Managing Open Source Dependencies in Products`,
 }
 
 var versionCmd = &cobra.Command{
-	Use: "version",
+	Use:   "version",
 	Short: "Show the version of Product Model Toolkit",
-	Long: "This command will show the current using version of the application",
+	Long:  "This command will show the current using version of the application",
 	Run: func(cmd *cobra.Command, args []string) {
 		printVersion()
 	},
@@ -53,18 +62,78 @@ var versionCmd = &cobra.Command{
 var importCmd = &cobra.Command{
 	Use:   "import",
 	Short: "Import the component graph",
-	Long: `Import the component graph from spdx, composer or file-hasher`,
+	Long:  `Import the component graph from spdx, composer or file-hasher`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("import called")
+		if err := callImport(importType, importPath); err != nil {
+			log.Fatalln(err)
+			return
+		}
+	},
+}
+
+var exportCmd = &cobra.Command{
+	Use:   "export",
+	Short: "Export the component graph",
+	Long:  `Export the component graph from spdx, composer or file-hasher`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := callExport(exportType, exportPath); err != nil {
+			log.Fatalln(err)
+			return
+		}
+	},
+}
+
+var diffCmd = &cobra.Command{
+	Use:   "diff",
+	Short: "Difference between two component graphs",
+	Long:  `Difference between two component graphs`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("call diff")
+	},
+}
+
+var searchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search for components",
+	Long:  `Search for components by their name and meta-data`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("call search")
+	},
+}
+
+var crawlerCmd = &cobra.Command{
+	Use:   "crawler",
+	Short: "crawl the licenses",
+	Long:  `crawl the licenses`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("call crawler")
+	},
+}
+
+var mergeCmd = &cobra.Command{
+	Use:   "merge",
+	Short: "Merge two components",
+	Long:  `Merge two components`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("call merge")
 	},
 }
 
 var listImportOptions = &cobra.Command{
 	Use:   "list",
-	Short: "List all available import options",
-	Long: `List all available file types for importing as a product into the PMt`,
+	Short: "List all available import types",
+	Long:  `List all available file types for importing as a product into the PMt`,
 	Run: func(cmd *cobra.Command, args []string) {
-		listAvailableImportOptions()
+		listAvailableImportTypes()
+	},
+}
+
+var listExportOptions = &cobra.Command{
+	Use:   "list",
+	Short: "List all available export types",
+	Long:  `List all available file types for exporting from BoM artifacts`,
+	Run: func(cmd *cobra.Command, args []string) {
+		listAvailableExportTypes()
 	},
 }
 
@@ -76,25 +145,36 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.AddCommand(importCmd)
 	rootCmd.AddCommand(versionCmd)
-	importCmd.AddCommand(listImportOptions)
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
+	rootCmd.AddCommand(importCmd)
+	rootCmd.AddCommand(exportCmd)
+	rootCmd.AddCommand(diffCmd)
+	rootCmd.AddCommand(searchCmd)
+	rootCmd.AddCommand(crawlerCmd)
+	rootCmd.AddCommand(mergeCmd)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	//rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
-
+	importCmd.AddCommand(listImportOptions)
 	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
-	importCmd.MarkPersistentFlagRequired("type")
-
 	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
-	importCmd.MarkPersistentFlagRequired("path")
+	importCmd.MarkFlagRequired("type")
+	importCmd.MarkFlagRequired("path")
+
+	// exportCmd
+	exportCmd.AddCommand(listExportOptions)
+	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export file type (required)")
+	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
+	exportCmd.MarkFlagRequired("type")
+	exportCmd.MarkFlagRequired("path")
+
+	// diffCmd
+
+	// searchCmd
+
+	// crawlerCmd
+
+	// mergeCmd
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -120,16 +200,10 @@ func initConfig() {
 	}
 }
 
-
 func main() {
+	// set-up the commands
 	Execute()
 
-
-	//flg, abort := checkFlags()
-	//if abort {
-	//	os.Exit(0)
-	//}
-	//
 	//scn := scanner.FromStr(flg.scanner)
 	//cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
 	//
@@ -140,34 +214,6 @@ func main() {
 
 }
 
-func checkFlags() (flags, bool) {
-	version := flag.Bool("v", false, "show version")
-
-	lstScanner := flag.Bool("l", false, "list all available scanner")
-
-	scanner := flag.String("s", "", "scanner to to use from list of available scanner")
-	wd, _ := os.Getwd()
-	inDir := flag.String("i", wd, "input dir to scan. Default is current working directory")
-
-	flag.Parse()
-
-	if *version {
-		printVersion()
-	}
-
-	if *lstScanner {
-		listScanner()
-	}
-
-	abortAfterFlags := *version || *lstScanner
-
-	return flags{
-			*scanner,
-			*inDir,
-		},
-		abortAfterFlags
-}
-
 func printVersion() {
 	fmt.Printf(
 		"PMT Client\n----------\nVersion: %s\nGit commit: %s\n",
@@ -176,23 +222,44 @@ func printVersion() {
 	)
 }
 
-
-func listAvailableImportOptions() {
+func listAvailableImportTypes() {
 	availableImportOptions := []string{
 		"spdx",
 		"composer",
 		"file-hasher",
 	}
-		fmt.Println("Available import options:")
+	fmt.Println("Available import options:")
 	for key, name := range availableImportOptions {
-		fmt.Printf("%v) %v\n",key+1, name)
+		fmt.Printf("%v) %v\n", key+1, name)
 	}
 }
 
-func listScanner() {
-	fmt.Println("Available license scanner:")
-	for _, scn := range scanner.Available {
-		fmt.Printf("----------\nName:    %s\nVersion: %s\nImage:   %s\n", scn.Name, scn.Version, scn.DockerImg)
+func listAvailableExportTypes() {
+	availableExportOptions := []string{
+		"spdx",
+		"human-read",
+		"custom-report",
 	}
-	fmt.Printf("----------\n")
+	fmt.Println("Available import options:")
+	for key, name := range availableExportOptions {
+		fmt.Printf("%v) %v\n", key+1, name)
+	}
+}
+
+func callImport(importType, importPath string) error {
+	postPath := fmt.Sprintf("/products/import/%s", strings.ToLower(importType))
+	client := rest.NewClient(serverBaseURL)
+	if err := importing.SendImport(importPath, client, postPath); err != nil {
+		return err
+	}
+	return nil
+}
+
+func callExport(exportType, exportPath string) error {
+	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
+	client := rest.NewClient(serverBaseURL)
+	if err := exporting.SendExport(exportPath, client, postPath); err != nil {
+		return err
+	}
+	return nil
 }

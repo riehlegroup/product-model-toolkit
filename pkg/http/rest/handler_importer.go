@@ -26,7 +26,6 @@ func importFromScanner(iSrv importing.Service) echo.HandlerFunc {
 			if err != nil {
 				c.Error(errors.Wrap(err, "Unable to perform SPDX import"))
 			}
-
 			return c.String(
 				http.StatusOK,
 				fmt.Sprintf("Successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
