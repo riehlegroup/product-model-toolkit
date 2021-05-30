@@ -23,43 +23,45 @@ import (
 	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
-var gitCommit string
 var (
-	importType string
-	importPath string
+	// config file
+	cfgFile string
 
+	// crawlerCmd
+	crawlerName   string
+	crawlerOutput string
+
+	// diffCmd
+	diffFirstId    string
+	diffSecondId   string
+	diffFirstFile  string
+	diffSecondFile string
+
+	// exportCmd
 	exportId   string
 	exportType string
 	exportPath string
 
-	diffFirstId  string
-	diffSecondId string
+	// importCmd
+	importType string
+	importPath string
 
-	diffFirstFile  string
-	diffSecondFile string
+	// mergeCmd
+	mergeFirstFile  string
+	mergeSecondFile string
+	mergeOutput     string
 
+	// searchCmd
 	searchPackageName string
 	searchRootDir     string
 	searchFileOut     string
 
-	crawlerName   string
-	crawlerOutput string
-
-	mergeFirstFile  string
-	mergeSecondFile string
-	mergeOutput     string
+	// git commit version
+	gitCommit string
 )
 
+// base url for connecting to server
 const serverBaseURL = "http://localhost:8081/api/v1"
-
-// Do I need this?
-type flags struct {
-	scanner string
-	inDir   string
-}
-
-// Do I need this?
-var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -68,27 +70,27 @@ var rootCmd = &cobra.Command{
 	Long:  `Product Model Toolkit for Managing Open Source Dependencies in Products`,
 }
 
-var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Show the version of Product Model Toolkit",
-	Long:  "This command will show the current using version of the application",
+// crawlerCmd
+var crawlerCmd = &cobra.Command{
+	Use:   "crawler",
+	Short: "Crawl the licenses",
+	Long:  `Crawl the licenses`,
 	Run: func(cmd *cobra.Command, args []string) {
-		printVersion()
-	},
-}
-
-var importCmd = &cobra.Command{
-	Use:   "import",
-	Short: "Import the component graph",
-	Long:  `Import the component graph from spdx, composer or file-hasher`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := callImport(importType, importPath); err != nil {
+		if err := callCrawler(crawlerName, crawlerOutput); err != nil {
 			log.Fatalln(err)
 			return
 		}
 	},
 }
 
+// diffCmd
+var diffCmd = &cobra.Command{
+	Use:   "diff",
+	Short: "Difference between two component graphs",
+	Long:  `Difference between two component graphs`,
+}
+
+// exportCmd
 var exportCmd = &cobra.Command{
 	Use:   "export",
 	Short: "Export the component graph",
@@ -101,36 +103,52 @@ var exportCmd = &cobra.Command{
 	},
 }
 
-var diffCmd = &cobra.Command{
-	Use:   "diff",
-	Short: "Difference between two component graphs",
-	Long:  `Difference between two component graphs`,
-}
-
-var searchCmd = &cobra.Command{
-	Use:   "search",
-	Short: "Search for components",
-	Long:  `Search for components by their name and meta-data`,
+// importCmd
+var importCmd = &cobra.Command{
+	Use:   "import",
+	Short: "Import the component graph",
+	Long:  `Import the component graph from spdx, composer or file-hasher`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("call search")
+		if err := callImport(importType, importPath); err != nil {
+			log.Fatalln(err)
+			return
+		}
 	},
 }
 
-var crawlerCmd = &cobra.Command{
-	Use:   "crawler",
-	Short: "crawl the licenses",
-	Long:  `crawl the licenses`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("call crawler")
-	},
-}
-
+// mergeCmd
 var mergeCmd = &cobra.Command{
 	Use:   "merge",
 	Short: "Merge two components",
 	Long:  `Merge two components`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("call merge")
+		if err := callMerge(mergeFirstFile, mergeSecondFile, mergeOutput); err != nil {
+			log.Fatalln(err)
+			return
+		}
+	},
+}
+
+// searchCmd
+var searchCmd = &cobra.Command{
+	Use:   "search",
+	Short: "Search for components",
+	Long:  `Search for components by their name and meta-data`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := callSearch(searchPackageName, searchRootDir, searchFileOut); err != nil {
+			log.Fatalln(err)
+			return
+		}
+	},
+}
+
+// versionCmd
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Show the version of Product Model Toolkit",
+	Long:  "This command will show the current using version of the application",
+	Run: func(cmd *cobra.Command, args []string) {
+		printVersion()
 	},
 }
 
@@ -157,7 +175,10 @@ var diffBasedOnId = &cobra.Command{
 	Short: "Difference based on id",
 	Long:  `Difference based on the id of saved products`,
 	Run: func(cmd *cobra.Command, args []string) {
-		listAvailableExportTypes()
+		if err := callDiffId(diffFirstId, diffSecondId); err != nil {
+			log.Fatalln(err)
+			return
+		}
 	},
 }
 
@@ -166,7 +187,10 @@ var diffBasedOnPath = &cobra.Command{
 	Short: "Difference based on path",
 	Long:  `Difference based on the path of spdx files`,
 	Run: func(cmd *cobra.Command, args []string) {
-		listAvailableExportTypes()
+		if err := callDiffPath(diffFirstFile, diffSecondFile); err != nil {
+			log.Fatalln(err)
+			return
+		}
 	},
 }
 
@@ -191,50 +215,50 @@ func init() {
 	importCmd.AddCommand(listImportOptions)
 	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
 	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
-	importCmd.MarkFlagRequired("type")
-	importCmd.MarkFlagRequired("path")
+	_ = importCmd.MarkFlagRequired("type")
+	_ = importCmd.MarkFlagRequired("path")
 
 	// exportCmd
 	exportCmd.AddCommand(listExportOptions)
 	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export file type (required)")
 	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
-	exportCmd.MarkFlagRequired("type")
-	exportCmd.MarkFlagRequired("path")
+	_ = exportCmd.MarkFlagRequired("type")
+	_ = exportCmd.MarkFlagRequired("path")
 
 	// diffCmd
 	diffCmd.AddCommand(diffBasedOnId)
 	diffCmd.AddCommand(diffBasedOnPath)
 	diffBasedOnId.Flags().StringVarP(&diffFirstId, "first", "f", "", "first id")
 	diffBasedOnId.Flags().StringVarP(&diffSecondId, "second", "s", "", "second id")
-	diffBasedOnId.MarkFlagRequired("first")
-	diffBasedOnId.MarkFlagRequired("second")
+	_ = diffBasedOnId.MarkFlagRequired("first")
+	_ = diffBasedOnId.MarkFlagRequired("second")
 
 	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
 	diffBasedOnPath.Flags().StringVarP(&diffSecondFile, "second", "s", "", "second file")
-	diffBasedOnPath.MarkFlagRequired("first")
-	diffBasedOnPath.MarkFlagRequired("second")
+	_ = diffBasedOnPath.MarkFlagRequired("first")
+	_ = diffBasedOnPath.MarkFlagRequired("second")
 
 	// searchCmd
 	searchCmd.Flags().StringVarP(&searchPackageName, "name", "n", "", "package name")
 	searchCmd.Flags().StringVarP(&searchRootDir, "dir", "d", "", "package root dir")
 	searchCmd.Flags().StringVarP(&searchFileOut, "out", "o", "", "spdx file out")
-	searchCmd.MarkFlagRequired("name")
-	searchCmd.MarkFlagRequired("dir")
-	searchCmd.MarkFlagRequired("out")
+	_ = searchCmd.MarkFlagRequired("name")
+	_ = searchCmd.MarkFlagRequired("dir")
+	_ = searchCmd.MarkFlagRequired("out")
 
 	// crawlerCmd
 	crawlerCmd.Flags().StringVarP(&crawlerName, "name", "n", "", "crawler name")
-	crawlerCmd.Flags().StringVarP(&crawlerOutput, "out", "n", "", "crawler output path")
-	crawlerCmd.MarkFlagRequired("name")
-	crawlerCmd.MarkFlagRequired("out")
+	crawlerCmd.Flags().StringVarP(&crawlerOutput, "out", "o", "", "crawler output path")
+	_ = crawlerCmd.MarkFlagRequired("name")
+	_ = crawlerCmd.MarkFlagRequired("out")
 
 	// mergeCmd
 	mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
 	mergeCmd.Flags().StringVarP(&mergeSecondFile, "second", "s", "", "second file")
 	mergeCmd.Flags().StringVarP(&mergeOutput, "out", "o", "", "output pat")
-	mergeCmd.MarkFlagRequired("first")
-	mergeCmd.MarkFlagRequired("second")
-	mergeCmd.MarkFlagRequired("out")
+	_ = mergeCmd.MarkFlagRequired("first")
+	_ = mergeCmd.MarkFlagRequired("second")
+	_ = mergeCmd.MarkFlagRequired("out")
 
 }
 
@@ -322,5 +346,25 @@ func callExport(exportId, exportType, exportPath string) error {
 	if err := exporting.SendExport(exportId, exportPath, client, postPath); err != nil {
 		return err
 	}
+	return nil
+}
+
+
+func callCrawler(name string, output string) interface{} {
+	return nil
+}
+
+func callDiffId(first, second string) error {
+	return nil
+}
+func callDiffPath(first, second string) error {
+	return nil
+}
+
+func callMerge(mergeFirstFile, mergeSecondFile, mergeOutput string) error {
+	return nil
+}
+
+func callSearch(searchPackageName, searchRootDir, searchFileOut string) error {
 	return nil
 }
