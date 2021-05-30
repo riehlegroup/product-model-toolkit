@@ -6,18 +6,18 @@ package rest
 
 import (
 	"fmt"
+	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
+	querying2 "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
+	version2 "github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"net/http"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing"
-	"github.com/osrgroup/product-model-toolkit/pkg/querying"
-	"github.com/osrgroup/product-model-toolkit/pkg/version"
 	"github.com/pkg/errors"
 )
 
 // Handler handle all request for the given route group.
-func Handler(g *echo.Group, qSrv querying.Service, iSrv importing.Service) {
+func Handler(g *echo.Group, qSrv querying2.Service, iSrv importing2.Service) {
 	g.GET("/", handleEntryPoint)
 	g.GET("/version", handleVersion)
 	g.GET("/health", handleHealth)
@@ -32,7 +32,7 @@ func handleEntryPoint(c echo.Context) error {
 }
 
 func handleVersion(c echo.Context) error {
-	return c.String(http.StatusOK, version.Name())
+	return c.String(http.StatusOK, version2.Name())
 }
 
 func handleHealth(c echo.Context) error {
@@ -43,7 +43,7 @@ func handleHealth(c echo.Context) error {
 	return c.JSON(http.StatusOK, status{Status: "UP"})
 }
 
-func findAllProducts(q querying.Service) echo.HandlerFunc {
+func findAllProducts(q querying2.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		prods, err := q.FindAllProducts()
 		if err != nil {
@@ -54,7 +54,7 @@ func findAllProducts(q querying.Service) echo.HandlerFunc {
 	}
 }
 
-func findProductByID(q querying.Service) echo.HandlerFunc {
+func findProductByID(q querying2.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)

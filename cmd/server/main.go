@@ -7,13 +7,13 @@ package main
 import (
 	"flag"
 	"fmt"
+	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
+	querying2 "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
+	version2 "github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
 	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing"
-	"github.com/osrgroup/product-model-toolkit/pkg/querying"
-	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
 var gitCommit string
@@ -31,8 +31,8 @@ func main() {
 
 	r := rest.NewSrv(
 		"127.0.0.1:8081",
-		querying.NewService(repo),
-		importing.NewService(repo),
+		querying2.NewService(repo),
+		importing2.NewService(repo),
 	)
 	go r.Start()
 	defer r.Shutdown()
@@ -53,7 +53,7 @@ func checkFlags() bool {
 func printVersion() {
 	fmt.Println("PMT Server")
 	fmt.Println("----------")
-	fmt.Println("Version: " + version.Name())
+	fmt.Println("Version: " + version2.Name())
 	fmt.Println("Git commit: " + gitCommit)
 	fmt.Println("----------")
 }

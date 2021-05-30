@@ -6,10 +6,8 @@ package main
 
 import (
 	"fmt"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/exporting"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/importing"
-
 	//"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 	"github.com/spf13/cobra"
 	"log"
@@ -20,7 +18,6 @@ import (
 	"github.com/spf13/viper"
 
 	//"github.com/osrgroup/product-model-toolkit/pkg/client/importing"
-	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
 var (
@@ -30,6 +27,7 @@ var (
 	// crawlerCmd
 	crawlerName   string
 	crawlerOutput string
+	crawlerSource string
 
 	// diffCmd
 	diffFirstId    string
@@ -76,7 +74,7 @@ var crawlerCmd = &cobra.Command{
 	Short: "Crawl the licenses",
 	Long:  `Crawl the licenses`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := callCrawler(crawlerName, crawlerOutput); err != nil {
+		if err := callCrawler(crawlerName, crawlerSource, crawlerOutput); err != nil {
 			log.Fatalln(err)
 			return
 		}
@@ -88,6 +86,30 @@ var diffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Difference between two component graphs",
 	Long:  `Difference between two component graphs`,
+}
+
+var diffBasedOnId = &cobra.Command{
+	Use:   "id",
+	Short: "Difference based on id",
+	Long:  `Difference based on the id of saved products`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := callDiffId(diffFirstId, diffSecondId); err != nil {
+			log.Fatalln(err)
+			return
+		}
+	},
+}
+
+var diffBasedOnPath = &cobra.Command{
+	Use:   "path",
+	Short: "Difference based on path",
+	Long:  `Difference based on the path of spdx files`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := callDiffPath(diffFirstFile, diffSecondFile); err != nil {
+			log.Fatalln(err)
+			return
+		}
+	},
 }
 
 // exportCmd
@@ -148,7 +170,10 @@ var versionCmd = &cobra.Command{
 	Short: "Show the version of Product Model Toolkit",
 	Long:  "This command will show the current using version of the application",
 	Run: func(cmd *cobra.Command, args []string) {
-		printVersion()
+		if err := callVersion(); err != nil {
+			log.Fatalln(err)
+			return
+		}
 	},
 }
 
@@ -170,30 +195,6 @@ var listExportOptions = &cobra.Command{
 	},
 }
 
-var diffBasedOnId = &cobra.Command{
-	Use:   "id",
-	Short: "Difference based on id",
-	Long:  `Difference based on the id of saved products`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := callDiffId(diffFirstId, diffSecondId); err != nil {
-			log.Fatalln(err)
-			return
-		}
-	},
-}
-
-var diffBasedOnPath = &cobra.Command{
-	Use:   "path",
-	Short: "Difference based on path",
-	Long:  `Difference based on the path of spdx files`,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := callDiffPath(diffFirstFile, diffSecondFile); err != nil {
-			log.Fatalln(err)
-			return
-		}
-	},
-}
-
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
@@ -201,7 +202,10 @@ func Execute() {
 }
 
 func init() {
+	// init
 	cobra.OnInitialize(initConfig)
+
+	// rootCmd
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(importCmd)
 	rootCmd.AddCommand(exportCmd)
@@ -209,9 +213,18 @@ func init() {
 	rootCmd.AddCommand(searchCmd)
 	rootCmd.AddCommand(crawlerCmd)
 	rootCmd.AddCommand(mergeCmd)
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
+	// crawlerCmd
+	crawlerCmd.Flags().StringVarP(&crawlerName, "name", "n", "", "crawler name")
+	crawlerCmd.Flags().StringVarP(&crawlerSource, "source", "s", "", "crawler source")
+	crawlerCmd.Flags().StringVarP(&crawlerOutput, "out", "o", "", "crawler output path")
+	_ = crawlerCmd.MarkFlagRequired("name")
+	_ = crawlerCmd.MarkFlagRequired("source")
+	_ = crawlerCmd.MarkFlagRequired("out")
+
+
+	// importCmd
 	importCmd.AddCommand(listImportOptions)
 	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
 	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
@@ -245,12 +258,6 @@ func init() {
 	_ = searchCmd.MarkFlagRequired("name")
 	_ = searchCmd.MarkFlagRequired("dir")
 	_ = searchCmd.MarkFlagRequired("out")
-
-	// crawlerCmd
-	crawlerCmd.Flags().StringVarP(&crawlerName, "name", "n", "", "crawler name")
-	crawlerCmd.Flags().StringVarP(&crawlerOutput, "out", "o", "", "crawler output path")
-	_ = crawlerCmd.MarkFlagRequired("name")
-	_ = crawlerCmd.MarkFlagRequired("out")
 
 	// mergeCmd
 	mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
@@ -299,26 +306,47 @@ func main() {
 
 }
 
-func printVersion() {
-	fmt.Printf(
-		"PMT Client\n----------\nVersion: %s\nGit commit: %s\n",
-		version.Name(),
-		gitCommit,
-	)
+// callCrawler of crawlerCmd
+func callCrawler(name, source, output string) interface{} {
+	client := rest.NewClient(serverBaseURL)
+	if err := commands.RunCrawler(name, source, output, client); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func listAvailableImportTypes() {
-	availableImportOptions := []string{
-		"spdx",
-		"composer",
-		"file-hasher",
+// callDiffId of diffCmd
+func callDiffId(first, second string) error {
+	client := rest.NewClient(serverBaseURL)
+	if err := commands.RunDiffById(first, second, client); err != nil {
+		return err
 	}
-	fmt.Println("Available import options:")
-	for key, name := range availableImportOptions {
-		fmt.Printf("%v) %v\n", key+1, name)
-	}
+
+	return nil
 }
 
+// callDiffId of diffCmd
+func callDiffPath(first, second string) error {
+	client := rest.NewClient(serverBaseURL)
+	if err := commands.RunDiffByPath(first, second, client); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// callExport of exportCmd
+func callExport(exportId, exportType, exportPath string) error {
+	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
+	client := rest.NewClient(serverBaseURL)
+	if err := commands.RunExport(exportId, exportPath, postPath, client); err != nil {
+		return err
+	}
+	return nil
+}
+
+// listAvailableExportTypes of exportCmd
 func listAvailableExportTypes() {
 	availableExportOptions := []string{
 		"spdx",
@@ -331,40 +359,51 @@ func listAvailableExportTypes() {
 	}
 }
 
+// callImport of importCmd
 func callImport(importType, importPath string) error {
 	postPath := fmt.Sprintf("/products/import/%s", strings.ToLower(importType))
 	client := rest.NewClient(serverBaseURL)
-	if err := importing.SendImport(importPath, client, postPath); err != nil {
+	if err := commands.RunImport(importPath, postPath, client); err != nil {
 		return err
 	}
 	return nil
 }
 
-func callExport(exportId, exportType, exportPath string) error {
-	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
-	client := rest.NewClient(serverBaseURL)
-	if err := exporting.SendExport(exportId, exportPath, client, postPath); err != nil {
-		return err
+// listAvailableImportTypes of importCmd
+func listAvailableImportTypes() {
+	availableImportOptions := []string{
+		"spdx",
+		"composer",
+		"file-hasher",
 	}
-	return nil
+	fmt.Println("Available import options:")
+	for key, name := range availableImportOptions {
+		fmt.Printf("%v) %v\n", key+1, name)
+	}
 }
 
-
-func callCrawler(name string, output string) interface{} {
-	return nil
-}
-
-func callDiffId(first, second string) error {
-	return nil
-}
-func callDiffPath(first, second string) error {
-	return nil
-}
-
+// callMerge of mergeCmd
 func callMerge(mergeFirstFile, mergeSecondFile, mergeOutput string) error {
+	client := rest.NewClient(serverBaseURL)
+	if err := commands.RunMerge(mergeFirstFile, mergeSecondFile, mergeOutput, client); err != nil {
+		return err
+	}
 	return nil
 }
 
+// callSearch of searchCmd
 func callSearch(searchPackageName, searchRootDir, searchFileOut string) error {
+	client := rest.NewClient(serverBaseURL)
+	if err := commands.RunSearch(searchPackageName, searchRootDir, searchFileOut, client); err != nil {
+		return err
+	}
+	return nil
+}
+
+// printVersion of versionCmd
+func callVersion() error {
+	if err := commands.RunVersion(gitCommit); err != nil {
+		return err
+	}
 	return nil
 }

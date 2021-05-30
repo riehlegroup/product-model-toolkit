@@ -8,11 +8,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	convert2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing/convert"
 	"io"
 	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
 )
 
 // Hasher represents a File-Hasher converter
@@ -23,7 +23,7 @@ func (Hasher) Convert(input io.Reader) (*model.Product, error) {
 	byteInput := new(bytes.Buffer)
 	byteInput.ReadFrom(input)
 
-	body := convert.TrimUTF8prefix(byteInput.Bytes())
+	body := convert2.TrimUTF8prefix(byteInput.Bytes())
 	var result []model.Artifact
 	err := json.Unmarshal(body, &result)
 	if err != nil {

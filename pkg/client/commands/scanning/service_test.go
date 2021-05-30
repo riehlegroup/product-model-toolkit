@@ -2,16 +2,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package exporting
+package scanning
 
 import (
+	scanner2 "github.com/osrgroup/product-model-toolkit/pkg/client/commands/scanner"
 	"reflect"
 	"testing"
-
-	"github.com/osrgroup/product-model-toolkit/pkg/client/scanner"
 )
 
-var dummyT1 = scanner.Tool{
+var dummyT1 = scanner2.Tool{
 	Name:      "Licensee",
 	Version:   "9.13.0",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
@@ -19,7 +18,7 @@ var dummyT1 = scanner.Tool{
 	Results:   []string{"result.json", "result.spdx"},
 }
 
-var dummyT2 = scanner.Tool{
+var dummyT2 = scanner2.Tool{
 	Name:      "Abc",
 	Version:   "1.13.9-beta",
 	DockerImg: "docker.pkg.github.com/some-user/some-repo/img:v1.13",
@@ -27,13 +26,13 @@ var dummyT2 = scanner.Tool{
 	Results:   []string{"my-result.spdx"},
 }
 
-var cfg1 = &scanner.Config{
+var cfg1 = &scanner2.Config{
 	Tool:      dummyT1,
 	InDir:     "/input",
 	ResultDir: "/result",
 }
 
-var cfg2 = &scanner.Config{
+var cfg2 = &scanner2.Config{
 	Tool:      dummyT2,
 	InDir:     "/in",
 	ResultDir: "/out",
@@ -41,7 +40,7 @@ var cfg2 = &scanner.Config{
 
 func Test_execStr(t *testing.T) {
 	type args struct {
-		cfg *scanner.Config
+		cfg *scanner2.Config
 	}
 	tests := []struct {
 		name string

@@ -7,6 +7,9 @@ package rest
 import (
 	"encoding/json"
 	"errors"
+	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
+	querying2 "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
+	version2 "github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -14,9 +17,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing"
-	"github.com/osrgroup/product-model-toolkit/pkg/querying"
-	"github.com/osrgroup/product-model-toolkit/pkg/version"
 )
 
 const basePath = "/api/v1"
@@ -26,7 +26,7 @@ func TestHandler(t *testing.T) {
 	v1 := e.Group("/api/v1")
 
 	repo := new(memory.DB)
-	Handler(v1, querying.NewService(&mockDB{}), importing.NewService(repo))
+	Handler(v1, querying2.NewService(&mockDB{}), importing2.NewService(repo))
 }
 
 func TestHandleEntryPoint(t *testing.T) {
@@ -62,8 +62,8 @@ func TestHandleVersion(t *testing.T) {
 		t.Errorf("Expected status code to be %v, but got %v", http.StatusOK, rec.Code)
 	}
 
-	if rec.Body.String() != version.Name() {
-		t.Errorf("Expected body to be '%v', but got '%v'", version.Name(), rec.Body.String())
+	if rec.Body.String() != version2.Name() {
+		t.Errorf("Expected body to be '%v', but got '%v'", version2.Name(), rec.Body.String())
 	}
 }
 
@@ -121,7 +121,7 @@ func TestFindAllProducts_Error(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	q := querying.NewService(&mockDB{})
+	q := querying2.NewService(&mockDB{})
 	handler := findAllProducts(q)
 	handler(c)
 
@@ -204,11 +204,11 @@ func TestFindProductByID_Error(t *testing.T) {
 	}
 }
 
-func inMemQueryingService() querying.Service {
+func inMemQueryingService() querying2.Service {
 	repo := new(memory.DB)
 	repo.AddSampleData()
 
-	return querying.NewService(repo)
+	return querying2.NewService(repo)
 }
 
 type mockDB struct{}

@@ -7,11 +7,11 @@ package composer
 import (
 	"bytes"
 	"encoding/json"
+	convert2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing/convert"
 	"io"
 	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
 )
 
 // Composer represents a PHP Composer converter
@@ -37,7 +37,7 @@ func (Composer) Convert(input io.Reader) (*model.Product, error) {
 	byteInput := new(bytes.Buffer)
 	byteInput.ReadFrom(input)
 
-	body := convert.TrimUTF8prefix(byteInput.Bytes())
+	body := convert2.TrimUTF8prefix(byteInput.Bytes())
 	var result composerDoc
 	err := json.Unmarshal(body, &result)
 	if err != nil {

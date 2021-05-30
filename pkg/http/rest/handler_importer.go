@@ -6,17 +6,17 @@ package rest
 
 import (
 	"fmt"
+	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
 	"net/http"
 	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing"
 	"github.com/pkg/errors"
 )
 
-func importFromScanner(iSrv importing.Service) echo.HandlerFunc {
+func importFromScanner(iSrv importing2.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		scanner := strings.ToLower(c.Param("scanner"))
 		r := c.Request().Body

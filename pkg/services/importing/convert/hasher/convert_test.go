@@ -6,11 +6,11 @@ package hasher
 
 import (
 	"bytes"
+	convert2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing/convert"
 	"os"
 	"testing"
 
 	"github.com/osrgroup/product-model-toolkit/model"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing/convert"
 )
 
 const testFile = "test/example.json"
@@ -56,7 +56,7 @@ func TestConvert(t *testing.T) {
 	}
 	defer jsonFile.Close()
 
-	var c convert.Converter = new(Hasher)
+	var c convert2.Converter = new(Hasher)
 	p, err := c.Convert(jsonFile)
 
 	t.Run("not error", func(t *testing.T) {

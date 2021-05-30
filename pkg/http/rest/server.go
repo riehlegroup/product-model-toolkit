@@ -7,14 +7,14 @@ package rest
 import (
 	"context"
 	"fmt"
+	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
+	querying2 "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/osrgroup/product-model-toolkit/pkg/importing"
-	"github.com/osrgroup/product-model-toolkit/pkg/querying"
 )
 
 // Instance is a REST server
@@ -24,7 +24,7 @@ type Instance struct {
 }
 
 // NewSrv creates a new REST server.
-func NewSrv(address string, qSrv querying.Service, iSrv importing.Service) *Instance {
+func NewSrv(address string, qSrv querying2.Service, iSrv importing2.Service) *Instance {
 	e := echo.New()
 
 	// Middleware
