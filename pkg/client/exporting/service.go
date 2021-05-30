@@ -123,9 +123,15 @@ func sendResults(resDir string, files []fileName, c *rest.Client, url string) {
 	}
 }
 
-func SendExport(importPath string, c *rest.Client, url string) error {
+func SendExport(exportId, exportPath string, c *rest.Client, url string) error {
 
-	resFile, err := os.Open(importPath)
+	// get the product by id
+
+	// create a file into the export path
+
+	// export and generate the items into the file
+
+	resFile, err := os.Open(exportPath)
 	if err != nil {
 		log.Printf("[Scanner] Error while reading result files: %s", err)
 		return err

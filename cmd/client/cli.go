@@ -28,8 +28,26 @@ var (
 	importType string
 	importPath string
 
+	exportId   string
 	exportType string
 	exportPath string
+
+	diffFirstId  string
+	diffSecondId string
+
+	diffFirstFile  string
+	diffSecondFile string
+
+	searchPackageName string
+	searchRootDir     string
+	searchFileOut     string
+
+	crawlerName   string
+	crawlerOutput string
+
+	mergeFirstFile  string
+	mergeSecondFile string
+	mergeOutput     string
 )
 
 const serverBaseURL = "http://localhost:8081/api/v1"
@@ -76,7 +94,7 @@ var exportCmd = &cobra.Command{
 	Short: "Export the component graph",
 	Long:  `Export the component graph from spdx, composer or file-hasher`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := callExport(exportType, exportPath); err != nil {
+		if err := callExport(exportId, exportType, exportPath); err != nil {
 			log.Fatalln(err)
 			return
 		}
@@ -87,9 +105,6 @@ var diffCmd = &cobra.Command{
 	Use:   "diff",
 	Short: "Difference between two component graphs",
 	Long:  `Difference between two component graphs`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("call diff")
-	},
 }
 
 var searchCmd = &cobra.Command{
@@ -137,6 +152,24 @@ var listExportOptions = &cobra.Command{
 	},
 }
 
+var diffBasedOnId = &cobra.Command{
+	Use:   "id",
+	Short: "Difference based on id",
+	Long:  `Difference based on the id of saved products`,
+	Run: func(cmd *cobra.Command, args []string) {
+		listAvailableExportTypes()
+	},
+}
+
+var diffBasedOnPath = &cobra.Command{
+	Use:   "path",
+	Short: "Difference based on path",
+	Long:  `Difference based on the path of spdx files`,
+	Run: func(cmd *cobra.Command, args []string) {
+		listAvailableExportTypes()
+	},
+}
+
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
@@ -169,12 +202,40 @@ func init() {
 	exportCmd.MarkFlagRequired("path")
 
 	// diffCmd
+	diffCmd.AddCommand(diffBasedOnId)
+	diffCmd.AddCommand(diffBasedOnPath)
+	diffBasedOnId.Flags().StringVarP(&diffFirstId, "first", "f", "", "first id")
+	diffBasedOnId.Flags().StringVarP(&diffSecondId, "second", "s", "", "second id")
+	diffBasedOnId.MarkFlagRequired("first")
+	diffBasedOnId.MarkFlagRequired("second")
+
+	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
+	diffBasedOnPath.Flags().StringVarP(&diffSecondFile, "second", "s", "", "second file")
+	diffBasedOnPath.MarkFlagRequired("first")
+	diffBasedOnPath.MarkFlagRequired("second")
 
 	// searchCmd
+	searchCmd.Flags().StringVarP(&searchPackageName, "name", "n", "", "package name")
+	searchCmd.Flags().StringVarP(&searchRootDir, "dir", "d", "", "package root dir")
+	searchCmd.Flags().StringVarP(&searchFileOut, "out", "o", "", "spdx file out")
+	searchCmd.MarkFlagRequired("name")
+	searchCmd.MarkFlagRequired("dir")
+	searchCmd.MarkFlagRequired("out")
 
 	// crawlerCmd
+	crawlerCmd.Flags().StringVarP(&crawlerName, "name", "n", "", "crawler name")
+	crawlerCmd.Flags().StringVarP(&crawlerOutput, "out", "n", "", "crawler output path")
+	crawlerCmd.MarkFlagRequired("name")
+	crawlerCmd.MarkFlagRequired("out")
 
 	// mergeCmd
+	mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
+	mergeCmd.Flags().StringVarP(&mergeSecondFile, "second", "s", "", "second file")
+	mergeCmd.Flags().StringVarP(&mergeOutput, "out", "o", "", "output pat")
+	mergeCmd.MarkFlagRequired("first")
+	mergeCmd.MarkFlagRequired("second")
+	mergeCmd.MarkFlagRequired("out")
+
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -255,10 +316,10 @@ func callImport(importType, importPath string) error {
 	return nil
 }
 
-func callExport(exportType, exportPath string) error {
+func callExport(exportId, exportType, exportPath string) error {
 	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
 	client := rest.NewClient(serverBaseURL)
-	if err := exporting.SendExport(exportPath, client, postPath); err != nil {
+	if err := exporting.SendExport(exportId, exportPath, client, postPath); err != nil {
 		return err
 	}
 	return nil
