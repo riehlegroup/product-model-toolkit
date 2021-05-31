@@ -223,13 +223,13 @@ func init() {
 	_ = crawlerCmd.MarkFlagRequired("source")
 	_ = crawlerCmd.MarkFlagRequired("out")
 
-
-	// importCmd
-	importCmd.AddCommand(listImportOptions)
-	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
-	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
-	_ = importCmd.MarkFlagRequired("type")
-	_ = importCmd.MarkFlagRequired("path")
+	// diffCmd
+	diffCmd.AddCommand(diffBasedOnId)
+	diffCmd.AddCommand(diffBasedOnPath)
+	diffBasedOnId.Flags().StringVarP(&diffFirstId, "first", "f", "", "first id")
+	diffBasedOnId.Flags().StringVarP(&diffSecondId, "second", "s", "", "second id")
+	_ = diffBasedOnId.MarkFlagRequired("first")
+	_ = diffBasedOnId.MarkFlagRequired("second")
 
 	// exportCmd
 	exportCmd.AddCommand(listExportOptions)
@@ -238,13 +238,13 @@ func init() {
 	_ = exportCmd.MarkFlagRequired("type")
 	_ = exportCmd.MarkFlagRequired("path")
 
-	// diffCmd
-	diffCmd.AddCommand(diffBasedOnId)
-	diffCmd.AddCommand(diffBasedOnPath)
-	diffBasedOnId.Flags().StringVarP(&diffFirstId, "first", "f", "", "first id")
-	diffBasedOnId.Flags().StringVarP(&diffSecondId, "second", "s", "", "second id")
-	_ = diffBasedOnId.MarkFlagRequired("first")
-	_ = diffBasedOnId.MarkFlagRequired("second")
+	// importCmd
+	importCmd.AddCommand(listImportOptions)
+	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
+	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
+	_ = importCmd.MarkFlagRequired("type")
+	_ = importCmd.MarkFlagRequired("path")
+
 
 	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
 	diffBasedOnPath.Flags().StringVarP(&diffSecondFile, "second", "s", "", "second file")
