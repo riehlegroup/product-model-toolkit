@@ -7,12 +7,13 @@ package main
 import (
 	"flag"
 	"fmt"
-	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
-	querying2 "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
-	version2 "github.com/osrgroup/product-model-toolkit/pkg/services/version"
+	"github.com/osrgroup/product-model-toolkit/pkg/db/postgraph"
+	"github.com/osrgroup/product-model-toolkit/pkg/services/diff"
+	"github.com/osrgroup/product-model-toolkit/pkg/services/importing"
+	"github.com/osrgroup/product-model-toolkit/pkg/services/querying"
+	"github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"os"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
 	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
 )
 
@@ -23,16 +24,17 @@ func main() {
 		os.Exit(0)
 	}
 
-	repo := new(memory.DB)
-	repo.AddSampleData()
+	//repo := new(memory.DB)
+	//repo.AddSampleData()
 
 	// Use Postgraphile as DB backend
-	//repo := postgraph.NewRepo("http://localhost:5433/graphql")
+	repo := postgraph.NewRepo("http://localhost:5433/graphql")
 
 	r := rest.NewSrv(
 		"127.0.0.1:8081",
-		querying2.NewService(repo),
-		importing2.NewService(repo),
+		diff.NewService(repo),
+		querying.NewService(repo),
+		importing.NewService(repo),
 	)
 	go r.Start()
 	defer r.Shutdown()
@@ -53,7 +55,7 @@ func checkFlags() bool {
 func printVersion() {
 	fmt.Println("PMT Server")
 	fmt.Println("----------")
-	fmt.Println("Version: " + version2.Name())
+	fmt.Println("Version: " + version.Name())
 	fmt.Println("Git commit: " + gitCommit)
 	fmt.Println("----------")
 }
