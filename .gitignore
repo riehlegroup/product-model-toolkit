@@ -39,3 +39,4 @@ pmtserver
 pmtclient
 source/
 output/
+*.spdx
