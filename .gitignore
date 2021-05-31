@@ -37,3 +37,5 @@ __debug_bin
 # Build artifacts
 pmtserver
 pmtclient
+source/
+output/
