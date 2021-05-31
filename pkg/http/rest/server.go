@@ -7,6 +7,7 @@ package rest
 import (
 	"context"
 	"fmt"
+	"github.com/osrgroup/product-model-toolkit/pkg/services/diff"
 	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
 	querying2 "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
 	"os"
@@ -24,7 +25,7 @@ type Instance struct {
 }
 
 // NewSrv creates a new REST server.
-func NewSrv(address string, qSrv querying2.Service, iSrv importing2.Service) *Instance {
+func NewSrv(address string, diff diff.Service, qSrv querying2.Service, iSrv importing2.Service) *Instance {
 	e := echo.New()
 
 	// Middleware
@@ -33,7 +34,7 @@ func NewSrv(address string, qSrv querying2.Service, iSrv importing2.Service) *In
 
 	// Routes
 	v1 := e.Group("/api/v1")
-	Handler(v1, qSrv, iSrv)
+	Handler(v1, diff, qSrv, iSrv)
 
 	return &Instance{
 		httpSrv: e,

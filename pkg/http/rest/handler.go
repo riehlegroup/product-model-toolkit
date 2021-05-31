@@ -6,6 +6,7 @@ package rest
 
 import (
 	"fmt"
+	"github.com/osrgroup/product-model-toolkit/pkg/services/diff"
 	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
 	querying2 "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
 	version2 "github.com/osrgroup/product-model-toolkit/pkg/services/version"
@@ -17,10 +18,11 @@ import (
 )
 
 // Handler handle all request for the given route group.
-func Handler(g *echo.Group, qSrv querying2.Service, iSrv importing2.Service) {
+func Handler(g *echo.Group, diff diff.Service, qSrv querying2.Service, iSrv importing2.Service) {
 	g.GET("/", handleEntryPoint)
 	g.GET("/version", handleVersion)
 	g.GET("/health", handleHealth)
+
 
 	g.GET("/products", findAllProducts(qSrv))
 	g.GET("/products/:id", findProductByID(qSrv))
