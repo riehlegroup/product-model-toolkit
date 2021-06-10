@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	//"github.com/osrgroup/product-model-toolkit/pkg/client/scanning"
 	"github.com/spf13/cobra"
 	"log"
 	"os"
@@ -16,8 +15,6 @@ import (
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
-
-	//"github.com/osrgroup/product-model-toolkit/pkg/client/importing"
 )
 
 var (
@@ -59,6 +56,7 @@ var (
 )
 
 // base url for connecting to server
+// TODO(read from env)
 const serverBaseURL = "http://localhost:8081/api/v1"
 
 // rootCmd represents the base command when called without any subcommands
@@ -177,10 +175,20 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+var listCrawlerOptions = &cobra.Command{
+	Use:   "list",
+	Short: "List all available crawlers",
+	Long:  `List all available crawlers for selecting as a license crawler`,
+	Run: func(cmd *cobra.Command, args []string) {
+		listAvailableCrawlerTypes()
+	},
+}
+
+
 var listImportOptions = &cobra.Command{
 	Use:   "list",
 	Short: "List all available import types",
-	Long:  `List all available file types for importing as a product into the PMt`,
+	Long:  `List all available file types for importing as a product into the PMT`,
 	Run: func(cmd *cobra.Command, args []string) {
 		listAvailableImportTypes()
 	},
@@ -216,6 +224,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
 	// crawlerCmd
+	crawlerCmd.AddCommand(listCrawlerOptions)
 	crawlerCmd.Flags().StringVarP(&crawlerName, "name", "n", "", "crawler name")
 	crawlerCmd.Flags().StringVarP(&crawlerSource, "source", "s", "", "crawler source")
 	crawlerCmd.Flags().StringVarP(&crawlerOutput, "out", "o", "", "crawler output path")
@@ -367,6 +376,17 @@ func callImport(importType, importPath string) error {
 		return err
 	}
 	return nil
+}
+
+// listAvailableCrawlerTypes of crawlerCmd
+func listAvailableCrawlerTypes() {
+	availableImportOptions := []string{
+		"php-scanner",
+	}
+	fmt.Println("Available crawler options:")
+	for key, name := range availableImportOptions {
+		fmt.Printf("%v) %v\n", key+1, name)
+	}
 }
 
 // listAvailableImportTypes of importCmd
