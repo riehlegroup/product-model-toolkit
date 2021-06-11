@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"errors"
 	"fmt"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"os/exec"
@@ -8,20 +9,20 @@ import (
 
 func RunCrawler(name, source, output string, client *rest.Client) error {
 	logServerVersion(client)
+
+	// the formal name for docker image
+	var dockerImageName string
+
 	// now we just have one crawler plugin then there is no need for checking the name
 	// Then the name would be php-scanner
-	if name == "php-scanner" {
-		name = "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0"
+
+	switch name {
+	case "php-scanner":
+		dockerImageName = "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0" // TODO
+	default:
+		return errors.New("invalid crawler name")
 	}
 
-	// source should have a slash at the end
-	//if okSource := strings.HasSuffix("source", "/"); !okSource {
-	//	source = fmt.Sprintf(source+"%v", "/")
-	//}
-	//
-	//if okOutput := strings.HasSuffix("source", "/"); !okOutput {
-	//	output = fmt.Sprintf(output+"%v", "/")
-	//}
 
 	fmt.Println(source)
 	if source == "." {
@@ -31,16 +32,22 @@ func RunCrawler(name, source, output string, client *rest.Client) error {
 		output = "$PWD"
 	}
 
+	// create the dockerCmd from input values
 	dockerCmd := fmt.Sprintf("sudo docker run"+
 		" -e USE_DEFAULT_REPO=0 "+
-		"-v %v/source:/source "+
-		"-v %v/output:/output %v",
-		source, output, name)
+		"-v %v:/source "+
+		"-v %v:/output %v",
+		source, output, dockerImageName)
 
 	// log information
 	fmt.Println("Running crawler")
+
 	// execute docker command
 	fmt.Println("Executing the docker command ...")
+
+	// print the docker command
+	fmt.Println(dockerCmd)
+
 	// executing the command
 	_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
 	// check error
@@ -49,6 +56,8 @@ func RunCrawler(name, source, output string, client *rest.Client) error {
 	}
 
 	fmt.Println("Crawling licenses successfully completed")
+	fmt.Printf("The output path: %v\n", output)
+
 
 	// return
 	return nil
