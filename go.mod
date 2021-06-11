@@ -16,6 +16,7 @@ require (
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1
+	github.com/pterm/pterm v0.12.23 // indirect
 	github.com/spdx/tools-golang v0.0.0-20200614220228-5a270f97f410
 	github.com/spf13/cobra v1.1.3 // indirect
 	github.com/spf13/viper v1.7.1 // indirect

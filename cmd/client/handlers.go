@@ -9,7 +9,8 @@ import (
 	"log"
 	"os"
 	"strings"
-
+	"time"
+	"github.com/pterm/pterm"
 	"github.com/osrgroup/product-model-toolkit/cnst"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
 	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
@@ -59,6 +60,24 @@ var (
 
 // base url for connecting to server
 const serverBaseURL = cnst.ServerBaseURL
+
+
+func introScreen() {
+	ptermLogo, _ := pterm.DefaultBigText.WithLetters(
+		pterm.NewLettersFromStringWithStyle("PMT", pterm.NewStyle(pterm.FgLightGreen))).
+		Srender()
+
+	pterm.DefaultCenter.Print(ptermLogo)
+
+	pterm.DefaultCenter.Print(pterm.DefaultHeader.
+		WithFullWidth().
+		WithBackgroundStyle(pterm.NewStyle(pterm.BgLightBlue)).
+		WithMargin(10).
+		Sprint(cnst.CliShort))
+	pterm.Info.Println(pterm.Green(time.Now().Format("02 Jan 2006 - 15:04:05 MST")))
+	pterm.Println()
+	
+}
 
 
 
@@ -218,6 +237,10 @@ var rootCmd = &cobra.Command{
 	Use:   cnst.Cli,
 	Short: cnst.CliShort,
 	Long:  cnst.CliLong,
+	Run: func(cmd *cobra.Command, args []string) {
+		introScreen()
+		cmd.Help()
+	},
 }
 
 // crawlerCmd
