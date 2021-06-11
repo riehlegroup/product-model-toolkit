@@ -6,12 +6,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/spf13/cobra"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/osrgroup/product-model-toolkit/cnst"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
+	"github.com/spf13/cobra"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
@@ -56,21 +58,20 @@ var (
 )
 
 // base url for connecting to server
-// TODO(read from env)
-const serverBaseURL = "http://localhost:8081/api/v1"
+const serverBaseURL = cnst.ServerBaseURL
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "cli",
-	Short: "Product Model Toolkit",
-	Long:  `Product Model Toolkit for Managing Open Source Dependencies in Products`,
+	Use:   cnst.Cli,
+	Short: cnst.CliShort,
+	Long:  cnst.CliLong,
 }
 
 // crawlerCmd
 var crawlerCmd = &cobra.Command{
-	Use:   "crawler",
-	Short: "Crawl the licenses",
-	Long:  `Crawl the licenses`,
+	Use:   cnst.Crawler,
+	Short: cnst.CrawlerShort,
+	Long:  cnst.CrawlerLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callCrawler(crawlerName, crawlerSource, crawlerOutput); err != nil {
 			log.Fatalln(err)
@@ -81,16 +82,16 @@ var crawlerCmd = &cobra.Command{
 
 // diffCmd
 var diffCmd = &cobra.Command{
-	Use:   "diff",
-	Short: "Difference between two component graphs",
-	Long:  `Difference between two component graphs`,
+	Use:   cnst.Diff,
+	Short: cnst.DiffShort,
+	Long:  cnst.DiffLong,
 }
 
 // diffBasedOnId command, this works as a subcommand for the diffCmd command
 var diffBasedOnId = &cobra.Command{
-	Use:   "id",
-	Short: "Difference based on id",
-	Long:  `Difference based on the id of saved products`,
+	Use:   cnst.Id,
+	Short: cnst.IdShort,
+	Long:  cnst.IdLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callDiffId(diffFirstId, diffSecondId); err != nil {
 			log.Fatalln(err)
@@ -101,9 +102,9 @@ var diffBasedOnId = &cobra.Command{
 
 // diffBasedOnPath command, this works as a subcommand for the diffCmd command
 var diffBasedOnPath = &cobra.Command{
-	Use:   "path",
-	Short: "Difference based on path",
-	Long:  `Difference based on the path of spdx files`,
+	Use:   cnst.Path,
+	Short: cnst.PathShort,
+	Long:  cnst.PathLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callDiffPath(diffFirstFile, diffSecondFile); err != nil {
 			log.Fatalln(err)
@@ -114,9 +115,9 @@ var diffBasedOnPath = &cobra.Command{
 
 // exportCmd
 var exportCmd = &cobra.Command{
-	Use:   "export",
-	Short: "Export the component graph",
-	Long:  `Export the component graph from spdx, composer or file-hasher`,
+	Use:   cnst.Export,
+	Short: cnst.ExportShort,
+	Long:  cnst.ExportLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callExport(exportId, exportType, exportPath); err != nil {
 			log.Fatalln(err)
@@ -127,9 +128,9 @@ var exportCmd = &cobra.Command{
 
 // importCmd
 var importCmd = &cobra.Command{
-	Use:   "import",
-	Short: "Import the component graph",
-	Long:  `Import the component graph from spdx, composer or file-hasher`,
+	Use:   cnst.Import,
+	Short: cnst.ImportShort,
+	Long:  cnst.ImportLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callImport(importType, importPath); err != nil {
 			log.Fatalln(err)
@@ -140,9 +141,9 @@ var importCmd = &cobra.Command{
 
 // mergeCmd
 var mergeCmd = &cobra.Command{
-	Use:   "merge",
-	Short: "Merge two components",
-	Long:  `Merge two components`,
+	Use:   cnst.Merge,
+	Short: cnst.MergeShort,
+	Long:  cnst.MergeLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callMerge(mergeFirstFile, mergeSecondFile, mergeOutput); err != nil {
 			log.Fatalln(err)
@@ -153,9 +154,9 @@ var mergeCmd = &cobra.Command{
 
 // searchCmd
 var searchCmd = &cobra.Command{
-	Use:   "search",
-	Short: "Search for components",
-	Long:  `Search for components by their name and meta-data`,
+	Use:   cnst.Search,
+	Short: cnst.SearchShort,
+	Long:  cnst.SearchLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callSearch(searchPackageName, searchRootDir, searchFileOut); err != nil {
 			log.Fatalln(err)
@@ -166,9 +167,9 @@ var searchCmd = &cobra.Command{
 
 // versionCmd
 var versionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Show the version of Product Model Toolkit",
-	Long:  "This command will show the current using version of the application",
+	Use: cnst.Version,
+	Short: cnst.VersionShort,
+	Long: cnst.VersionLong,
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := callVersion(); err != nil {
 			log.Fatalln(err)
@@ -179,20 +180,19 @@ var versionCmd = &cobra.Command{
 
 // listCrawlerOptions command, this works as a subcommand for the crawlerCmd command
 var listCrawlerOptions = &cobra.Command{
-	Use:   "list",
-	Short: "List all available crawlers",
-	Long:  `List all available crawlers for selecting as a license crawler`,
+	Use:   cnst.List,
+	Short: cnst.ListShortCrawler,
+	Long:  cnst.ListLongCrawler,
 	Run: func(cmd *cobra.Command, args []string) {
 		listAvailableCrawlerTypes()
 	},
 }
 
-
 // listImportOptions command, this works as a subcommand for the importCmd command
 var listImportOptions = &cobra.Command{
-	Use:   "list",
-	Short: "List all available import types",
-	Long:  `List all available file types for importing as a product into the PMT`,
+	Use:   cnst.List,
+	Short: cnst.ListShortImport,
+	Long:  cnst.ListLongImport,
 	Run: func(cmd *cobra.Command, args []string) {
 		listAvailableImportTypes()
 	},
@@ -200,21 +200,20 @@ var listImportOptions = &cobra.Command{
 
 // listExportOptions command, this works as a subcommand for the exportCmd command
 var listExportOptions = &cobra.Command{
-	Use:   "list",
-	Short: "List all available export types",
-	Long:  `List all available file types for exporting from BoM artifacts`,
+	Use:   cnst.List,
+	Short: cnst.ListShortExport,
+	Long:  cnst.ListLongExport,
 	Run: func(cmd *cobra.Command, args []string) {
 		listAvailableExportTypes()
 	},
 }
 
-// Execute adds all child commands to the 
-// root command and sets flags appropriately. 
+// Execute adds all child commands to the
+// root command and sets flags appropriately.
 // It only needs to happen once to the rootCmd.
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
-
 
 // init function
 func init() {
@@ -268,7 +267,6 @@ func init() {
 	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
 	_ = importCmd.MarkFlagRequired("type")
 	_ = importCmd.MarkFlagRequired("path")
-
 
 	// adding the subcommands for the searchCmd
 	searchCmd.Flags().StringVarP(&searchPackageName, "name", "n", "", "package name")
@@ -328,7 +326,7 @@ func main() {
 func callCrawler(name, source, output string) error {
 	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
-	
+
 	// run the crawler and check the error
 	if err := commands.RunCrawler(name, source, output, client); err != nil {
 		return err
@@ -386,8 +384,8 @@ func listAvailableExportTypes() {
 		"human-read",
 		"custom-report",
 	}
-	
-	// print instrcution, loop over the 
+
+	// print instrcution, loop over the
 	// list and print the available options
 	fmt.Println("Available import options:")
 	for key, name := range availableExportOptions {
@@ -402,7 +400,7 @@ func callImport(importType, importPath string) error {
 
 	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
-	
+
 	// run the run import and check the error
 	if err := commands.RunImport(importPath, postPath, client); err != nil {
 		return err
