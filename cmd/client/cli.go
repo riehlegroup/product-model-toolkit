@@ -86,6 +86,7 @@ var diffCmd = &cobra.Command{
 	Long:  `Difference between two component graphs`,
 }
 
+// diffBasedOnId command, this works as a subcommand for the diffCmd command
 var diffBasedOnId = &cobra.Command{
 	Use:   "id",
 	Short: "Difference based on id",
@@ -98,6 +99,7 @@ var diffBasedOnId = &cobra.Command{
 	},
 }
 
+// diffBasedOnPath command, this works as a subcommand for the diffCmd command
 var diffBasedOnPath = &cobra.Command{
 	Use:   "path",
 	Short: "Difference based on path",
@@ -175,6 +177,7 @@ var versionCmd = &cobra.Command{
 	},
 }
 
+// listCrawlerOptions command, this works as a subcommand for the crawlerCmd command
 var listCrawlerOptions = &cobra.Command{
 	Use:   "list",
 	Short: "List all available crawlers",
@@ -185,6 +188,7 @@ var listCrawlerOptions = &cobra.Command{
 }
 
 
+// listImportOptions command, this works as a subcommand for the importCmd command
 var listImportOptions = &cobra.Command{
 	Use:   "list",
 	Short: "List all available import types",
@@ -194,6 +198,7 @@ var listImportOptions = &cobra.Command{
 	},
 }
 
+// listExportOptions command, this works as a subcommand for the exportCmd command
 var listExportOptions = &cobra.Command{
 	Use:   "list",
 	Short: "List all available export types",
@@ -203,17 +208,21 @@ var listExportOptions = &cobra.Command{
 	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// Execute adds all child commands to the 
+// root command and sets flags appropriately. 
+// It only needs to happen once to the rootCmd.
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())
 }
 
+
+// init function
 func init() {
-	// init
+
+	// initializing the cobra cli application
 	cobra.OnInitialize(initConfig)
 
-	// rootCmd
+	// adding the subcommands for the rootCmd
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(importCmd)
 	rootCmd.AddCommand(exportCmd)
@@ -223,7 +232,7 @@ func init() {
 	rootCmd.AddCommand(mergeCmd)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
-	// crawlerCmd
+	// adding the subcommands for the crawlerCmd
 	crawlerCmd.AddCommand(listCrawlerOptions)
 	crawlerCmd.Flags().StringVarP(&crawlerName, "name", "n", "", "crawler name")
 	crawlerCmd.Flags().StringVarP(&crawlerSource, "source", "s", "", "crawler source")
@@ -232,22 +241,28 @@ func init() {
 	_ = crawlerCmd.MarkFlagRequired("source")
 	_ = crawlerCmd.MarkFlagRequired("out")
 
-	// diffCmd
+	// adding the subcommands for the diffCmd
 	diffCmd.AddCommand(diffBasedOnId)
 	diffCmd.AddCommand(diffBasedOnPath)
+
 	diffBasedOnId.Flags().StringVarP(&diffFirstId, "first", "f", "", "first id")
 	diffBasedOnId.Flags().StringVarP(&diffSecondId, "second", "s", "", "second id")
 	_ = diffBasedOnId.MarkFlagRequired("first")
 	_ = diffBasedOnId.MarkFlagRequired("second")
 
-	// exportCmd
+	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
+	diffBasedOnPath.Flags().StringVarP(&diffSecondFile, "second", "s", "", "second file")
+	_ = diffBasedOnPath.MarkFlagRequired("first")
+	_ = diffBasedOnPath.MarkFlagRequired("second")
+
+	// adding the subcommands for the exportCmd
 	exportCmd.AddCommand(listExportOptions)
 	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export file type (required)")
 	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
 	_ = exportCmd.MarkFlagRequired("type")
 	_ = exportCmd.MarkFlagRequired("path")
 
-	// importCmd
+	// adding the subcommands for the importCmd
 	importCmd.AddCommand(listImportOptions)
 	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
 	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
@@ -255,12 +270,7 @@ func init() {
 	_ = importCmd.MarkFlagRequired("path")
 
 
-	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
-	diffBasedOnPath.Flags().StringVarP(&diffSecondFile, "second", "s", "", "second file")
-	_ = diffBasedOnPath.MarkFlagRequired("first")
-	_ = diffBasedOnPath.MarkFlagRequired("second")
-
-	// searchCmd
+	// adding the subcommands for the searchCmd
 	searchCmd.Flags().StringVarP(&searchPackageName, "name", "n", "", "package name")
 	searchCmd.Flags().StringVarP(&searchRootDir, "dir", "d", "", "package root dir")
 	searchCmd.Flags().StringVarP(&searchFileOut, "out", "o", "", "spdx file out")
@@ -268,7 +278,7 @@ func init() {
 	_ = searchCmd.MarkFlagRequired("dir")
 	_ = searchCmd.MarkFlagRequired("out")
 
-	// mergeCmd
+	// adding the subcommands for the mergeCmd
 	mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
 	mergeCmd.Flags().StringVarP(&mergeSecondFile, "second", "s", "", "second file")
 	mergeCmd.Flags().StringVarP(&mergeOutput, "out", "o", "", "output pat")
@@ -276,6 +286,7 @@ func init() {
 	_ = mergeCmd.MarkFlagRequired("second")
 	_ = mergeCmd.MarkFlagRequired("out")
 
+	// enf of the commands
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -305,9 +316,7 @@ func main() {
 	// set-up the commands
 	Execute()
 
-	//scn := scanner.FromStr(flg.scanner)
-	//cfg := &scanner.Config{Tool: scn, InDir: flg.inDir, ResultDir: "/tmp/pm/"}
-	//
+	// TODO (we need to have http handlers for all of the services)
 	//scanning.Run(
 	//	cfg,
 	//	rest.NewClient(serverBaseURL),
@@ -315,9 +324,12 @@ func main() {
 
 }
 
-// callCrawler of crawlerCmd
-func callCrawler(name, source, output string) interface{} {
+// callCrawler function for the crawlerCmd command -> returns error
+func callCrawler(name, source, output string) error {
+	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
+	
+	// run the crawler and check the error
 	if err := commands.RunCrawler(name, source, output, client); err != nil {
 		return err
 	}
@@ -325,9 +337,12 @@ func callCrawler(name, source, output string) interface{} {
 	return nil
 }
 
-// callDiffId of diffCmd
+// callDiffId function for the diffCmd command -> returns error
 func callDiffId(first, second string) error {
+	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
+
+	// run the diff by id and check the error
 	if err := commands.RunDiffById(first, second, client); err != nil {
 		return err
 	}
@@ -335,9 +350,12 @@ func callDiffId(first, second string) error {
 	return nil
 }
 
-// callDiffId of diffCmd
+// callDiffId function for the diffCmd command -> returns error
 func callDiffPath(first, second string) error {
+	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
+
+	// run the diff by path and check the error
 	if err := commands.RunDiffByPath(first, second, client); err != nil {
 		return err
 	}
@@ -345,83 +363,112 @@ func callDiffPath(first, second string) error {
 	return nil
 }
 
-// callExport of exportCmd
+// callExport function for the exportCmd command -> returns error
 func callExport(exportId, exportType, exportPath string) error {
+	// define the post path
 	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
+
+	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
+
+	// run the run export and check the error
 	if err := commands.RunExport(exportId, exportPath, postPath, client); err != nil {
 		return err
 	}
 	return nil
 }
 
-// listAvailableExportTypes of exportCmd
+// listAvailableExportTypes function for the exportCmd command
 func listAvailableExportTypes() {
+	// define the available export options list
 	availableExportOptions := []string{
 		"spdx",
 		"human-read",
 		"custom-report",
 	}
+	
+	// print instrcution, loop over the 
+	// list and print the available options
 	fmt.Println("Available import options:")
 	for key, name := range availableExportOptions {
 		fmt.Printf("%v) %v\n", key+1, name)
 	}
 }
 
-// callImport of importCmd
+// callImport function for the importCmd command -> returns error
 func callImport(importType, importPath string) error {
+	// define the post path
 	postPath := fmt.Sprintf("/products/import/%s", strings.ToLower(importType))
+
+	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
+	
+	// run the run import and check the error
 	if err := commands.RunImport(importPath, postPath, client); err != nil {
 		return err
 	}
 	return nil
 }
 
-// listAvailableCrawlerTypes of crawlerCmd
+// listAvailableCrawlerTypes function for the crawlerCmd command
 func listAvailableCrawlerTypes() {
-	availableImportOptions := []string{
+	// define the available crawler options
+	availableCrawlerOptions := []string{
 		"php-scanner",
 	}
+
+	// print instruction, loop over the
+	// list and print the available options
 	fmt.Println("Available crawler options:")
-	for key, name := range availableImportOptions {
+	for key, name := range availableCrawlerOptions {
 		fmt.Printf("%v) %v\n", key+1, name)
 	}
 }
 
-// listAvailableImportTypes of importCmd
+// listAvailableImportTypes function for the importCmd command
 func listAvailableImportTypes() {
+	// define the available import options list
 	availableImportOptions := []string{
 		"spdx",
 		"composer",
 		"file-hasher",
 	}
+
+	// print instruction, loop over the
+	// list and print the available options
 	fmt.Println("Available import options:")
 	for key, name := range availableImportOptions {
 		fmt.Printf("%v) %v\n", key+1, name)
 	}
 }
 
-// callMerge of mergeCmd
+// callMerge function for the mergeCmd command -> returns error
 func callMerge(mergeFirstFile, mergeSecondFile, mergeOutput string) error {
+	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
+
+	// run the run merge command and check the error
 	if err := commands.RunMerge(mergeFirstFile, mergeSecondFile, mergeOutput, client); err != nil {
 		return err
 	}
 	return nil
 }
 
-// callSearch of searchCmd
+// callSearch function for the searchCmd command
 func callSearch(searchPackageName, searchRootDir, searchFileOut string) error {
+	// creating a new http client
 	client := rest.NewClient(serverBaseURL)
+
+	// run the run search command and check the error
 	if err := commands.RunSearch(searchPackageName, searchRootDir, searchFileOut, client); err != nil {
 		return err
 	}
 	return nil
 }
 
-// printVersion of versionCmd
+// printVersion function for the versionCmd command
 func callVersion() error {
+	// run the run version command and check the error
 	if err := commands.RunVersion(gitCommit); err != nil {
 		return err
 	}
