@@ -58,8 +58,6 @@ var (
 	gitCommit string
 )
 
-// base url for connecting to server
-const serverBaseURL = cnst.ServerBaseURL
 
 
 func introScreen() {
@@ -83,11 +81,8 @@ func introScreen() {
 
 // callCrawler function for the crawlerCmd command -> returns error
 func callCrawler(name, source, output string) error {
-	// creating a new http client
-	client := rest.NewClient(serverBaseURL)
-
 	// run the crawler and check the error
-	if err := commands.RunCrawler(name, source, output, client); err != nil {
+	if err := commands.RunCrawler(name, source, output); err != nil {
 		return err
 	}
 
@@ -96,11 +91,9 @@ func callCrawler(name, source, output string) error {
 
 // callDiffId function for the diffCmd command -> returns error
 func callDiffId(first, second string) error {
-	// creating a new http client
-	client := rest.NewClient(serverBaseURL)
 
 	// run the diff by id and check the error
-	if err := commands.RunDiffById(first, second, client); err != nil {
+	if err := commands.RunDiffById(first, second); err != nil {
 		return err
 	}
 
@@ -109,11 +102,9 @@ func callDiffId(first, second string) error {
 
 // callDiffId function for the diffCmd command -> returns error
 func callDiffPath(first, second string) error {
-	// creating a new http client
-	client := rest.NewClient(serverBaseURL)
 
 	// run the diff by path and check the error
-	if err := commands.RunDiffByPath(first, second, client); err != nil {
+	if err := commands.RunDiffByPath(first, second); err != nil {
 		return err
 	}
 
@@ -125,11 +116,8 @@ func callExport(exportId, exportType, exportPath string) error {
 	// define the post path
 	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
 
-	// creating a new http client
-	client := rest.NewClient(serverBaseURL)
-
 	// run the run export and check the error
-	if err := commands.RunExport(exportId, exportPath, postPath, client); err != nil {
+	if err := commands.RunExport(exportId, exportPath, postPath); err != nil {
 		return err
 	}
 	return nil
@@ -157,11 +145,8 @@ func callImport(importType, importPath string) error {
 	// define the post path
 	postPath := fmt.Sprintf("/products/import/%s", strings.ToLower(importType))
 
-	// creating a new http client
-	client := rest.NewClient(serverBaseURL)
-
 	// run the run import and check the error
-	if err := commands.RunImport(importPath, postPath, client); err != nil {
+	if err := commands.RunImport(importPath, postPath); err != nil {
 		return err
 	}
 	return nil
@@ -201,11 +186,8 @@ func listAvailableImportTypes() {
 
 // callMerge function for the mergeCmd command -> returns error
 func callMerge(mergeFirstFile, mergeSecondFile, mergeOutput string) error {
-	// creating a new http client
-	client := rest.NewClient(serverBaseURL)
-
 	// run the run merge command and check the error
-	if err := commands.RunMerge(mergeFirstFile, mergeSecondFile, mergeOutput, client); err != nil {
+	if err := commands.RunMerge(mergeFirstFile, mergeSecondFile, mergeOutput); err != nil {
 		return err
 	}
 	return nil
@@ -213,11 +195,8 @@ func callMerge(mergeFirstFile, mergeSecondFile, mergeOutput string) error {
 
 // callSearch function for the searchCmd command
 func callSearch(searchPackageName, searchRootDir, searchFileOut string) error {
-	// creating a new http client
-	client := rest.NewClient(serverBaseURL)
-
 	// run the run search command and check the error
-	if err := commands.RunSearch(searchPackageName, searchRootDir, searchFileOut, client); err != nil {
+	if err := commands.RunSearch(searchPackageName, searchRootDir, searchFileOut); err != nil {
 		return err
 	}
 	return nil

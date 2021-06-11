@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-func RunSearch(name, dir, output string, client *rest.Client) error {
+func RunSearch(name, dir, output string) error {
 	logServerVersion(client)
 
 	// get the command-line arguments

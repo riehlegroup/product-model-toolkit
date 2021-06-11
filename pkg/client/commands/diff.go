@@ -9,7 +9,7 @@ import (
 	"os"
 )
 
-func RunDiffById(first, second string, client *rest.Client) error {
+func RunDiffById(first, second string) error {
 	//logServerVersion(client)
 	//
 	//log information
@@ -123,7 +123,7 @@ func RunDiffById(first, second string, client *rest.Client) error {
 	return nil
 }
 
-func RunDiffByPath(first, second string, client *rest.Client) error  {
+func RunDiffByPath(first, second string) error  {
 	logServerVersion(client)
 
 	// log information

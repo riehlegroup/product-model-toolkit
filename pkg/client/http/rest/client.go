@@ -10,6 +10,7 @@ import (
 	"io"
 	"net/http"
 	"time"
+	"io/ioutil"
 )
 
 // Client to communicate with Product-Model-Toolkit server.
@@ -70,4 +71,25 @@ func (c *Client) PostResult(url string, input io.Reader) (string, error) {
 	}
 
 	return res.Header.Get(locHeader), nil
+}
+
+func (c *Client) PostData(url string, data []byte) (string, error) {
+
+    req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
+	if err != nil {
+		return "", err
+	}
+    req.Header.Set("Content-Type", "application/json")
+
+    resp, err := c.HTTPClient.Do(req)
+    if err != nil {
+		return "", nil
+    }
+    defer resp.Body.Close()
+
+    fmt.Println("response Status:", resp.Status)
+    fmt.Println("response Headers:", resp.Header)
+    body, _ := ioutil.ReadAll(resp.Body)
+    fmt.Println("response Body:", string(body))
+	return string(body), nil
 }

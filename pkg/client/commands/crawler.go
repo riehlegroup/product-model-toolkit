@@ -3,11 +3,17 @@ package commands
 import (
 	"errors"
 	"fmt"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"os/exec"
+
+	"github.com/osrgroup/product-model-toolkit/cnst"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 )
 
-func RunCrawler(name, source, output string, client *rest.Client) error {
+func RunCrawler(name, source, output string) error {
+	// creating a new http client
+	client := rest.NewClient(cnst.ServerBaseURL)
+
+	// log server version with respect to client
 	logServerVersion(client)
 
 	// the formal name for docker image
@@ -54,6 +60,15 @@ func RunCrawler(name, source, output string, client *rest.Client) error {
 	if err != nil {
 		return err
 	}
+
+	// define the url of respected http call
+	url := ""
+
+	// create a json data for sending to the server
+	var jsonStr = []byte(fmt.Sprintf(`{"path":%v}`, output))
+
+	// send the results to the server
+	client.PostData(url, jsonStr)
 
 	fmt.Println("Crawling licenses successfully completed")
 	fmt.Printf("The output path: %v\n", output)
