@@ -2,7 +2,7 @@ package commands
 
 import (
 	"fmt"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
+	"github.com/osrgroup/product-model-toolkit/cnst"
 	"github.com/spdx/tools-golang/licensediff"
 	"github.com/spdx/tools-golang/spdxlib"
 	"github.com/spdx/tools-golang/tvloader"
@@ -124,6 +124,10 @@ func RunDiffById(first, second string) error {
 }
 
 func RunDiffByPath(first, second string) error  {
+	// creating a new http client
+	client := newClient(cnst.ServerBaseURL)
+
+	// log server version with respect to client
 	logServerVersion(client)
 
 	// log information

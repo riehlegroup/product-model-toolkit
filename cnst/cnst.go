@@ -54,3 +54,9 @@ const (
 	ListShortExport = "List all available export types"
 	ListLongExport = `List all available file types for exporting from BoM artifacts`
 )
+
+
+// general
+const (
+	APIGroup = "/api/v1"
+)

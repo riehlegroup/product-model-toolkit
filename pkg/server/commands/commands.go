@@ -1,13 +1,12 @@
 package commands
 
 import (
-	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"log"
 )
 
 
-func logServerVersion(c *rest.Client) {
-	v, err := c.GetServerVersion()
+func logServerVersion(c *Client) {
+	v, err := c.getServerVersion()
 	if err != nil {
 		log.Printf("[REST-Client] Unable to read server version: %s", err)
 		return

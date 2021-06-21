@@ -8,11 +8,10 @@ import (
 	"flag"
 	"fmt"
 	"github.com/osrgroup/product-model-toolkit/pkg/db/postgraph"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/diff"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/importing"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/querying"
 	"github.com/osrgroup/product-model-toolkit/pkg/services/version"
+	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"os"
+	
 
 	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
 )
@@ -32,9 +31,7 @@ func main() {
 
 	r := rest.NewSrv(
 		"127.0.0.1:8081",
-		diff.NewService(repo),
-		querying.NewService(repo),
-		importing.NewService(repo),
+		services.NewService(repo),
 	)
 	go r.Start()
 	defer r.Shutdown()

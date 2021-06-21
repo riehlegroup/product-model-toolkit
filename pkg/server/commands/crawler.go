@@ -6,12 +6,11 @@ import (
 	"os/exec"
 
 	"github.com/osrgroup/product-model-toolkit/cnst"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 )
 
 func RunCrawler(name, source, output string) error {
 	// creating a new http client
-	client := rest.NewClient(cnst.ServerBaseURL)
+	client := newClient(cnst.ServerBaseURL)
 
 	// log server version with respect to client
 	logServerVersion(client)
@@ -68,7 +67,7 @@ func RunCrawler(name, source, output string) error {
 	var jsonStr = []byte(fmt.Sprintf(`{"path":%v}`, output))
 
 	// send the results to the server
-	client.PostData(url, jsonStr)
+	client.postData(url, jsonStr)
 
 	fmt.Println("Crawling licenses successfully completed")
 	fmt.Printf("The output path: %v\n", output)

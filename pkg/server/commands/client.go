@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package rest
+package commands
 
 import (
 	"bytes"
@@ -24,8 +24,8 @@ type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
 
-// NewClient returns a HTTP client.
-func NewClient(baseURL string) *Client {
+// newClient returns a HTTP client.
+func newClient(baseURL string) *Client {
 	return &Client{
 		baseURL: baseURL,
 		HTTPClient: &http.Client{
@@ -35,7 +35,7 @@ func NewClient(baseURL string) *Client {
 }
 
 // GetServerVersion returns the semantic version of the PMT server.
-func (c *Client) GetServerVersion() (string, error) {
+func (c *Client) getServerVersion() (string, error) {
 	url := fmt.Sprintf("%s/version", c.baseURL)
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
@@ -57,7 +57,7 @@ func (c *Client) GetServerVersion() (string, error) {
 const locHeader = "Location"
 
 // PostResult send result JSON to PMT server and returns the path to the created resource.
-func (c *Client) PostResult(url string, input io.Reader) (string, error) {
+func (c *Client) postResult(url string, input io.Reader) (string, error) {
 	completeURL := c.baseURL + url
 
 	req, err := http.NewRequest(http.MethodPost, completeURL, input)
@@ -73,7 +73,7 @@ func (c *Client) PostResult(url string, input io.Reader) (string, error) {
 	return res.Header.Get(locHeader), nil
 }
 
-func (c *Client) PostData(url string, data []byte) (string, error) {
+func (c *Client) postData(url string, data []byte) (string, error) {
 
     req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	if err != nil {
