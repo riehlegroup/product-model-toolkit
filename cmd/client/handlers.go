@@ -6,16 +6,17 @@ package main
 
 import (
 	"fmt"
-	"github.com/osrgroup/product-model-toolkit/cnst"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
-	"github.com/pterm/pterm"
-	"github.com/spf13/cobra"
 	"log"
 	"strings"
 	"time"
+
+	"github.com/osrgroup/product-model-toolkit/cnst"
+	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
+	"github.com/pterm/pterm"
+	"github.com/spf13/cobra"
 )
 
+// introScreen creates a fancy intro message
 func introScreen() {
 	ptermLogo, _ := pterm.DefaultBigText.WithLetters(
 		pterm.NewLettersFromStringWithStyle("PMT", pterm.NewStyle(pterm.FgLightGreen))).
