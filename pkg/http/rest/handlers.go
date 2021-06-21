@@ -17,18 +17,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Handler handle all request for the given route group.
-func Handler(g *echo.Group, srv services.Service) {
-	g.GET("/", handleEntryPoint)
-	g.GET("/version", handleVersion)
-	g.GET("/health", handleHealth)
-
-	
-	g.GET("/products", findAllProducts(srv))
-	g.GET("/products/:id", findProductByID(srv))
-	g.POST("/products/import/:scanner", importFromScanner(srv))
-}
-
 func handleEntryPoint(c echo.Context) error {
 	return c.JSON(http.StatusOK, c.Echo().Routers())
 }
