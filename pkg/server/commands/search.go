@@ -2,13 +2,17 @@ package commands
 
 import (
 	"fmt"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
 	"github.com/spdx/tools-golang/idsearcher"
 	"github.com/spdx/tools-golang/tvsaver"
+	"github.com/osrgroup/product-model-toolkit/cnst"
 	"os"
 )
 
 func RunSearch(name, dir, output string) error {
+	// creating a new http client
+	client := newClient(cnst.ServerBaseURL)
+
+	// log server version with respect to client
 	logServerVersion(client)
 
 	// get the command-line arguments

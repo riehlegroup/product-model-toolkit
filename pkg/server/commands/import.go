@@ -1,8 +1,14 @@
 package commands
 
-import "github.com/osrgroup/product-model-toolkit/pkg/client/http/rest"
+import (
+	"github.com/osrgroup/product-model-toolkit/cnst"
+)
 
 func RunImport(importPath, postPath string) error {
+	// creating a new http client
+	client := newClient(cnst.ServerBaseURL)
+
+	// log server version with respect to client
 	logServerVersion(client)
 
 	// log information

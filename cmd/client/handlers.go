@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/osrgroup/product-model-toolkit/cnst"
-	"github.com/osrgroup/product-model-toolkit/pkg/client/commands"
+	"github.com/osrgroup/product-model-toolkit/pkg/server/commands"
 	"github.com/pterm/pterm"
 	"github.com/spf13/cobra"
 )

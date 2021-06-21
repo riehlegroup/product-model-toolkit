@@ -6,27 +6,27 @@ package rest
 
 import (
 	"fmt"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/diff"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/importing"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/querying"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"net/http"
 	"strconv"
+
+	"github.com/osrgroup/product-model-toolkit/pkg/services/querying"
+	"github.com/osrgroup/product-model-toolkit/pkg/services/version"
+	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 )
 
 // Handler handle all request for the given route group.
-func Handler(g *echo.Group, diff diff.Service, qSrv querying.Service, iSrv importing.Service) {
+func Handler(g *echo.Group, srv services.Service) {
 	g.GET("/", handleEntryPoint)
 	g.GET("/version", handleVersion)
 	g.GET("/health", handleHealth)
 
-
-	g.GET("/products", findAllProducts(qSrv))
-	g.GET("/products/:id", findProductByID(qSrv))
-	g.POST("/products/import/:scanner", importFromScanner(iSrv))
+	
+	g.GET("/products", findAllProducts(srv))
+	g.GET("/products/:id", findProductByID(srv))
+	g.POST("/products/import/:scanner", importFromScanner(srv))
 }
 
 func handleEntryPoint(c echo.Context) error {
