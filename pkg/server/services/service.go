@@ -2,7 +2,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-package querying
+package services
 
 import (
 	"errors"
@@ -12,7 +12,7 @@ import (
 
 var (
 	// ErrNotFound if a entity couldn't be found in the db.
-	ErrNotFound = errors.New("Entity not found")
+	ErrNotFound = errors.New("entity not found")
 )
 
 // Repository provides access to the product db.
@@ -25,7 +25,7 @@ type Repository interface {
 
 // Service  provides product querying operations.
 type Service interface {
-	FindAllLicenses() ([]model.Product, error)
+	FindAllProducts() ([]model.Product, error)
 	FindProductByID(id int) (model.Product, error)
 }
 

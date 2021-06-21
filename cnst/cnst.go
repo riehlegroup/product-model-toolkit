@@ -10,9 +10,9 @@ const (
 	CliShort = "Product Model Toolkit"
 	CliLong = `Product Model Toolkit for Managing Open Source Dependencies in Products`
 
-	Crawler = "crawler"
-	CrawlerShort = "Crawl the licenses"
-	CrawlerLong = `Crawl the licenses`
+	Scanner = "scanner"
+	ScannerShort = "Scan the licenses"
+	ScannerLong = `Scan the licenses`
 
 	Diff = "diff"
 	DiffShort = "Difference between two component graphs"
@@ -47,8 +47,8 @@ const (
 	VersionLong =  "This command will show the current using version of the application"
 
 	List = "list"
-	ListShortCrawler =  "List all available crawlers"
-	ListLongCrawler = `List all available crawlers for selecting as a license crawler`
+	ListShortScanner =  "List all available scanners"
+	ListLongScanner = `List all available scanners for selecting as a license crawler`
 	ListShortImport = "List all available import types"
 	ListLongImport = `List all available file types for importing as a product into the PMT`
 	ListShortExport = "List all available export types"

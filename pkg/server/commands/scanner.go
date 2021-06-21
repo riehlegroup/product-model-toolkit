@@ -8,7 +8,7 @@ import (
 	"github.com/osrgroup/product-model-toolkit/cnst"
 )
 
-func RunCrawler(name, source, output string) error {
+func RunScanner(name, source, output string) error {
 	// creating a new http client
 	client := newClient(cnst.ServerBaseURL)
 

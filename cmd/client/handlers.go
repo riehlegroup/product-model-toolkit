@@ -34,10 +34,10 @@ func introScreen() {
 
 }
 
-// callCrawler function for the crawlerCmd command -> returns error
-func callCrawler(name, source, output string) error {
-	// run the crawler and check the error
-	if err := commands.RunCrawler(name, source, output); err != nil {
+// callscanner function for the scannerCmd command -> returns error
+func callscanner(name, source, output string) error {
+	// run the scanner and check the error
+	if err := commands.RunScanner(name, source, output); err != nil {
 		return err
 	}
 
@@ -107,17 +107,17 @@ func callImport(importType, importPath string) error {
 	return nil
 }
 
-// listAvailableCrawlerTypes function for the crawlerCmd command
-func listAvailableCrawlerTypes() {
-	// define the available crawler options
-	availableCrawlerOptions := []string{
+// listAvailablescannerTypes function for the scannerCmd command
+func listAvailablescannerTypes() {
+	// define the available scanner options
+	availablescannerOptions := []string{
 		"php-scanner",
 	}
 
 	// print instruction, loop over the
 	// list and print the available options
-	fmt.Println("Available crawler options:")
-	for key, name := range availableCrawlerOptions {
+	fmt.Println("Available scanner options:")
+	for key, name := range availablescannerOptions {
 		fmt.Printf("%v) %v\n", key+1, name)
 	}
 }
@@ -177,13 +177,13 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-// crawlerCmd
-var crawlerCmd = &cobra.Command{
-	Use:   cnst.Crawler,
-	Short: cnst.CrawlerShort,
-	Long:  cnst.CrawlerLong,
+// scannerCmd
+var scannerCmd = &cobra.Command{
+	Use:   cnst.Scanner,
+	Short: cnst.ScannerShort,
+	Long:  cnst.ScannerLong,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := callCrawler(crawlerName, crawlerSource, crawlerOutput); err != nil {
+		if err := callscanner(scannerName, scannerSource, scannerOutput); err != nil {
 			log.Fatalln(err)
 			return
 		}
@@ -288,13 +288,13 @@ var versionCmd = &cobra.Command{
 	},
 }
 
-// listCrawlerOptions command, this works as a subcommand for the crawlerCmd command
-var listCrawlerOptions = &cobra.Command{
+// listscannerOptions command, this works as a subcommand for the scannerCmd command
+var listScannerOptions = &cobra.Command{
 	Use:   cnst.List,
-	Short: cnst.ListShortCrawler,
-	Long:  cnst.ListLongCrawler,
+	Short: cnst.ListShortScanner,
+	Long:  cnst.ListLongScanner,
 	Run: func(cmd *cobra.Command, args []string) {
-		listAvailableCrawlerTypes()
+		listAvailablescannerTypes()
 	},
 }
 

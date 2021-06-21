@@ -23,14 +23,19 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.GET("/", handleEntryPoint)
 	g.GET("/health", handleHealth)
 
-	// crawler routes
-	g.GET("/license", findAllLicenses(srv))
-	g.GET("licenses/:id", findLicenseById(srv))
-	g.POST("licenses/add", addLicense(srv))
+	// product routes
+	g.GET("/products", findAllProducts(srv))
+	g.GET("/products/:id", findProductByID(srv))
+	g.POST("/products/import/:scanner", importFromScanner(srv))
 
+	// crawler routes
+	g.GET("/crawlers/list", listAllCrawlers(srv))
+	g.POST("/crawlers/license/add", addLicense(srv))
+	
 	// diff routes
 	g.POST("/diff/id", diffById(srv))
 	g.POST("/diff/path", diffByPath(srv))
+	
 	// export routes
 	g.POST("/export", exportFile(srv))
 
@@ -39,11 +44,6 @@ func Handler(g *echo.Group, srv services.Service) {
 
 	// merge routes
 	g.POST("/merge", mergeFiles(srv))
-
-	// product routes
-	g.GET("/products", findAllProducts(srv))
-	g.GET("/products/:id", findProductByID(srv))
-	g.POST("/products/import/:scanner", importFromScanner(srv))
 
 	// search routes
 	g.GET("/search", searchData(srv))
