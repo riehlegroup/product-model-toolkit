@@ -131,59 +131,71 @@ func RunDiffByPath(first, second string) error  {
 	logServerVersion(client)
 
 	// log information
-	fmt.Println("Running the diff by Id")
+	fmt.Println("Running the diff by path")
 
 	// open the first spdx file
 	r, err := os.Open(first)
 	if err != nil {
-		fmt.Printf("Error while opening %v for reading: %v", first, err)
+		fmt.Printf("error while opening %v for reading: %v", first, err)
 		return err
 	}
 	defer r.Close()
 
 	// try to load the first SPDX file's contents as a tag-value file, version 2.2
 	docFirst, err := tvloader.Load2_2(r)
+
+	// check the error
 	if err != nil {
-		fmt.Printf("Error while parsing %v: %v", first, err)
+		fmt.Printf("error while parsing %v: %v", first, err)
 		return err
 	}
 
-	// check whether the SPDX file has at least one package that it describes
+	// check SPDX file for packages
 	pkgIDsFirst, err := spdxlib.GetDescribedPackageIDs2_2(docFirst)
+
+	// check the erro
 	if err != nil {
-		fmt.Printf("Unable to get describe packages from first SPDX document: %v\n", err)
+		fmt.Printf("unable to get describe packages from first SPDX document: %v\n", err)
 		return err
 	}
 
-	// if we got here, the file is now loaded into memory.
-	fmt.Printf("Successfully loaded first SPDX file %s\n", first)
+	// print the successful message -> first file is loaded
+	fmt.Printf("successfully loaded first SPDX file %s\n", first)
 
-	// open the second SPDX file
+	// open the second file
 	r, err = os.Open(second)
+
+	// check the error
 	if err != nil {
 		fmt.Printf("Error while opening %v for reading: %v", second, err)
 		return err
 	}
+
+	// close the file in defer
 	defer r.Close()
 
-	// try to load the second SPDX file's contents as a tag-value file, version 2.2
+	// load the second file as tag-value
 	docSecond, err := tvloader.Load2_2(r)
+
+	// check the error
 	if err != nil {
 		fmt.Printf("Error while parsing %v: %v", second, err)
 		return err
 	}
-	// check whether the SPDX file has at least one package that it describes
+
+	// check SPDX file for packages
 	pkgIDsSecond, err := spdxlib.GetDescribedPackageIDs2_2(docSecond)
+
+	// check the error
 	if err != nil {
 		fmt.Printf("Unable to get describe packages from second SPDX document: %v\n", err)
 		return err
 	}
 
-	// if we got here, the file is now loaded into memory.
+	// print the successful message -> second file is loaded
 	fmt.Printf("Successfully loaded second SPDX file %s\n\n", second)
 
-	// compare the described packages from each Document, by SPDX ID
-	// go through the first set first, report if they aren't in the second set
+	// compare the packages by SPDX ID
 	for _, pkgID := range pkgIDsFirst {
 		fmt.Printf("================================\n")
 		p1, okFirst := docFirst.Packages[pkgID]
@@ -235,7 +247,6 @@ func RunDiffByPath(first, second string) error  {
 			fmt.Printf("  Found in second document, not found in first\n")
 		}
 	}
-
 
 	// return
 	return nil

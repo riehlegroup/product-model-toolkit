@@ -7,15 +7,15 @@ package memory
 import (
 	"errors"
 	"math/rand"
-
+	"fmt"
 	"github.com/osrgroup/product-model-toolkit/model"
 )
 
 var (
 	// ErrNotFound if a entity couldn't be found in the db.
-	ErrNotFound = errors.New("Entity not found")
+	ErrNotFound = errors.New("entity not found")
 	// ErrAlreadyExist if a entity with the same ID already exist in the db.
-	ErrAlreadyExist = errors.New("Entity already exist")
+	ErrAlreadyExist = errors.New("entity already exist")
 )
 
 // DB represents a database.
@@ -81,6 +81,8 @@ func (db *DB) AddSampleData() {
 		VCS:     "github.com/prod2",
 	}
 
-	db.SaveProduct(prod1)
-	db.SaveProduct(prod2)
+	_, err := db.SaveProduct(prod1)
+	if err != nil {fmt.Println(err)}
+	_, err = db.SaveProduct(prod2)
+	if err != nil {fmt.Println(err)}
 }

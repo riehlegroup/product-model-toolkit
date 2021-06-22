@@ -8,12 +8,17 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	convert2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing/convert"
 	"io"
 	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
 )
+
+
+// TrimUTF8prefix returns doc without UTF8 prefix string
+func TrimUTF8prefix(doc []byte) []byte {
+	return bytes.TrimPrefix(doc, []byte("\xef\xbb\xbf"))
+}
 
 // Hasher represents a File-Hasher converter
 type Hasher struct{}
@@ -23,7 +28,7 @@ func (Hasher) Convert(input io.Reader) (*model.Product, error) {
 	byteInput := new(bytes.Buffer)
 	byteInput.ReadFrom(input)
 
-	body := convert2.TrimUTF8prefix(byteInput.Bytes())
+	body := TrimUTF8prefix(byteInput.Bytes())
 	var result []model.Artifact
 	err := json.Unmarshal(body, &result)
 	if err != nil {

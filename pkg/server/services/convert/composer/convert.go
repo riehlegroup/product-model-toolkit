@@ -7,12 +7,19 @@ package composer
 import (
 	"bytes"
 	"encoding/json"
-	convert2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing/convert"
+	// convert "github.com/osrgroup/product-model-toolkit/pkg/services/server/convert"
 	"io"
 	"strings"
 
 	"github.com/osrgroup/product-model-toolkit/model"
 )
+
+
+// TrimUTF8prefix returns doc without UTF8 prefix string
+func TrimUTF8prefix(doc []byte) []byte {
+	return bytes.TrimPrefix(doc, []byte("\xef\xbb\xbf"))
+}
+
 
 // Composer represents a PHP Composer converter
 type Composer struct{}
@@ -37,7 +44,7 @@ func (Composer) Convert(input io.Reader) (*model.Product, error) {
 	byteInput := new(bytes.Buffer)
 	byteInput.ReadFrom(input)
 
-	body := convert2.TrimUTF8prefix(byteInput.Bytes())
+	body := TrimUTF8prefix(byteInput.Bytes())
 	var result composerDoc
 	err := json.Unmarshal(body, &result)
 	if err != nil {

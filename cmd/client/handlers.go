@@ -7,7 +7,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/osrgroup/product-model-toolkit/cnst"
@@ -56,10 +55,10 @@ func callDiffId(first, second string) error {
 }
 
 // callDiffId function for the diffCmd command -> returns error
-func callDiffPath(first, second string) error {
+func callDiffPath(firstPath, secondPath string) error {
 
 	// run the diff by path and check the error
-	if err := commands.RunDiffByPath(first, second); err != nil {
+	if err := commands.RunDiffByPath(firstPath, secondPath); err != nil {
 		return err
 	}
 
@@ -67,12 +66,9 @@ func callDiffPath(first, second string) error {
 }
 
 // callExport function for the exportCmd command -> returns error
-func callExport(exportId, exportType, exportPath string) error {
-	// define the post path
-	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
-
+func callExport(exportId, exportPath string) error {
 	// run the run export and check the error
-	if err := commands.RunExport(exportId, exportPath, postPath); err != nil {
+	if err := commands.RunExport(exportId, exportPath); err != nil {
 		return err
 	}
 	return nil
@@ -97,11 +93,9 @@ func listAvailableExportTypes() {
 
 // callImport function for the importCmd command -> returns error
 func callImport(importType, importPath string) error {
-	// define the post path
-	postPath := fmt.Sprintf("/products/import/%s", strings.ToLower(importType))
 
 	// run the run import and check the error
-	if err := commands.RunImport(importPath, postPath); err != nil {
+	if err := commands.RunImport(importType, importPath); err != nil {
 		return err
 	}
 	return nil
@@ -224,7 +218,7 @@ var exportCmd = &cobra.Command{
 	Short: cnst.ExportShort,
 	Long:  cnst.ExportLong,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := callExport(exportId, exportType, exportPath); err != nil {
+		if err := callExport(exportId, exportPath); err != nil {
 			log.Fatalln(err)
 			return
 		}

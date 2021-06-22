@@ -26,7 +26,6 @@ var (
 
 	// exportCmd
 	exportId   string
-	exportType string
 	exportPath string
 
 	// importCmd
@@ -88,10 +87,11 @@ func init() {
 
 	// adding the subcommands for the exportCmd
 	exportCmd.AddCommand(listExportOptions)
-	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export file type (required)")
 	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
-	_ = exportCmd.MarkFlagRequired("type")
+	exportCmd.Flags().StringVarP(&exportId, "id", "i", "", "id of the product to be exported (required)")
 	_ = exportCmd.MarkFlagRequired("path")
+	_ = exportCmd.MarkFlagRequired("id")
+
 
 	// adding the subcommands for the importCmd
 	importCmd.AddCommand(listImportOptions)

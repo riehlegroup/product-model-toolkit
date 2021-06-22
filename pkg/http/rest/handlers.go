@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/services/querying"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/version"
+	// "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
+	// "github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 
 	"github.com/labstack/echo/v4"
@@ -22,7 +22,7 @@ func handleEntryPoint(c echo.Context) error {
 }
 
 func handleVersion(c echo.Context) error {
-	return c.String(http.StatusOK, version.Name())
+	return c.String(http.StatusOK, "1.0.0")
 }
 
 func handleHealth(c echo.Context) error {
@@ -34,15 +34,15 @@ func handleHealth(c echo.Context) error {
 }
 
 // findAllLicenses
-func findAllLicenses(srv services.Service) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		licenses, err := srv.FindAllLicenses()
-		if err != nil {
-			c.Error(errors.Wrap(err, "unable to find all licenses"))
-		}
-		return c.JSON(http.StatusOK, licenses)
-	}
-}
+// func findAllLicenses(srv services.Service) echo.HandlerFunc {
+	// return func(c echo.Context) error {
+		// licenses, err := srv.FindAllLicenses()
+		// if err != nil {
+			// c.Error(errors.Wrap(err, "unable to find all licenses"))
+		// }
+		// return c.JSON(http.StatusOK, licenses)
+	// }
+// }
 
 func findAllProducts(srv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {

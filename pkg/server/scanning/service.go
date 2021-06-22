@@ -94,7 +94,7 @@ func contains(slice []string, val string) bool {
 }
 
 func logServerVersion(c *rest.Client) {
-	v, err := c.GetServerVersion()
+	v, err := c.getServerVersion()
 	if err != nil {
 		log.Printf("[REST-Client] Unable to read server version: %s", err)
 		return
