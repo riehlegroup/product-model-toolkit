@@ -32,6 +32,7 @@ type Config struct {
 
 // Available list all available scanner tools that can be used.
 var Available = [...]Tool{
+	PhpScanner,
 	Licensee,
 	Scancode,
 	Composer,
@@ -43,7 +44,7 @@ var Default Tool = Licensee
 
 // Licensee represents the latest usable Licensee version
 var Licensee = Tool{
-	Name:      "Licensee",
+	Name:      "licensee",
 	Version:   "9.13.0",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0",
 	Cmd:       `/bin/bash -c "licensee detect /input/ --json > /result/result.json"`,
@@ -52,7 +53,7 @@ var Licensee = Tool{
 
 // Scancode represents the latest usable Scancode version
 var Scancode = Tool{
-	Name:      "Scancode",
+	Name:      "scancode",
 	Version:   "3.1.1",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1",
 	Cmd:       `/bin/bash -c "./scancode --spdx-tv /result/result.spdx /input"`,
@@ -62,7 +63,7 @@ var Scancode = Tool{
 
 // Composer represents a container which produces a Composer result artifact.
 var Composer = Tool{
-	Name:      "Composer",
+	Name:      "composer",
 	Version:   "dummy",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy",
 	Cmd:       `/bin/sh -c "cp example.json result/example.json"`,
@@ -71,7 +72,7 @@ var Composer = Tool{
 
 // FileHasher represents a container which produces a JSON file with hashes of all file of the input folder.
 var FileHasher = Tool{
-	Name:      "File-Hasher",
+	Name:      "filehasher",
 	Version:   "latest",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/file-hasher:latest",
 	Cmd:       `/bin/sh -c "./fh -i /input -o /result/result.json"`,
@@ -79,7 +80,7 @@ var FileHasher = Tool{
 }
 
 var PhpScanner = Tool {
-	Name: "PHP-Scanner",
+	Name: "phpscanner",
 	Version: "1.0.0",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0",
 	Cmd: `/bin/sh -c  "phpScanner.php --sourcedir=<path/to/scanned/folder> --outputdir=<path/to/output/folder>"`, // TODO
@@ -171,5 +172,17 @@ func RunScanner(name, source, output string) error {
 
 
 	// return
+	return nil
+}
+
+
+func ListAvailableScannerTypes() error {
+	// print instruction, loop over the
+	// list and print the available options
+	fmt.Println("Available scanner options:")
+	for key, item := range Available {
+		fmt.Printf("%v) %v\n", key+1, item.Name)
+	}
+
 	return nil
 }

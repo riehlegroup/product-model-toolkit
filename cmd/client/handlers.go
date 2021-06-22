@@ -108,18 +108,13 @@ func callImport(importType, importPath string) error {
 }
 
 // listAvailablescannerTypes function for the scannerCmd command
-func listAvailablescannerTypes() {
-	// define the available scanner options
-	availablescannerOptions := []string{
-		"php-scanner",
+func listAvailablescannerTypes() error {
+	// list available scanner types and check the error
+	if err := commands.ListAvailableScannerTypes(); err != nil {
+		return err
 	}
 
-	// print instruction, loop over the
-	// list and print the available options
-	fmt.Println("Available scanner options:")
-	for key, name := range availablescannerOptions {
-		fmt.Printf("%v) %v\n", key+1, name)
-	}
+	return nil
 }
 
 // listAvailableImportTypes function for the importCmd command
