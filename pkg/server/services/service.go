@@ -13,7 +13,6 @@ import (
 	"io"
 
 	"github.com/pkg/errors"
-	"github.com/spdx/tools-golang/spdx"
 	"github.com/spdx/tools-golang/tvloader"
 	"github.com/osrgroup/product-model-toolkit/model"
 )
@@ -40,7 +39,7 @@ type Service interface {
 
 	// import
 	ComposerImport(io.Reader) (*model.Product, error)
-	SPDX(io.Reader) (*spdx.Document2_1, error)
+	SPDX(io.Reader) (*model.Product, error)
 	FileHasherImport(io.Reader) (*model.Product, error)
 }
 
@@ -82,26 +81,20 @@ func (s *service) ComposerImport(input io.Reader) (*model.Product, error) {
 }
 
 // SPDX import a SPDX representation of the BOM.
-func (s *service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
+func (s *service) SPDX(input io.Reader) (*model.Product, error) {
 	doc, err := tvloader.Load2_1(input)
 	if err != nil {
 		msg := fmt.Sprintf("error while parsing SPDX body: %v", err)
 		return nil, errors.New(msg)
 	}
 
-	
-
-	// packageDesc, err := json.Marshal(doc.CreationInfo)
-    // if err != nil {
-    //     return nil, err
-    // }
 	components := []model.Component{}
 
 	for _, p := range(doc.Packages) {
 		cmp := model.Component{
 			UID: string(p.PackageSPDXIdentifier),
 			Name: p.PackageName,
-			Pkg: fmt.Sprintf("%v")
+			Pkg: p.PackageSummary,
 			Version: p.PackageVersion,
 			License: model.License{
 				SPDXID: string(p.PackageSPDXIdentifier),
@@ -113,7 +106,7 @@ func (s *service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
 		components = append(components, cmp)
 	}
 
-	prd := &model.Product{
+	prod := &model.Product{
 		Name: doc.CreationInfo.DocumentName,
 		Version: doc.CreationInfo.SPDXVersion,
 		VCS: "",
@@ -125,10 +118,14 @@ func (s *service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
 		Components: components,
 	}
 
+	pSaved, err := s.r.SaveProduct(prod)
+	if err != nil {
+		msg := fmt.Sprintf("error while saving the product to the DB: %v", err)
+		return nil, errors.New(msg)
+	}
 
-	fmt.Println(len(doc.Packages))
+	return &pSaved, nil
 
-	return doc, nil
 }
 
 // FileHasherImport import a File-Hasher representation of the BOM and store it in the DB.
@@ -142,7 +139,7 @@ func (s *service) FileHasherImport(input io.Reader) (*model.Product, error) {
 
 	pSaved, err := s.r.SaveProduct(prod)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error while saving the product to the DB")
+		return nil, errors.Wrap(err, "error while saving the product to the DB")
 	}
 
 	return &pSaved, nil

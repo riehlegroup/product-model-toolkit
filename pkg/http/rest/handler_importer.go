@@ -21,22 +21,24 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 		scanner := strings.ToLower(c.Param("scanner"))
 		r := c.Request().Body
 
-		if scanner == "scancode" || scanner == "spdx" {
-			doc, err := iSrv.SPDX(r)
-			if err != nil {
-				c.Error(errors.Wrap(err, "unable to perform SPDX import"))
-			}
+		// if scanner == "scancode" || scanner == "spdx" {
+		// 	doc, err := iSrv.SPDX(r)
+		// 	if err != nil {
+		// 		c.Error(errors.Wrap(err, "unable to perform SPDX import"))
+		// 	}
 			
-			return c.String(
-				http.StatusOK,
-				fmt.Sprintf("successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
+		// 	return c.String(
+		// 		http.StatusOK,
+		// 		fmt.Sprintf("successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
 				
-			)
-		}
+		// 	)
+		// }
 
 		var prod *model.Product
 		var err error
 		switch scanner {
+		case "spdx":
+			prod, err = iSrv.SPDX(r)
 		case "composer":
 			prod, err = iSrv.ComposerImport(r)
 		case "file-hasher":
