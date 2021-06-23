@@ -22,19 +22,14 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 		r := c.Request().Body
 
 		if scanner == "scancode" || scanner == "spdx" {
-			fmt.Println("in spdx")
 			doc, err := iSrv.SPDX(r)
 			if err != nil {
 				c.Error(errors.Wrap(err, "unable to perform SPDX import"))
 			}
-
-			for k, v := range(doc.Packages) {
-				fmt.Println(k, v)
-			}
-
+			
 			return c.String(
 				http.StatusOK,
-				fmt.Sprintf("Successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
+				fmt.Sprintf("successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
 				
 			)
 		}

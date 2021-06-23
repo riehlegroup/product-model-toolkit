@@ -6,6 +6,7 @@ package services
 
 import (
 	"fmt"
+	"reflect"
 	convert "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert"
 	composer "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert/composer"
 	hasher "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert/hasher"
@@ -73,7 +74,7 @@ func (s *service) ComposerImport(input io.Reader) (*model.Product, error) {
 
 	pSaved, err := s.r.SaveProduct(prod)
 	if err != nil {
-		msg := fmt.Sprintf("Error while saving the product to the DB: %v", err)
+		msg := fmt.Sprintf("error while saving the product to the DB: %v", err)
 		return nil, errors.New(msg)
 	}
 
@@ -84,9 +85,48 @@ func (s *service) ComposerImport(input io.Reader) (*model.Product, error) {
 func (s *service) SPDX(input io.Reader) (*spdx.Document2_1, error) {
 	doc, err := tvloader.Load2_1(input)
 	if err != nil {
-		msg := fmt.Sprintf("Error while parsing SPDX body: %v", err)
+		msg := fmt.Sprintf("error while parsing SPDX body: %v", err)
 		return nil, errors.New(msg)
 	}
+
+	
+
+	// packageDesc, err := json.Marshal(doc.CreationInfo)
+    // if err != nil {
+    //     return nil, err
+    // }
+	components := []model.Component{}
+
+	for _, p := range(doc.Packages) {
+		cmp := model.Component{
+			UID: string(p.PackageSPDXIdentifier),
+			Name: p.PackageName,
+			Pkg: fmt.Sprintf("%v")
+			Version: p.PackageVersion,
+			License: model.License{
+				SPDXID: string(p.PackageSPDXIdentifier),
+				DeclaredLicense: p.PackageLicenseDeclared,
+				ConcludedLicense: p.PackageLicenseConcluded,			
+			},
+
+		}
+		components = append(components, cmp)
+	}
+
+	prd := &model.Product{
+		Name: doc.CreationInfo.DocumentName,
+		Version: doc.CreationInfo.SPDXVersion,
+		VCS: "",
+		Description: doc.CreationInfo.DocumentComment,
+		Comment: doc.CreationInfo.CreatorComment,
+		HomepageURL: doc.CreationInfo.DocumentNamespace,
+		ExternalReference: fmt.Sprintf("%v",reflect.TypeOf(doc.CreationInfo.ExternalDocumentReferences)),
+		ClearingState: nil,
+		Components: components,
+	}
+
+
+	fmt.Println(len(doc.Packages))
 
 	return doc, nil
 }
@@ -97,7 +137,7 @@ func (s *service) FileHasherImport(input io.Reader) (*model.Product, error) {
 
 	prod, err := c.Convert(input)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error while parsing File-Hasher body")
+		return nil, errors.Wrap(err, "error while parsing File-Hasher body")
 	}
 
 	pSaved, err := s.r.SaveProduct(prod)

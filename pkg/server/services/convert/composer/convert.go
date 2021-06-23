@@ -7,6 +7,9 @@ package composer
 import (
 	"bytes"
 	"encoding/json"
+	"math/rand"
+	"time"
+	"fmt"
 	// convert "github.com/osrgroup/product-model-toolkit/pkg/services/server/convert"
 	"io"
 	"strings"
@@ -38,6 +41,20 @@ type composerDoc struct {
 
 type mapComp map[model.CmpID]model.Component
 
+func init() {
+    rand.Seed(time.Now().UnixNano())
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func RandStringRunes(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letterRunes[rand.Intn(len(letterRunes))]
+    }
+    return string(b)
+}
+
 // Convert converts a PHP Composer representation into a Product Model representation.
 func (Composer) Convert(input io.Reader) (*model.Product, error) {
 
@@ -56,7 +73,7 @@ func (Composer) Convert(input io.Reader) (*model.Product, error) {
 	comps := compMapToSlice(compAsMap)
 
 	return &model.Product{
-		Name:       "new Product",
+		Name:       fmt.Sprintf("product-%s", RandStringRunes(10)),
 		Components: comps,
 	}, nil
 }
