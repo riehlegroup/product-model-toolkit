@@ -1,45 +1,37 @@
-package commands
+// SPDX-License-Identifier: Apache-2.0 OR GPL-2.0-or-later
+
+// Example for: *builder*, *tvsaver*
+
+// This example demonstrates building an 'empty' SPDX document in memory that
+// corresponds to a given directory's contents, including all files with their
+// hashes and the package's verification code, and saving the document to disk.
+
+package main
 
 import (
-	// "bytes"
-	"encoding/json"
-	// "errors"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"github.com/osrgroup/product-model-toolkit/cnst"
-	"github.com/osrgroup/product-model-toolkit/model"
+
 	"github.com/spdx/tools-golang/builder"
 	"github.com/spdx/tools-golang/tvsaver"
 )
 
-func RunExport(exportId, exportPath string) error {
-	// creating a new http client
-	client := newClient(cnst.ServerBaseURL)
+func main() {
 
-	// log server version with respect to client
-	logServerVersion(client)
-
-	// get the id from the database
-	result, err := client.GetProductId(exportId)
-	if err != nil {
-		return err
+	// check that we've received the right number of arguments
+	args := os.Args
+	if len(args) != 4 {
+		fmt.Printf("Usage: %v <package-name> <package-root-dir> <spdx-file-out>\n", args[0])
+		fmt.Printf("  Build a SPDX 2.2 document with one package called <package-name>;\n")
+		fmt.Printf("  create files with hashes corresponding to the files in <package-root-dir>;\n")
+		fmt.Printf("  and save it out as a tag-value file to <spdx-file-out>.\n")
+		return
 	}
-
-	body, err := ioutil.ReadAll(result.Body)
-	if err != nil {
-		return err
-	}
-
-	var prod model.Product
-	if err := json.Unmarshal(body, &prod); err != nil {
-		return err
-	}
-
 
 	// get the command-line arguments
-	packageName := "test"
-	packageRootDir := exportPath
+	packageName := args[1]
+	packageRootDir := args[2]
+	fileOut := args[3]
 
 	// to use the SPDX builder package, the first step is to define a
 	// builder.Config2_2 struct. this config data can be reused, in case you
@@ -51,16 +43,17 @@ func RunExport(exportId, exportPath string) error {
 		// Because it needs to be unique, the value that will be filled in
 		// for the document will have the package name and verification code
 		// appended to this prefix.
-		NamespacePrefix: "https://example.com/whatever/testdata-",
+		NamespacePrefix: "github.com/osrgroup/product-model-toolkit/testdata-",
 
 		// CreatorType will be used for the first part of the Creator field
 		// in the Creation Info section. Per the SPDX spec, it can be
 		// "Person", "Organization" or "Tool".
-		CreatorType: "Person",
+		CreatorType: "Tool",
 
 		// Creator will be used for the second part of the Creator field in
 		// the Creation Info section.
-		Creator: "Jane Doe",
+		Creator: "github.com/osrgroup/product-model-toolkit",
+
 
 		// note that builder will also add the following, in addition to the
 		// Creator defined above:
@@ -86,6 +79,8 @@ func RunExport(exportId, exportPath string) error {
 			// or ignore all files with this filename, anywhere within the
 			// package directory tree
 			"**/.DS_Store",
+
+			"/vendor/",
 		},
 	}
 
@@ -96,40 +91,33 @@ func RunExport(exportId, exportPath string) error {
 	//   - the config object we just defined.
 	doc, err := builder.Build2_2(packageName, packageRootDir, config)
 	if err != nil {
-		fmt.Printf("error while building document: %v\n", err)
-		return err
+		fmt.Printf("Error while building document: %v\n", err)
+		return
 	}
+
+	// here we need to fill the licenses
+
 
 	// if we got here, the document has been created.
 	// all license info is marked as NOASSERTION, but file hashes and
 	// the package verification code have been filled in appropriately.
-	fmt.Printf("successfully created document for package %s\n", packageName)
+	fmt.Printf("Successfully created document for package %s\n", packageName)
 
 	// we can now save it to disk, using tvsaver.
 
 	// create a new file for writing
-	w, err := os.Create("result.spdx")
+	w, err := os.Create(fileOut)
 	if err != nil {
-		fmt.Printf("error while opening %v for writing: %v\n", "result.spdx", err)
-		return err
+		fmt.Printf("Error while opening %v for writing: %v\n", fileOut, err)
+		return
 	}
 	defer w.Close()
 
 	err = tvsaver.Save2_2(doc, w)
 	if err != nil {
-		fmt.Printf("error while saving %v: %v", "result.spdx", err)
-		return err
+		fmt.Printf("Error while saving %v: %v", fileOut, err)
+		return
 	}
 
-	fmt.Printf("successfully saved %v\n", "result.spdx")
-
-
-	// save the spdx file
-	
-	// return the path of the spdx file
-
-	fmt.Println(prod)
-	// return
-	return nil
+	fmt.Printf("Successfully saved %v\n", fileOut)
 }
-

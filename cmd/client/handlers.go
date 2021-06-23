@@ -44,17 +44,6 @@ func callscanner(name, source, output string) error {
 }
 
 // callDiffId function for the diffCmd command -> returns error
-func callDiffId(first, second string) error {
-
-	// run the diff by id and check the error
-	if err := commands.RunDiffById(first, second); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// callDiffId function for the diffCmd command -> returns error
 func callDiffPath(firstPath, secondPath string) error {
 
 	// run the diff by path and check the error
@@ -184,19 +173,6 @@ var diffCmd = &cobra.Command{
 	Use:   cnst.Diff,
 	Short: cnst.DiffShort,
 	Long:  cnst.DiffLong,
-}
-
-// diffBasedOnId command, this works as a subcommand for the diffCmd command
-var diffBasedOnId = &cobra.Command{
-	Use:   cnst.Id,
-	Short: cnst.IdShort,
-	Long:  cnst.IdLong,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := callDiffId(diffFirstId, diffSecondId); err != nil {
-			log.Fatalln(err)
-			return
-		}
-	},
 }
 
 // diffBasedOnPath command, this works as a subcommand for the diffCmd command

@@ -72,13 +72,7 @@ func init() {
 	_ = scannerCmd.MarkFlagRequired("out")
 
 	// adding the subcommands for the diffCmd
-	diffCmd.AddCommand(diffBasedOnId)
 	diffCmd.AddCommand(diffBasedOnPath)
-
-	diffBasedOnId.Flags().StringVarP(&diffFirstId, "first", "f", "", "first id")
-	diffBasedOnId.Flags().StringVarP(&diffSecondId, "second", "s", "", "second id")
-	_ = diffBasedOnId.MarkFlagRequired("first")
-	_ = diffBasedOnId.MarkFlagRequired("second")
 
 	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
 	diffBasedOnPath.Flags().StringVarP(&diffSecondFile, "second", "s", "", "second file")
