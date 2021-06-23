@@ -74,7 +74,6 @@ func (c *Client) postResult(url string, input io.Reader) (string, error) {
 }
 
 func (c *Client) postData(url string, data []byte) (string, error) {
-
     req, err := http.NewRequest("POST", url, bytes.NewBuffer(data))
 	if err != nil {
 		return "", err
@@ -92,4 +91,23 @@ func (c *Client) postData(url string, data []byte) (string, error) {
     body, _ := ioutil.ReadAll(resp.Body)
     fmt.Println("response Body:", string(body))
 	return string(body), nil
+}
+
+
+// GetServerVersion returns the semantic version of the PMT server.
+func (c *Client) GetProductId(id string) (*http.Response, error) {
+	url := fmt.Sprintf("%s/products/%s", c.baseURL, id)
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	// buf := new(bytes.Buffer)
+	// buf.ReadFrom(res.Body)
+
+	return res, nil
 }

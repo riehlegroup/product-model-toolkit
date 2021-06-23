@@ -7,7 +7,6 @@ package main
 import "github.com/spf13/cobra"
 
 
-
 // Execute adds all child commands
 func Execute() {
 	cobra.CheckErr(rootCmd.Execute())

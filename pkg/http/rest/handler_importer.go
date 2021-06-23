@@ -6,7 +6,7 @@ package rest
 
 import (
 	"fmt"
-	importing2 "github.com/osrgroup/product-model-toolkit/pkg/services/importing"
+	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"net/http"
 	"strconv"
 	"strings"
@@ -16,25 +16,29 @@ import (
 	"github.com/pkg/errors"
 )
 
-func importFromScanner(iSrv importing2.Service) echo.HandlerFunc {
+func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		scanner := strings.ToLower(c.Param("scanner"))
 		r := c.Request().Body
 
-		if scanner == "scancode" || scanner == "spdx" {
-			doc, err := iSrv.SPDX(r)
-			if err != nil {
-				c.Error(errors.Wrap(err, "Unable to perform SPDX import"))
-			}
-			return c.String(
-				http.StatusOK,
-				fmt.Sprintf("Successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
-			)
-		}
+		// if scanner == "scancode" || scanner == "spdx" {
+		// 	doc, err := iSrv.SPDX(r)
+		// 	if err != nil {
+		// 		c.Error(errors.Wrap(err, "unable to perform SPDX import"))
+		// 	}
+			
+		// 	return c.String(
+		// 		http.StatusOK,
+		// 		fmt.Sprintf("successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
+				
+		// 	)
+		// }
 
 		var prod *model.Product
 		var err error
 		switch scanner {
+		case "spdx":
+			prod, err = iSrv.SPDX(r)
 		case "composer":
 			prod, err = iSrv.ComposerImport(r)
 		case "file-hasher":

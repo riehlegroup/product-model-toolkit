@@ -14,9 +14,9 @@ var (
 	cfgFile string
 
 	// crawlerCmd
-	crawlerName   string
-	crawlerOutput string
-	crawlerSource string
+	scannerName   string
+	scannerOutput string
+	scannerSource string
 
 	// diffCmd
 	diffFirstId    string
@@ -26,7 +26,6 @@ var (
 
 	// exportCmd
 	exportId   string
-	exportType string
 	exportPath string
 
 	// importCmd
@@ -59,27 +58,21 @@ func init() {
 	rootCmd.AddCommand(exportCmd)
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(searchCmd)
-	rootCmd.AddCommand(crawlerCmd)
+	rootCmd.AddCommand(scannerCmd)
 	rootCmd.AddCommand(mergeCmd)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
 	// adding the subcommands for the crawlerCmd
-	crawlerCmd.AddCommand(listCrawlerOptions)
-	crawlerCmd.Flags().StringVarP(&crawlerName, "name", "n", "", "crawler name")
-	crawlerCmd.Flags().StringVarP(&crawlerSource, "source", "s", "", "crawler source")
-	crawlerCmd.Flags().StringVarP(&crawlerOutput, "out", "o", "", "crawler output path")
-	_ = crawlerCmd.MarkFlagRequired("name")
-	_ = crawlerCmd.MarkFlagRequired("source")
-	_ = crawlerCmd.MarkFlagRequired("out")
+	scannerCmd.AddCommand(listScannerOptions)
+	scannerCmd.Flags().StringVarP(&scannerName, "name", "n", "", "scanner name")
+	scannerCmd.Flags().StringVarP(&scannerSource, "source", "s", "", "scanner source")
+	scannerCmd.Flags().StringVarP(&scannerOutput, "out", "o", "", "scanner output path")
+	_ = scannerCmd.MarkFlagRequired("name")
+	_ = scannerCmd.MarkFlagRequired("source")
+	_ = scannerCmd.MarkFlagRequired("out")
 
 	// adding the subcommands for the diffCmd
-	diffCmd.AddCommand(diffBasedOnId)
 	diffCmd.AddCommand(diffBasedOnPath)
-
-	diffBasedOnId.Flags().StringVarP(&diffFirstId, "first", "f", "", "first id")
-	diffBasedOnId.Flags().StringVarP(&diffSecondId, "second", "s", "", "second id")
-	_ = diffBasedOnId.MarkFlagRequired("first")
-	_ = diffBasedOnId.MarkFlagRequired("second")
 
 	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
 	diffBasedOnPath.Flags().StringVarP(&diffSecondFile, "second", "s", "", "second file")
@@ -88,10 +81,11 @@ func init() {
 
 	// adding the subcommands for the exportCmd
 	exportCmd.AddCommand(listExportOptions)
-	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export file type (required)")
 	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
-	_ = exportCmd.MarkFlagRequired("type")
+	exportCmd.Flags().StringVarP(&exportId, "id", "i", "", "id of the product to be exported (required)")
 	_ = exportCmd.MarkFlagRequired("path")
+	_ = exportCmd.MarkFlagRequired("id")
+
 
 	// adding the subcommands for the importCmd
 	importCmd.AddCommand(listImportOptions)

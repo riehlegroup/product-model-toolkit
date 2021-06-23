@@ -5,16 +5,10 @@
 package rest
 
 import (
-	"fmt"
-	"net/http"
-	"strconv"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/services/querying"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 )
 
 // Handler handle all request for the given route group.
@@ -23,31 +17,31 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.GET("/", handleEntryPoint)
 	g.GET("/health", handleHealth)
 
-	// crawler routes
-	g.GET("/license", findAllLicenses(srv))
-	g.GET("licenses/:id", findLicenseById(srv))
-	g.POST("licenses/add", addLicense(srv))
-
-	// diff routes
-	g.POST("/diff/id", diffById(srv))
-	g.POST("/diff/path", diffByPath(srv))
-	// export routes
-	g.POST("/export", exportFile(srv))
-
-	// import routes
-	g.POST("/import", importFile(srv))
-
-	// merge routes
-	g.POST("/merge", mergeFiles(srv))
-
 	// product routes
 	g.GET("/products", findAllProducts(srv))
 	g.GET("/products/:id", findProductByID(srv))
 	g.POST("/products/import/:scanner", importFromScanner(srv))
 
-	// search routes
-	g.GET("/search", searchData(srv))
+	// // crawler routes
+	// g.GET("/crawlers/list", listAllCrawlers(srv))
+	// g.POST("/crawlers/license/add", addLicense(srv))
+	
+	// // diff routes
+	// g.POST("/diff/id", diffById(srv))
+	// g.POST("/diff/path", diffByPath(srv))
+	
+	// // export routes
+	// g.POST("/export", exportFile(srv))
 
-	// version routes
-	g.GET("/version", handleVersion)
+	// // import routes
+	// g.POST("/import", importFile(srv))
+
+	// // merge routes
+	// g.POST("/merge", mergeFiles(srv))
+
+	// // search routes
+	// g.GET("/search", searchData(srv))
+
+	// // version routes
+	// g.GET("/version", handleVersion)
 }

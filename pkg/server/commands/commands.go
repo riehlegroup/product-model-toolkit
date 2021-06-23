@@ -4,7 +4,6 @@ import (
 	"log"
 )
 
-
 func logServerVersion(c *Client) {
 	v, err := c.getServerVersion()
 	if err != nil {

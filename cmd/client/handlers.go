@@ -7,7 +7,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"strings"
 	"time"
 
 	"github.com/osrgroup/product-model-toolkit/cnst"
@@ -34,10 +33,10 @@ func introScreen() {
 
 }
 
-// callCrawler function for the crawlerCmd command -> returns error
-func callCrawler(name, source, output string) error {
-	// run the crawler and check the error
-	if err := commands.RunCrawler(name, source, output); err != nil {
+// callscanner function for the scannerCmd command -> returns error
+func callscanner(name, source, output string) error {
+	// run the scanner and check the error
+	if err := commands.RunScanner(name, source, output); err != nil {
 		return err
 	}
 
@@ -45,21 +44,10 @@ func callCrawler(name, source, output string) error {
 }
 
 // callDiffId function for the diffCmd command -> returns error
-func callDiffId(first, second string) error {
-
-	// run the diff by id and check the error
-	if err := commands.RunDiffById(first, second); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// callDiffId function for the diffCmd command -> returns error
-func callDiffPath(first, second string) error {
+func callDiffPath(firstPath, secondPath string) error {
 
 	// run the diff by path and check the error
-	if err := commands.RunDiffByPath(first, second); err != nil {
+	if err := commands.RunDiffByPath(firstPath, secondPath); err != nil {
 		return err
 	}
 
@@ -67,12 +55,9 @@ func callDiffPath(first, second string) error {
 }
 
 // callExport function for the exportCmd command -> returns error
-func callExport(exportId, exportType, exportPath string) error {
-	// define the post path
-	postPath := fmt.Sprintf("/products/export/%s", strings.ToLower(exportType))
-
+func callExport(exportId, exportPath string) error {
 	// run the run export and check the error
-	if err := commands.RunExport(exportId, exportPath, postPath); err != nil {
+	if err := commands.RunExport(exportId, exportPath); err != nil {
 		return err
 	}
 	return nil
@@ -97,29 +82,22 @@ func listAvailableExportTypes() {
 
 // callImport function for the importCmd command -> returns error
 func callImport(importType, importPath string) error {
-	// define the post path
-	postPath := fmt.Sprintf("/products/import/%s", strings.ToLower(importType))
 
 	// run the run import and check the error
-	if err := commands.RunImport(importPath, postPath); err != nil {
+	if err := commands.RunImport(importType, importPath); err != nil {
 		return err
 	}
 	return nil
 }
 
-// listAvailableCrawlerTypes function for the crawlerCmd command
-func listAvailableCrawlerTypes() {
-	// define the available crawler options
-	availableCrawlerOptions := []string{
-		"php-scanner",
+// listAvailablescannerTypes function for the scannerCmd command
+func listAvailablescannerTypes() error {
+	// list available scanner types and check the error
+	if err := commands.ListAvailableScannerTypes(); err != nil {
+		return err
 	}
 
-	// print instruction, loop over the
-	// list and print the available options
-	fmt.Println("Available crawler options:")
-	for key, name := range availableCrawlerOptions {
-		fmt.Printf("%v) %v\n", key+1, name)
-	}
+	return nil
 }
 
 // listAvailableImportTypes function for the importCmd command
@@ -177,13 +155,13 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-// crawlerCmd
-var crawlerCmd = &cobra.Command{
-	Use:   cnst.Crawler,
-	Short: cnst.CrawlerShort,
-	Long:  cnst.CrawlerLong,
+// scannerCmd
+var scannerCmd = &cobra.Command{
+	Use:   cnst.Scanner,
+	Short: cnst.ScannerShort,
+	Long:  cnst.ScannerLong,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := callCrawler(crawlerName, crawlerSource, crawlerOutput); err != nil {
+		if err := callscanner(scannerName, scannerSource, scannerOutput); err != nil {
 			log.Fatalln(err)
 			return
 		}
@@ -195,19 +173,6 @@ var diffCmd = &cobra.Command{
 	Use:   cnst.Diff,
 	Short: cnst.DiffShort,
 	Long:  cnst.DiffLong,
-}
-
-// diffBasedOnId command, this works as a subcommand for the diffCmd command
-var diffBasedOnId = &cobra.Command{
-	Use:   cnst.Id,
-	Short: cnst.IdShort,
-	Long:  cnst.IdLong,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := callDiffId(diffFirstId, diffSecondId); err != nil {
-			log.Fatalln(err)
-			return
-		}
-	},
 }
 
 // diffBasedOnPath command, this works as a subcommand for the diffCmd command
@@ -229,7 +194,7 @@ var exportCmd = &cobra.Command{
 	Short: cnst.ExportShort,
 	Long:  cnst.ExportLong,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := callExport(exportId, exportType, exportPath); err != nil {
+		if err := callExport(exportId, exportPath); err != nil {
 			log.Fatalln(err)
 			return
 		}
@@ -288,13 +253,13 @@ var versionCmd = &cobra.Command{
 	},
 }
 
-// listCrawlerOptions command, this works as a subcommand for the crawlerCmd command
-var listCrawlerOptions = &cobra.Command{
+// listscannerOptions command, this works as a subcommand for the scannerCmd command
+var listScannerOptions = &cobra.Command{
 	Use:   cnst.List,
-	Short: cnst.ListShortCrawler,
-	Long:  cnst.ListLongCrawler,
+	Short: cnst.ListShortScanner,
+	Long:  cnst.ListLongScanner,
 	Run: func(cmd *cobra.Command, args []string) {
-		listAvailableCrawlerTypes()
+		listAvailablescannerTypes()
 	},
 }
 

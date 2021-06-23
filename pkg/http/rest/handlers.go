@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/osrgroup/product-model-toolkit/pkg/services/querying"
-	"github.com/osrgroup/product-model-toolkit/pkg/services/version"
+	// "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
+	// "github.com/osrgroup/product-model-toolkit/pkg/services/version"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 
 	"github.com/labstack/echo/v4"
@@ -22,7 +22,7 @@ func handleEntryPoint(c echo.Context) error {
 }
 
 func handleVersion(c echo.Context) error {
-	return c.String(http.StatusOK, version.Name())
+	return c.String(http.StatusOK, "1.0.0")
 }
 
 func handleHealth(c echo.Context) error {
@@ -33,30 +33,41 @@ func handleHealth(c echo.Context) error {
 	return c.JSON(http.StatusOK, status{Status: "UP"})
 }
 
-func findAllProducts(q querying.Service) echo.HandlerFunc {
+// findAllLicenses
+// func findAllLicenses(srv services.Service) echo.HandlerFunc {
+	// return func(c echo.Context) error {
+		// licenses, err := srv.FindAllLicenses()
+		// if err != nil {
+			// c.Error(errors.Wrap(err, "unable to find all licenses"))
+		// }
+		// return c.JSON(http.StatusOK, licenses)
+	// }
+// }
+
+func findAllProducts(srv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		prods, err := q.FindAllProducts()
+		prods, err := srv.FindAllProducts()
 		if err != nil {
-			c.Error(errors.Wrap(err, "Unable to find all products"))
+			c.Error(errors.Wrap(err, "unable to find all products"))
 		}
 
 		return c.JSON(http.StatusOK, prods)
 	}
 }
 
-func findProductByID(q querying.Service) echo.HandlerFunc {
+func findProductByID(srv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			c.Error(errors.Wrap(err, fmt.Sprintf("Unable to convert query param id with value '%v' to int", idStr)))
+			c.Error(errors.Wrap(err, fmt.Sprintf("unable to convert query param id with value '%v' to int", idStr)))
 		}
 
-		prod, err := q.FindProductByID(id)
+		prod, err := srv.FindProductByID(id)
 		if err != nil {
 			c.String(
 				http.StatusNotFound,
-				fmt.Sprintf("Unable fo find product with ID %v", id))
+				fmt.Sprintf("unable fo find product with ID %v", id))
 		}
 
 		return c.JSON(http.StatusOK, prod)

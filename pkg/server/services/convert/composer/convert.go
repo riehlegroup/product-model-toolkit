@@ -1,0 +1,107 @@
+// SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+//
+// SPDX-License-Identifier: Apache-2.0
+
+package composer
+
+import (
+	"bytes"
+	"encoding/json"
+	"math/rand"
+	"time"
+	"fmt"
+	// convert "github.com/osrgroup/product-model-toolkit/pkg/services/server/convert"
+	"io"
+	"strings"
+
+	"github.com/osrgroup/product-model-toolkit/model"
+)
+
+
+// TrimUTF8prefix returns doc without UTF8 prefix string
+func TrimUTF8prefix(doc []byte) []byte {
+	return bytes.TrimPrefix(doc, []byte("\xef\xbb\xbf"))
+}
+
+
+// Composer represents a PHP Composer converter
+type Composer struct{}
+
+type composerDocComp struct {
+	Name        string
+	Version     string
+	Description string
+	License     []string
+	Requires    []composerDocComp
+}
+
+type composerDoc struct {
+	Installed []composerDocComp
+}
+
+type mapComp map[model.CmpID]model.Component
+
+func init() {
+    rand.Seed(time.Now().UnixNano())
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func RandStringRunes(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letterRunes[rand.Intn(len(letterRunes))]
+    }
+    return string(b)
+}
+
+// Convert converts a PHP Composer representation into a Product Model representation.
+func (Composer) Convert(input io.Reader) (*model.Product, error) {
+
+	byteInput := new(bytes.Buffer)
+	byteInput.ReadFrom(input)
+
+	body := TrimUTF8prefix(byteInput.Bytes())
+	var result composerDoc
+	err := json.Unmarshal(body, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	compAsMap := make(mapComp, 2*len(result.Installed))
+	extractDependencies(&result.Installed, compAsMap)
+	comps := compMapToSlice(compAsMap)
+
+	return &model.Product{
+		Name:       fmt.Sprintf("product-%s", RandStringRunes(10)),
+		Components: comps,
+	}, nil
+}
+
+func compMapToSlice(compAsMap mapComp) []model.Component {
+	compSlice := make([]model.Component, 0, len(compAsMap))
+	for _, value := range compAsMap {
+		compSlice = append(compSlice, value)
+	}
+	return compSlice
+}
+
+func extractDependencies(input *[]composerDocComp, comps map[model.CmpID]model.Component) {
+	for _, c := range *input {
+		licenses := strings.Join(c.License, ", ")
+		comp := model.Component{
+			Name:    c.Name,
+			Version: c.Version,
+			License: model.License{DeclaredLicense: licenses},
+		}
+
+		_, ok := comps[comp.ID()]
+		if !ok {
+			comps[comp.ID()] = comp
+		}
+
+		if len(c.Requires) > 0 {
+			extractDependencies(&c.Requires, comps)
+		}
+	}
+}
