@@ -106,14 +106,18 @@ func (s *service) SPDX(input io.Reader) (*model.Product, error) {
 		components = append(components, cmp)
 	}
 
+	ref := ""
+	if len(doc.CreationInfo.ExternalDocumentReferences) > 0 {
+		ref = fmt.Sprintf("%v", reflect.TypeOf(doc.CreationInfo.ExternalDocumentReferences))
+	} 
+
 	prod := &model.Product{
 		Name: doc.CreationInfo.DocumentName,
 		Version: doc.CreationInfo.SPDXVersion,
-		VCS: "",
 		Description: doc.CreationInfo.DocumentComment,
 		Comment: doc.CreationInfo.CreatorComment,
 		HomepageURL: doc.CreationInfo.DocumentNamespace,
-		ExternalReference: fmt.Sprintf("%v",reflect.TypeOf(doc.CreationInfo.ExternalDocumentReferences)),
+		ExternalReference: ref,
 		ClearingState: nil,
 		Components: components,
 	}

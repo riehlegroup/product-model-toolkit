@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"net/http"
-	"strconv"
 	"strings"
 
 	"github.com/labstack/echo/v4"
@@ -18,24 +17,17 @@ import (
 
 func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// get the scanner from the url param
 		scanner := strings.ToLower(c.Param("scanner"))
+
+		// read request body
 		r := c.Request().Body
 
-		// if scanner == "scancode" || scanner == "spdx" {
-		// 	doc, err := iSrv.SPDX(r)
-		// 	if err != nil {
-		// 		c.Error(errors.Wrap(err, "unable to perform SPDX import"))
-		// 	}
-			
-		// 	return c.String(
-		// 		http.StatusOK,
-		// 		fmt.Sprintf("successfully parsed SPDX document.\nFound %v packages", len(doc.Packages)),
-				
-		// 	)
-		// }
-
+		// define product and error variable
 		var prod *model.Product
 		var err error
+
+		// switch over the scanner name
 		switch scanner {
 		case "spdx":
 			prod, err = iSrv.SPDX(r)
@@ -46,26 +38,24 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 		default:
 			return c.String(
 				http.StatusOK,
-				fmt.Sprintf("Received result file with content length %d, but will not import content, because there is no importer for the scanner '%s'", c.Request().ContentLength, scanner))
+				fmt.Sprintf("received result file with content length %d, but will not import content, because there is no importer for the scanner '%s'", c.Request().ContentLength, scanner))
 		}
 
+		// check error
 		if err != nil {
-			c.Error(errors.Wrap(err, fmt.Sprintf("Unable to perform import for scanner %s", scanner)))
+			c.Error(errors.Wrap(err, fmt.Sprintf("unable to perform import for scanner %s", scanner)))
 		}
-
-		loc := productLocation(c.Path(), prod.ID)
-		c.Response().Header().Set(echo.HeaderLocation, loc)
 
 		return c.String(
 			http.StatusCreated,
-			fmt.Sprintf("Successfully parsed content from scanner %s.\n Found %v packages\n", scanner, len(prod.Components)),
+			fmt.Sprintf("successfully parsed content from scanner %s.\n Found %v packages\n", scanner, len(prod.Components)),
 		)
 	}
 }
 
-func productLocation(path string, id int) string {
-	i := strings.LastIndex(path, "/")
-	prodPath := path[:i+1]
+// func productLocation(path string, id int) string {
+// 	i := strings.LastIndex(path, "/")
+// 	prodPath := path[:i+1]
 
-	return fmt.Sprintf("%s%s", prodPath, strconv.Itoa(id))
-}
+// 	return fmt.Sprintf("%s%s", prodPath, strconv.Itoa(id))
+// }
