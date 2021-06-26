@@ -19,13 +19,12 @@ var (
 	scannerSource string
 
 	// diffCmd
-	diffFirstId    string
-	diffSecondId   string
 	diffFirstFile  string
 	diffSecondFile string
 
 	// exportCmd
 	exportId   string
+	exportType string
 	exportPath string
 
 	// importCmd
@@ -81,10 +80,12 @@ func init() {
 
 	// adding the subcommands for the exportCmd
 	exportCmd.AddCommand(listExportOptions)
-	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
 	exportCmd.Flags().StringVarP(&exportId, "id", "i", "", "id of the product to be exported (required)")
-	_ = exportCmd.MarkFlagRequired("path")
+	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export type (required)")
+	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
 	_ = exportCmd.MarkFlagRequired("id")
+	_ = exportCmd.MarkFlagRequired("type")
+	_ = exportCmd.MarkFlagRequired("path")
 
 
 	// adding the subcommands for the importCmd

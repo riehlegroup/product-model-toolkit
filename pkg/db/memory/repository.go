@@ -69,14 +69,14 @@ func (db *DB) productExists(id int) bool {
 func (db *DB) AddSampleData() {
 	prod1 := &model.Product{
 		ID:      1,
-		Name:    "Product 1",
+		Name:    "Product1",
 		Version: "1.0.0",
 		VCS:     "github.com/prod1",
 	}
 
 	prod2 := &model.Product{
 		ID:      2,
-		Name:    "Product 2",
+		Name:    "Product2",
 		Version: "2.0.0",
 		VCS:     "github.com/prod2",
 	}

@@ -22,6 +22,8 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.GET("/products/:id", findProductByID(srv))
 	g.POST("/products/import/:scanner", importFromScanner(srv))
 
+	g.POST("/products/export", exportWithType(srv))
+
 	// // crawler routes
 	// g.GET("/crawlers/list", listAllCrawlers(srv))
 	// g.POST("/crawlers/license/add", addLicense(srv))
