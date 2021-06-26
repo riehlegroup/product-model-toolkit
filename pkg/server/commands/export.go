@@ -1,13 +1,8 @@
 package commands
 
 import (
-	// "bytes"
-	// "errors"
 	"fmt"
 	"github.com/osrgroup/product-model-toolkit/cnst"
-	// "github.com/osrgroup/product-model-toolkit/model"
-	// "github.com/spdx/tools-golang/builder"
-	// "github.com/spdx/tools-golang/tvsaver"
 )
 
 func RunExport(exportId, exportType, exportPath string) error {

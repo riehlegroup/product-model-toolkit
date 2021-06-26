@@ -32,9 +32,9 @@ var (
 	importPath string
 
 	// mergeCmd
-	mergeFirstFile  string
-	mergeSecondFile string
-	mergeOutput     string
+	// mergeFirstFile  string
+	// mergeSecondFile string
+	// mergeOutput     string
 
 	// searchCmd
 	searchPackageName string
@@ -58,7 +58,7 @@ func init() {
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(searchCmd)
 	rootCmd.AddCommand(scannerCmd)
-	rootCmd.AddCommand(mergeCmd)
+	// rootCmd.AddCommand(mergeCmd)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
 	// adding the subcommands for the crawlerCmd
@@ -104,12 +104,12 @@ func init() {
 	_ = searchCmd.MarkFlagRequired("out")
 
 	// adding the subcommands for the mergeCmd
-	mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
-	mergeCmd.Flags().StringVarP(&mergeSecondFile, "second", "s", "", "second file")
-	mergeCmd.Flags().StringVarP(&mergeOutput, "out", "o", "", "output pat")
-	_ = mergeCmd.MarkFlagRequired("first")
-	_ = mergeCmd.MarkFlagRequired("second")
-	_ = mergeCmd.MarkFlagRequired("out")
+	// mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
+	// mergeCmd.Flags().StringVarP(&mergeSecondFile, "second", "s", "", "second file")
+	// mergeCmd.Flags().StringVarP(&mergeOutput, "out", "o", "", "output pat")
+	// _ = mergeCmd.MarkFlagRequired("first")
+	// _ = mergeCmd.MarkFlagRequired("second")
+	// _ = mergeCmd.MarkFlagRequired("out")
 
 	// enf of the commands
 }

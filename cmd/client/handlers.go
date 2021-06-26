@@ -216,17 +216,17 @@ var importCmd = &cobra.Command{
 }
 
 // mergeCmd
-var mergeCmd = &cobra.Command{
-	Use:   cnst.Merge,
-	Short: cnst.MergeShort,
-	Long:  cnst.MergeLong,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := callMerge(mergeFirstFile, mergeSecondFile, mergeOutput); err != nil {
-			log.Fatalln(err)
-			return
-		}
-	},
-}
+// var mergeCmd = &cobra.Command{
+// 	Use:   cnst.Merge,
+// 	Short: cnst.MergeShort,
+// 	Long:  cnst.MergeLong,
+// 	Run: func(cmd *cobra.Command, args []string) {
+// 		if err := callMerge(mergeFirstFile, mergeSecondFile, mergeOutput); err != nil {
+// 			log.Fatalln(err)
+// 			return
+// 		}
+// 	},
+// }
 
 // searchCmd
 var searchCmd = &cobra.Command{

@@ -21,29 +21,6 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.GET("/products", findAllProducts(srv))
 	g.GET("/products/:id", findProductByID(srv))
 	g.POST("/products/import/:scanner", importFromScanner(srv))
-
 	g.POST("/products/export", exportWithType(srv))
-
-	// // crawler routes
-	// g.GET("/crawlers/list", listAllCrawlers(srv))
-	// g.POST("/crawlers/license/add", addLicense(srv))
-	
-	// // diff routes
-	// g.POST("/diff/id", diffById(srv))
-	// g.POST("/diff/path", diffByPath(srv))
-	
-	// // export routes
-	// g.POST("/export", exportFile(srv))
-
-	// // import routes
-	// g.POST("/import", importFile(srv))
-
-	// // merge routes
-	// g.POST("/merge", mergeFiles(srv))
-
-	// // search routes
-	// g.GET("/search", searchData(srv))
-
-	// // version routes
-	// g.GET("/version", handleVersion)
+	g.POST("/spdx/search", searchSPDX(srv))
 }

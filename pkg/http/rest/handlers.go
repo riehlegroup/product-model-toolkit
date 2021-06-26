@@ -5,16 +5,19 @@
 package rest
 
 import (
+	"encoding/json"
 	"fmt"
-	"net/http"
-	"strconv"
-
-	// "github.com/osrgroup/product-model-toolkit/pkg/services/querying"
-	// "github.com/osrgroup/product-model-toolkit/pkg/services/version"
+	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
+	"github.com/pkg/errors"
+	"github.com/spdx/tools-golang/idsearcher"
+	"github.com/spdx/tools-golang/tvsaver"
+	"net/http"
+	"os"
+	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 )
 
 func handleEntryPoint(c echo.Context) error {
@@ -32,17 +35,6 @@ func handleHealth(c echo.Context) error {
 
 	return c.JSON(http.StatusOK, status{Status: "UP"})
 }
-
-// findAllLicenses
-// func findAllLicenses(srv services.Service) echo.HandlerFunc {
-	// return func(c echo.Context) error {
-		// licenses, err := srv.FindAllLicenses()
-		// if err != nil {
-			// c.Error(errors.Wrap(err, "unable to find all licenses"))
-		// }
-		// return c.JSON(http.StatusOK, licenses)
-	// }
-// }
 
 func findAllProducts(srv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -71,5 +63,169 @@ func findProductByID(srv services.Service) echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, prod)
+	}
+}
+
+func importFromScanner(iSrv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// get the scanner from the url param
+		scanner := strings.ToLower(c.Param("scanner"))
+
+		// read request body
+		r := c.Request().Body
+
+		// define product and error variable
+		var prod *model.Product
+		var err error
+
+		// switch over the scanner name
+		switch scanner {
+		case "spdx":
+			prod, err = iSrv.SPDXImport(r)
+		case "composer":
+			prod, err = iSrv.ComposerImport(r)
+		case "file-hasher":
+			prod, err = iSrv.FileHasherImport(r)
+		default:
+			return c.String(
+				http.StatusOK,
+				fmt.Sprintf("received result file with content length %d, but will not import content, because there is no importer for the scanner '%s'", c.Request().ContentLength, scanner))
+		}
+
+		// check error
+		if err != nil {
+			c.Error(errors.Wrap(err, fmt.Sprintf("unable to perform import for scanner %s", scanner)))
+		}
+
+		return c.String(
+			http.StatusCreated,
+			fmt.Sprintf("successfully parsed content from scanner %s.\nProduct id: %v\nFound %v packages\n", scanner, prod.ID, len(prod.Components)),
+		)
+	}
+}
+
+func getJSONRawBody(c echo.Context) (map[string]string, error) {
+
+	jsonBody := make(map[string]string)
+	err := json.NewDecoder(c.Request().Body).Decode(&jsonBody)
+	if err != nil {
+		return nil, err
+	}
+
+	return jsonBody, nil
+}
+
+func exportWithType(iSrv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		// get json body
+		jsonBody, err := getJSONRawBody(c)
+		if err != nil {
+			return c.String(
+				http.StatusInternalServerError,
+				err.Error(),
+			)
+		}
+
+		// read data
+		exportId := jsonBody["exportId"]
+		exportType := jsonBody["exportType"]
+		exportPath := jsonBody["exportPath"]
+
+		// switch over the scanner name
+		switch exportType {
+		case "spdx":
+			_, exportPath, err = iSrv.SPDXExport(exportId, exportPath)
+			if err != nil {
+				return c.String(
+					http.StatusInternalServerError,
+					err.Error(),
+				)
+			}
+			return c.String(
+				http.StatusCreated,
+				fmt.Sprintf("export path: %v", exportPath),
+			)
+		case "human-read":
+			fmt.Println("inja1")
+			exportPath, err = iSrv.ReportExport(exportId, exportPath)
+			if err != nil {
+				return c.String(
+					http.StatusInternalServerError,
+					err.Error(),
+				)
+			}
+			return c.String(
+				http.StatusCreated,
+				fmt.Sprintf("export path: %v", exportPath),
+			)
+		default:
+			return c.String(
+				http.StatusNotAcceptable,
+				"file received but couldn't accept it",
+			)
+		}
+	}
+}
+
+func searchSPDX(srv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// get json body
+		jsonBody, err := getJSONRawBody(c)
+		if err != nil {
+			return c.String(
+				http.StatusInternalServerError,
+				err.Error(),
+			)
+		}
+		// read data
+		packageName := jsonBody["name"]
+		packageRootDir := jsonBody["dir"]
+		fileOut := jsonBody["out"]
+
+		config := &idsearcher.Config2_2{
+
+			NamespacePrefix: "https://example.com/whatever/testdata-",
+
+			BuilderPathsIgnored: []string{
+				"/.git/",
+				"**/__pycache__/",
+				"/.ignorefile",
+				"**/.DS_Store",
+				"/vendor/",
+			},
+
+			SearcherPathsIgnored: []string{
+
+				"/Documentation/process/license-rules.rst",
+				"/LICENSES/",
+			},
+		}
+
+		doc, err := idsearcher.BuildIDsDocument2_2(packageName, packageRootDir, config)
+		if err != nil {
+			fmt.Printf("Error while building document: %v\n", err)
+			return err
+		}
+
+		fmt.Printf("successfully created document and searched for IDs for package %s\n", packageName)
+
+		w, err := os.Create(fileOut)
+		if err != nil {
+			fmt.Printf("error while opening %v for writing: %v\n", fileOut, err)
+			return err
+		}
+		defer w.Close()
+
+		err = tvsaver.Save2_2(doc, w)
+		if err != nil {
+			fmt.Printf("error while saving %v: %v", fileOut, err)
+			return err
+		}
+
+		return c.String(
+			http.StatusOK,
+			fmt.Sprintf("successfully saved: %v", fileOut),
+		)
 	}
 }

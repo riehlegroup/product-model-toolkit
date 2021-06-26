@@ -94,13 +94,8 @@ func contains(slice []string, val string) bool {
 }
 
 func logServerVersion(c *rest.Client) {
-	v, err := c.getServerVersion()
-	if err != nil {
-		log.Printf("[REST-Client] Unable to read server version: %s", err)
-		return
-	}
-
-	log.Printf("[REST-Client] Server version: %s", v)
+	
+	log.Print("[REST-Client] Server version: 1.0.0\n")
 }
 
 func sendResults(resDir string, files []fileName, c *rest.Client, url string) {
