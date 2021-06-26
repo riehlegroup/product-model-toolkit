@@ -19,13 +19,12 @@ var (
 	scannerSource string
 
 	// diffCmd
-	diffFirstId    string
-	diffSecondId   string
 	diffFirstFile  string
 	diffSecondFile string
 
 	// exportCmd
 	exportId   string
+	exportType string
 	exportPath string
 
 	// importCmd
@@ -33,9 +32,9 @@ var (
 	importPath string
 
 	// mergeCmd
-	mergeFirstFile  string
-	mergeSecondFile string
-	mergeOutput     string
+	// mergeFirstFile  string
+	// mergeSecondFile string
+	// mergeOutput     string
 
 	// searchCmd
 	searchPackageName string
@@ -59,7 +58,7 @@ func init() {
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(searchCmd)
 	rootCmd.AddCommand(scannerCmd)
-	rootCmd.AddCommand(mergeCmd)
+	// rootCmd.AddCommand(mergeCmd)
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
 	// adding the subcommands for the crawlerCmd
@@ -81,10 +80,12 @@ func init() {
 
 	// adding the subcommands for the exportCmd
 	exportCmd.AddCommand(listExportOptions)
-	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
 	exportCmd.Flags().StringVarP(&exportId, "id", "i", "", "id of the product to be exported (required)")
-	_ = exportCmd.MarkFlagRequired("path")
+	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export type (required)")
+	exportCmd.Flags().StringVarP(&exportPath, "path", "p", "", "export file path (required)")
 	_ = exportCmd.MarkFlagRequired("id")
+	_ = exportCmd.MarkFlagRequired("type")
+	_ = exportCmd.MarkFlagRequired("path")
 
 
 	// adding the subcommands for the importCmd
@@ -103,12 +104,12 @@ func init() {
 	_ = searchCmd.MarkFlagRequired("out")
 
 	// adding the subcommands for the mergeCmd
-	mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
-	mergeCmd.Flags().StringVarP(&mergeSecondFile, "second", "s", "", "second file")
-	mergeCmd.Flags().StringVarP(&mergeOutput, "out", "o", "", "output pat")
-	_ = mergeCmd.MarkFlagRequired("first")
-	_ = mergeCmd.MarkFlagRequired("second")
-	_ = mergeCmd.MarkFlagRequired("out")
+	// mergeCmd.Flags().StringVarP(&mergeFirstFile, "first", "f", "", "first file")
+	// mergeCmd.Flags().StringVarP(&mergeSecondFile, "second", "s", "", "second file")
+	// mergeCmd.Flags().StringVarP(&mergeOutput, "out", "o", "", "output pat")
+	// _ = mergeCmd.MarkFlagRequired("first")
+	// _ = mergeCmd.MarkFlagRequired("second")
+	// _ = mergeCmd.MarkFlagRequired("out")
 
 	// enf of the commands
 }

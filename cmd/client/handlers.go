@@ -43,7 +43,7 @@ func callscanner(name, source, output string) error {
 	return nil
 }
 
-// callDiffId function for the diffCmd command -> returns error
+// callDiffPath function for the diffCmd command -> returns error
 func callDiffPath(firstPath, secondPath string) error {
 
 	// run the diff by path and check the error
@@ -55,9 +55,9 @@ func callDiffPath(firstPath, secondPath string) error {
 }
 
 // callExport function for the exportCmd command -> returns error
-func callExport(exportId, exportPath string) error {
+func callExport(exportId, exportType, exportPath string) error {
 	// run the run export and check the error
-	if err := commands.RunExport(exportId, exportPath); err != nil {
+	if err := commands.RunExport(exportId, exportType, exportPath); err != nil {
 		return err
 	}
 	return nil
@@ -69,7 +69,7 @@ func listAvailableExportTypes() {
 	availableExportOptions := []string{
 		"spdx",
 		"human-read",
-		"custom-report",
+		// "custom-report",
 	}
 
 	// print instrcution, loop over the
@@ -175,6 +175,7 @@ var diffCmd = &cobra.Command{
 	Long:  cnst.DiffLong,
 }
 
+
 // diffBasedOnPath command, this works as a subcommand for the diffCmd command
 var diffBasedOnPath = &cobra.Command{
 	Use:   cnst.Path,
@@ -194,7 +195,7 @@ var exportCmd = &cobra.Command{
 	Short: cnst.ExportShort,
 	Long:  cnst.ExportLong,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := callExport(exportId, exportPath); err != nil {
+		if err := callExport(exportId, exportType, exportPath); err != nil {
 			log.Fatalln(err)
 			return
 		}
@@ -215,17 +216,17 @@ var importCmd = &cobra.Command{
 }
 
 // mergeCmd
-var mergeCmd = &cobra.Command{
-	Use:   cnst.Merge,
-	Short: cnst.MergeShort,
-	Long:  cnst.MergeLong,
-	Run: func(cmd *cobra.Command, args []string) {
-		if err := callMerge(mergeFirstFile, mergeSecondFile, mergeOutput); err != nil {
-			log.Fatalln(err)
-			return
-		}
-	},
-}
+// var mergeCmd = &cobra.Command{
+// 	Use:   cnst.Merge,
+// 	Short: cnst.MergeShort,
+// 	Long:  cnst.MergeLong,
+// 	Run: func(cmd *cobra.Command, args []string) {
+// 		if err := callMerge(mergeFirstFile, mergeSecondFile, mergeOutput); err != nil {
+// 			log.Fatalln(err)
+// 			return
+// 		}
+// 	},
+// }
 
 // searchCmd
 var searchCmd = &cobra.Command{
