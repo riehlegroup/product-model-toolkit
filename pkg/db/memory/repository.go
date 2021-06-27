@@ -48,7 +48,6 @@ func (db *DB) SaveProduct(prod *model.Product) (model.Product, error) {
 	found := db.productExists(prod.ID)
 	if !found {
 		db.products = append(db.products, *prod)
-
 		return *prod, nil
 	}
 

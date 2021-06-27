@@ -7,8 +7,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	// "github.com/osrgroup/product-model-toolkit/pkg/db/memory"
-	"github.com/osrgroup/product-model-toolkit/pkg/db/postgraph"
+	"github.com/osrgroup/product-model-toolkit/pkg/db/memory"
+	// "github.com/osrgroup/product-model-toolkit/pkg/db/postgraph"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"os"
 	
@@ -23,11 +23,11 @@ func main() {
 		os.Exit(0)
 	}
 
-	// repo := new(memory.DB)
-	// repo.AddSampleData()
+	repo := new(memory.DB)
+	repo.AddSampleData()
 
 	// Use Postgraphile as DB backend
-	repo := postgraph.NewRepo("http://localhost:5433/graphql")
+	// repo := postgraph.NewRepo("http://localhost:5433/graphql")
 	
 	r := rest.NewSrv(
 		"127.0.0.1:8081",

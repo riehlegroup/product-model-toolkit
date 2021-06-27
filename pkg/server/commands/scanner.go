@@ -120,10 +120,10 @@ func RunScanner(name, source, output string) error {
 	// Then the name would be php-scanner
 
 	switch name {
-	case "php-scanner":
+	case "phpscanner":
 		dockerImageName = "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0" // TODO
 	default:
-		return errors.New("invalid crawler name")
+		return errors.New("invalid scanner name")
 	}
 
 
