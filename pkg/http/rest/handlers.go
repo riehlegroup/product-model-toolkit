@@ -86,6 +86,8 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 			prod, err = iSrv.ComposerImport(r)
 		case "file-hasher":
 			prod, err = iSrv.FileHasherImport(r)
+		case "scanner":
+			prod, err = iSrv.ScannerImport(r)
 		default:
 			return c.String(
 				http.StatusOK,

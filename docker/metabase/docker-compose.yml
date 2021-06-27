@@ -1,0 +1,9 @@
+# SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+#
+# SPDX-License-Identifier: Apache-2.0
+
+version: "3.7"
+services:
+  metabase:
+    image: metabase/metabase
+

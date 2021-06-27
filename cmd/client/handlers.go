@@ -107,6 +107,7 @@ func listAvailableImportTypes() {
 		"spdx",
 		"composer",
 		"file-hasher",
+		"scanner",
 	}
 
 	// print instruction, loop over the

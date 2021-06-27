@@ -9,12 +9,14 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"bytes"
 	"strconv"
-
+	"encoding/json"
 	convert "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert"
 	composer "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert/composer"
 	hasher "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert/hasher"
-
+	"math/rand"
+	"time"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/pkg/errors"
 	"github.com/spdx/tools-golang/builder"
@@ -29,6 +31,21 @@ var (
 	// ErrNotFound if a entity couldn't be found in the db.
 	ErrNotFound = errors.New("entity not found")
 )
+
+
+func init() {
+    rand.Seed(time.Now().UnixNano())
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randStringRunes(n int) string {
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letterRunes[rand.Intn(len(letterRunes))]
+    }
+    return string(b)
+}
 
 // Repository provides access to the product db.
 type Repository interface {
@@ -49,6 +66,7 @@ type Service interface {
 	ComposerImport(io.Reader) (*model.Product, error)
 	SPDXImport(io.Reader) (*model.Product, error)
 	FileHasherImport(io.Reader) (*model.Product, error)
+	ScannerImport(io.Reader) (*model.Product, error)
 
 	// export
 	SPDXExport(exportId, exportPath string) (*spdx.Document2_2, string, error)
@@ -303,4 +321,27 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 		return nil, "", err
 	}
 	return doc, exportPath, nil
+}
+
+// ComposerImport import a Composer representation of the BOM and store it in the DB.
+func (s *service) ScannerImport(input io.Reader) (*model.Product, error) {
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(input)
+
+	prod := new(model.Product)
+	err := json.Unmarshal(buf.Bytes(), &prod)
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+	prod.Name = fmt.Sprintf("product-%s", randStringRunes(10))
+
+	pSaved, err := s.r.SaveProduct(prod)
+	if err != nil {
+		msg := fmt.Sprintf("error while saving the product to the DB: %v", err)
+		return nil, errors.New(msg)
+	}
+
+	return &pSaved, nil
+	
 }
