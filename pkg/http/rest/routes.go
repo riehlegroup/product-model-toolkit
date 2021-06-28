@@ -23,4 +23,6 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.POST("/products/import/:scanner", importFromScanner(srv))
 	g.POST("/products/export", exportWithType(srv))
 	g.POST("/spdx/search", searchSPDX(srv))
+
+	g.POST("/scanner", scan(srv))
 }

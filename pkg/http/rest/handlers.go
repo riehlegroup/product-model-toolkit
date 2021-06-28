@@ -7,6 +7,7 @@ package rest
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/osrgroup/product-model-toolkit/cnst"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"github.com/pkg/errors"
@@ -14,6 +15,7 @@ import (
 	"github.com/spdx/tools-golang/tvsaver"
 	"net/http"
 	"os"
+	"os/exec"
 	"strconv"
 	"strings"
 
@@ -104,6 +106,121 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 			fmt.Sprintf("successfully parsed content from scanner %s.\nProduct id: %v\nFound %v packages\n", scanner, prod.ID, len(prod.Components)),
 		)
 	}
+}
+
+func scan(iSrv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		scanDetails, err := getScanDetails(c)
+		if err != nil {
+			return err
+		}
+		scannerName, source, output := scanDetails[0], scanDetails[1], scanDetails[2]
+
+		switch scannerName {
+		case "phpscanner":
+
+			dockerImageName := cnst.PhpscannerImage
+
+			fmt.Println(source)
+			if source == "." {
+				source = "$PWD"
+			}
+			if output == "." {
+				output = "$PWD"
+			}
+
+			// create the dockerCmd from input values
+			dockerCmd := fmt.Sprintf("sudo docker run "+
+				"-v %v:/source "+
+				"-v %v:/output %v",
+				source, output, dockerImageName)
+
+			// log information
+			fmt.Println("Running crawler")
+
+			// execute docker command
+			fmt.Println("Executing the docker command ...")
+
+			// print the docker command
+			fmt.Println(dockerCmd)
+
+			// executing the command
+			_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
+			// check error
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Crawling licenses successfully completed")
+			fmt.Printf("The output path: %v\n", output)
+			return c.String(
+				http.StatusOK,
+				fmt.Sprintf("The output path: %v\n", output),
+			)
+
+		// case "licensee":
+			// dockerImageName := cnst.LicenseeImage
+
+			// fmt.Println(source)
+			// if source == "." {
+			// 	source = "$PWD"
+			// }
+			// if output == "." {
+			// 	output = "$PWD"
+			// }
+
+			// // create the dockerCmd from input values
+			// dockerCmd := fmt.Sprintf("sudo docker run "+
+			// 	"-v %v:/source "+
+			// 	"-v %v:/output %v",
+			// 	source, output, dockerImageName)
+
+			// // log information
+			// fmt.Println("Running crawler")
+
+			// // execute docker command
+			// fmt.Println("Executing the docker command ...")
+
+			// // print the docker command
+			// fmt.Println(dockerCmd)
+
+			// // executing the command
+			// _, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
+			// // check error
+			// if err != nil {
+			// 	return err
+			// }
+
+			// fmt.Println("Crawling licenses successfully completed")
+			// fmt.Printf("The output path: %v\n", output)
+			// return c.String(
+			// 	http.StatusOK,
+			// 	fmt.Sprintf("The output path: %v\n", output),
+			// )
+
+		default:
+			return c.String(
+				http.StatusNotAcceptable,
+				"file received but couldn't accept it",
+			)
+		}
+
+	}
+}
+
+func getScanDetails(c echo.Context) ([]string, error) {
+	// get json body
+	jsonBody, err := getJSONRawBody(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// read data
+	scannerName := jsonBody["scannerName"]
+	source := jsonBody["source"]
+	output := jsonBody["output"]
+
+	return []string{scannerName, source, output}, nil
 }
 
 func getJSONRawBody(c echo.Context) (map[string]string, error) {
