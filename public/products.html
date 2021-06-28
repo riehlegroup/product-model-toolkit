@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+        table {
+          font-family: arial, sans-serif;
+          border-collapse: collapse;
+          width: 100%;
+        }
+        
+        td, th {
+          border: 1px solid #dddddd;
+          text-align: left;
+          padding: 8px;
+        }
+        
+        tr:nth-child(even) {
+          background-color: #dddddd;
+        }
+        </style>
+</head>
+<body>
+    <table id="products-table" class="table">
+        <thead>
+            <tr>
+                <th>ID</th> 
+                <th>Name</th> 
+                <th>Version</th>
+                <th>VCS</th>  
+                <th>Description</th>  
+                <th>Comment</th>  
+                <th>Home page URL</th> 
+                <th>External Ref</th> 
+
+                <!-- <th>Components</th>   -->
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script type="text/javascript">
+        const products = document.querySelector("#products-table > tbody");
+
+        function loadBody() {
+            const request = new XMLHttpRequest();
+
+            request.open("get", "http://localhost:8081/api/v1/products");
+            request.onload = () => {
+                try {
+                    const json = JSON.parse(request.responseText);
+                    populateProducts(json);
+                } catch(e) {
+                    console.warn("could not load products");
+                    console.warn(e);
+                }
+            };
+
+            request.send();
+
+        }
+
+        function populateProducts (json) {
+
+            while (products.firstChild) {
+                products.removeChild(products.firstChild);
+            }
+
+
+            json.forEach((row) => {
+                row = Object.values(row)
+                var count = row.length;
+                const tr = document.createElement("tr");
+                for (var i = 0, l = count; i < l; i++) {
+                    var obj = row[i];
+                    const td = document.createElement("td");
+                    td.textContent = obj;
+                    tr.appendChild(td);  
+                }
+
+                products.appendChild(tr);
+                
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {loadBody();});
+    </script>
+
+</body>
+</html>

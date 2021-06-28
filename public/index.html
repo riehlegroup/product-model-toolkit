@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Info boxes</title>
+  <style>
+      #Services{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.ServicesWrapper{
+  margin: 20px 50px;
+  display:flex;
+  min-width:500px;
+  height:210px;
+  background-color:#0f0f0fcc;
+}
+.Circle:before{
+  position:absolute;
+  content:"";
+  min-width: 100px;
+  height: 100px;
+  border-radius:50%;
+  background-color:#3863db;
+  top:5%;
+  right:-90%;
+}
+.Circle{
+  display:inline-block;
+  position:relative;
+  content:"";
+  width: 55px;
+  height: 110px;
+  border-radius:110px 0px 0px 110px;
+  background: #1d41a3;
+  top:20%;
+  right:11%;
+}
+.Info{
+  display:block;
+  max-width:400px;
+}
+
+h1{
+  color:white;
+  margin:10px 5px;
+}
+p{
+  color:white;
+  margin:0px 5px;
+}
+button, input[type="submit"], input[type="reset"] {
+	background: #a0b444;
+    border-radius: 5px;
+	color: white;
+	border: none;
+	padding: 5px 10px;
+	font: inherit;
+	cursor: pointer;
+	outline: inherit;
+  margin:10px 5px;
+}
+
+@media only screen and (max-width: 600px) {
+  .Circle:before{
+    position:absolute;
+  content:"";
+  min-width: 100px;
+  height: 100px;
+  border-radius:50%;
+  background-color:#1d41a3;
+  top:10%;
+  right:5%;
+  }
+  .Circle{
+    display:flex;
+    position:relative;
+    content:"";
+    width: 110px;
+    height: 55px;
+    border-radius:110px 110px  0px 0px ;
+    background: #1d41a3;
+    left:65px;
+    top:-55px;
+  }
+  .ServicesWrapper{
+  margin: 50px 50px;
+  display:block;
+  min-width:250px;
+  height:auto;
+  background-color:#0f0f0fcc;
+}
+  .Info{
+  display:block;
+  margin: 10px;
+  margin-top:10px
+}
+}
+
+.intro {
+    padding: 60px;
+  text-align: center;
+  background: #1abc9c;
+  color: white;
+  font-size: 50px;
+  width: 100%;
+}
+  </style>
+</head>
+<body>
+   
+  <section id="Services">
+      <div class="intro">
+          Product Model Toolkit
+      </div>
+    <div class="ServicesWrapper">
+      <div class="Circle">  
+      </div>
+      <div class="Info">
+        <h1>All products</h1>
+        <br>
+        <br>
+        <p>
+            Get all saved products from the database.
+        </p>
+        <button onclick="window.location.href='/products'">
+          Find out more
+        </button>
+      </div>
+    </div>
+    <div class="ServicesWrapper">
+      <div class="Circle">  
+      </div>
+      <div class="Info">
+        <h1>Find product by ID</h1>
+        <br>
+        <br>
+        <p>
+            Get an specific product by ID
+        </p>
+        <button onclick="window.location.href='/find-product-by-id'">
+          Find out more
+        </button>
+      </div>
+    </div>
+    <div class="ServicesWrapper">
+      <div class="Circle">  
+      </div>
+      <div class="Info">
+        <h1>Import product</h1>
+        <br>
+        <br>
+        <p>
+            Import product to database
+        </p>
+        <button onclick="window.location.href='/import'">
+          Find out more
+        </button>
+      </div>
+    </div>
+    
+    
+  </section>
+</body>
+</html>
