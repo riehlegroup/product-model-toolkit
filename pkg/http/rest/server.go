@@ -34,6 +34,7 @@ func NewSrv(address string, srv services.Service) *Instance {
 	e.File("/", "public/index.html")
 	e.File("/products", "public/products.html")
 	e.File("/find-product-by-id", "public/findproduct.html")
+	e.File("/import", "public/import.html")
 	// Routes
 	v1 := e.Group(cnst.APIGroup)
 	Handler(v1, srv)
