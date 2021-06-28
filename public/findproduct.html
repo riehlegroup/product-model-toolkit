@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find product by id</title>
+    <style>
+      table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+    </style>
+</head>
+<body>
+
+
+<!-- <form> -->
+  <label for="productid">product id</label><br>
+  <input type="text" id="productid" name="productid" value="1"><br>
+  <button type="submit" onclick="UserAction()">submit</button>
+  <table id="products-table" class="table">
+    <thead>
+        <tr>
+            <th>ID</th> 
+            <th>Name</th> 
+            <th>Version</th>
+            <th>VCS</th>  
+            <th>Description</th>  
+            <th>Comment</th>  
+            <th>Home page URL</th> 
+            <th>External Ref</th> 
+           
+            <!-- <th>Components</th>   -->
+        </tr>
+        <tr>
+          <td id="id"></th> 
+            <th id="name"h></th> 
+            <th id="version"></th>
+            <th id="vcs"></th>  
+            <th id="description"></th>  
+            <th id="comment"></th>  
+            <th id="homepageurl"></th> 
+            <th id=externalref"></th> 
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<!-- </form>  -->
+
+<p>Please enter the product id.</p>
+<script>
+
+function UserAction() {
+    var apiUrl = "http://localhost:8081/api/v1/products/" + document.getElementById("productid").value
+    fetch(apiUrl).then(response => {
+      return response.json();
+    }).then(data => {
+        var id = document.getElementById('id');
+        var name = document.getElementById('name');
+        var version = document.getElementById('version');
+        var vcs = document.getElementById('vcs');
+        var description = document.getElementById('description');
+        var comment = document.getElementById('comment');
+        var homepageurl = document.getElementById('homepageUrl');
+        var externalref = document.getElementById('externalref');
+        
+        id.innerHTML += data["id"]
+        name.innerHTML += data["name"]
+        version.innerHTML += data["version"]
+        vcs.innerHTML += data["vcs"]
+        description.innerHTML += data["description"]
+        comment.innerHTML += data["comment"]
+        homepageurl.innerHTML += data["homepageurl"]
+        externalref.innerHTML += data["externalRef"]
+
+        console.warn(data);
+    }).catch(err => {
+      // Do something for an error here
+    });
+    
+}
+</script>
+</body>
+</html>

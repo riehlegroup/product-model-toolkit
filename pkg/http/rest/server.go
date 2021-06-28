@@ -31,7 +31,9 @@ func NewSrv(address string, srv services.Service) *Instance {
 	// Middleware
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
-
+	e.File("/", "public/index.html")
+	e.File("/products", "public/products.html")
+	e.File("/find-product-by-id", "public/findproduct.html")
 	// Routes
 	v1 := e.Group(cnst.APIGroup)
 	Handler(v1, srv)
