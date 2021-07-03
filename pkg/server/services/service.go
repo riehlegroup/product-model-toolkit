@@ -215,7 +215,7 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 
 // SPDX import a SPDX representation of the BOM.
 func (s *service) SPDXImport(input io.Reader) (*model.Product, error) {
-
+	
 	doc, err := tvloader.Load2_1(input)
 	if err != nil {
 		msg := fmt.Sprintf("error while parsing SPDX body: %v", err)

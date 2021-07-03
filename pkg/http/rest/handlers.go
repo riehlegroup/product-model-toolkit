@@ -5,19 +5,20 @@
 package rest
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"os"
+	"os/exec"
+	"strconv"
+
 	"github.com/osrgroup/product-model-toolkit/cnst"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"github.com/pkg/errors"
 	"github.com/spdx/tools-golang/idsearcher"
 	"github.com/spdx/tools-golang/tvsaver"
-	"net/http"
-	"os"
-	"os/exec"
-	"strconv"
-	"strings"
 
 	"github.com/labstack/echo/v4"
 )
@@ -70,15 +71,22 @@ func findProductByID(srv services.Service) echo.HandlerFunc {
 
 func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		importDetails, err := getImportDetails(c)
+		if err != nil {
+			return err
+		}
+		scanner, importPath := importDetails[0], importDetails[1]
+
+		rb, err := os.ReadFile(importPath)
+		if err != nil {
+			fmt.Printf("error while opening %v for reading: %v", importPath, err)
+			return err
+		}
 		// get the scanner from the url param
-		scanner := strings.ToLower(c.Param("scanner"))
-
-		// read request body
-		r := c.Request().Body
-
+		// scanner := strings.ToLower(c.Param("scanner"))
+		r := bytes.NewReader(rb)
 		// define product and error variable
 		var prod *model.Product
-		var err error
 
 		// switch over the scanner name
 		switch scanner {
@@ -221,6 +229,21 @@ func getScanDetails(c echo.Context) ([]string, error) {
 	output := jsonBody["output"]
 
 	return []string{scannerName, source, output}, nil
+}
+
+
+func getImportDetails(c echo.Context) ([]string, error) {
+	// get json body
+	jsonBody, err := getJSONRawBody(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// read data
+	importType := jsonBody["importType"]
+	importPath := jsonBody["importPath"]
+
+	return []string{importType, importPath}, nil
 }
 
 func getJSONRawBody(c echo.Context) (map[string]string, error) {
