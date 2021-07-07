@@ -113,6 +113,9 @@ Base path: `http://[hostname]:[port]`
 | GET    | /find-product-by-id       | Get a product by id                   |
 | POST   | /import                   | Import a product from scanner results |
 
+### API Documentation
+
+You can find the [Insomnia](https://insomnia.rest/download) import file on docs folder.
 
 ## License Crawler
 
