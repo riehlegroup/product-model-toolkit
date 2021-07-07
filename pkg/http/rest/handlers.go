@@ -10,10 +10,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"os/exec"
 	"strconv"
 
-	"github.com/osrgroup/product-model-toolkit/cnst"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"github.com/pkg/errors"
@@ -122,97 +120,19 @@ func scan(iSrv services.Service) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		scannerName, source, output := scanDetails[0], scanDetails[1], scanDetails[2]
+		result , err := iSrv.Scan(scanDetails)
 
-		switch scannerName {
-		case "phpscanner":
-
-			dockerImageName := cnst.PhpscannerImage
-
-			fmt.Println(source)
-			if source == "." {
-				source = "$PWD"
-			}
-			if output == "." {
-				output = "$PWD"
-			}
-
-			// create the dockerCmd from input values
-			dockerCmd := fmt.Sprintf("sudo docker run "+
-				"-v %v:/source "+
-				"-v %v:/output %v",
-				source, output, dockerImageName)
-
-			// log information
-			fmt.Println("Running crawler")
-
-			// execute docker command
-			fmt.Println("Executing the docker command ...")
-
-			// print the docker command
-			fmt.Println(dockerCmd)
-
-			// executing the command
-			_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
-			// check error
-			if err != nil {
-				return err
-			}
-
-			fmt.Println("Crawling licenses successfully completed")
-			fmt.Printf("The output path: %v\n", output)
+		if err != nil {
 			return c.String(
-				http.StatusOK,
-				fmt.Sprintf("The output path: %v\n", output),
-			)
-
-		// case "licensee":
-			// dockerImageName := cnst.LicenseeImage
-
-			// fmt.Println(source)
-			// if source == "." {
-			// 	source = "$PWD"
-			// }
-			// if output == "." {
-			// 	output = "$PWD"
-			// }
-
-			// // create the dockerCmd from input values
-			// dockerCmd := fmt.Sprintf("sudo docker run "+
-			// 	"-v %v:/source "+
-			// 	"-v %v:/output %v",
-			// 	source, output, dockerImageName)
-
-			// // log information
-			// fmt.Println("Running crawler")
-
-			// // execute docker command
-			// fmt.Println("Executing the docker command ...")
-
-			// // print the docker command
-			// fmt.Println(dockerCmd)
-
-			// // executing the command
-			// _, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
-			// // check error
-			// if err != nil {
-			// 	return err
-			// }
-
-			// fmt.Println("Crawling licenses successfully completed")
-			// fmt.Printf("The output path: %v\n", output)
-			// return c.String(
-			// 	http.StatusOK,
-			// 	fmt.Sprintf("The output path: %v\n", output),
-			// )
-
-		default:
-			return c.String(
-				http.StatusNotAcceptable,
-				"file received but couldn't accept it",
+				http.StatusInternalServerError,
+				err.Error(),
 			)
 		}
 
+		return c.String(
+			http.StatusOK,
+			result,			
+		)
 	}
 }
 
