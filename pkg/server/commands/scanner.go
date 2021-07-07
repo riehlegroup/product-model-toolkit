@@ -17,6 +17,7 @@ type Tool struct {
 	Name      string
 	Version   string
 	DockerImg string
+	DockerCmd string
 	Cmd       string
 	Results   []string
 }
@@ -81,7 +82,8 @@ var PhpScanner = Tool {
 	Name: "phpscanner",
 	Version: "1.0.0",
 	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0",
-	Cmd: `/bin/sh -c  "phpScanner.php --sourcedir=<path/to/scanned/folder> --outputdir=<path/to/output/folder>"`, // TODO
+	DockerCmd: "sudo docker run -v %v:/source -v %v:/output phpscanner",
+	Cmd: `/bin/sh -c  "phpScanner.php --sourcedir=<path/to/scanned/folder> --outputdir=<path/to/output/folder>"`,
 	Results: []string{"phpScanner.json"},
 
 }

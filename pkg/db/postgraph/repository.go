@@ -15,7 +15,7 @@ import (
 
 var (
 	// ErrNotFound if a entity couldn't be found in the db.
-	ErrNotFound = errors.New("Entity not found")
+	ErrNotFound = errors.New("entity not found")
 )
 
 type repo struct {

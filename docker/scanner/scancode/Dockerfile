@@ -9,7 +9,7 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sL https://github.com/nexB/scancode-toolkit/releases/download/v3.1.1/scancode-toolkit-3.1.1.tar.bz2 | tar -xj \
+RUN curl -sL https://github.com/nexB/scancode-toolkit/releases/download/v21.6.7/scancode-toolkit-21.6.7_py36-linux.tar.xz | tar -xj \
     && mv scancode* /app
 
 WORKDIR /app

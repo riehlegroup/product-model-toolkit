@@ -4,22 +4,22 @@
 
 version: "3.7"
 services:
-  licensee:
-    image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0
-    build: ./licensee/
+  # licensee:
+  #   image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-licensee:9.13.0
+  #   build: ./licensee/
 
-  scancode:
-    image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1
-    build: ./scancode/
+  # scancode:
+  #   image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-scancode:3.1.1
+  #   build: ./scancode/
 
   php-scanner:
-    image: docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0
+    image: docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:latest
     build: ./php-scanner/
   
-  composer:
-    image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy
-    build: ./composer/
+  # composer:
+    # image: docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy
+    # build: ./composer/
   
-  file-hasher:
-    image: docker.pkg.github.com/osrgroup/product-model-toolkit/file-hasher:latest
-    build: ./file-hasher/
+  # file-hasher:
+    # image: docker.pkg.github.com/osrgroup/product-model-toolkit/file-hasher:latest
+    # build: ./file-hasher/

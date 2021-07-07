@@ -5,19 +5,22 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"reflect"
-	"bytes"
+	"sort"
 	"strconv"
-	"encoding/json"
+	"time"
+	"os/exec"
+	"github.com/osrgroup/product-model-toolkit/model"
+	"github.com/osrgroup/product-model-toolkit/pkg/server/commands"
 	convert "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert"
 	composer "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert/composer"
 	hasher "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert/hasher"
-	"math/rand"
-	"time"
-	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/pkg/errors"
 	"github.com/spdx/tools-golang/builder"
 	"github.com/spdx/tools-golang/reporter"
@@ -71,6 +74,8 @@ type Service interface {
 	// export
 	SPDXExport(exportId, exportPath string) (*spdx.Document2_2, string, error)
 	ReportExport(exportId, exportPath string) (string, error)
+
+	Scan(scanDetails[]string) (string, error)
 }
 
 type service struct {
@@ -90,6 +95,108 @@ func (s *service) FindAllProducts() ([]model.Product, error) {
 // FindProductByID returns the product with the given ID.
 func (s *service) FindProductByID(id int) (model.Product, error) {
 	return s.r.FindProductByID(id)
+}
+
+func (s *service) Scan(scanDetails[]string) (string, error) {
+	scannerName, source, output := scanDetails[0], scanDetails[1], scanDetails[2]
+
+	sort.Slice(commands.Available[:], func(i, j int) bool {
+		return commands.Available[i].Name <= commands.Available[j].Name
+	})
+
+	idx := sort.Search(len(commands.Available), func (i int) bool {
+		return string(commands.Available[i].Name) >= scannerName
+	})
+ 
+	if item:=commands.Available[idx]; item.Name == scannerName {
+		if item.DockerCmd == "" {
+			return "", errors.New("The scanner has not been defined yet!")
+		}
+		fmt.Printf("Running scanner %v version %v\n", item.Name, item.Version)
+		fmt.Printf("Source: %v\n", source)
+		fmt.Println("Executing the docker command ...")
+		dockerCmd := fmt.Sprintf(item.DockerCmd, source, output)
+		fmt.Println(dockerCmd)
+		// execute the command
+		_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
+		if err != nil {
+			fmt.Println(err)
+			return "", err
+		}
+
+		fmt.Println("Crawling licenses successfully completed")
+		fmt.Printf("The output path: %v\n", output)
+		return fmt.Sprintf("The output path: %v\n", output),nil
+	
+	} else {
+		return "", errors.New("scanner not found!!1")
+	}
+	// switch scannerName {
+		// case "phpscanner":
+			// dockerImageName := cnst.PhpscannerImage
+
+
+			// create the dockerCmd from input values
+			// dockerCmd := fmt.Sprintf("sudo docker run "+
+			// 	"-v %v:/source "+
+			// 	"-v %v:/output %v",
+			// 	source, output, dockerImageName)
+
+			// log information
+
+			// execute docker command
+
+			// print the docker command
+
+		
+
+
+		// case "licensee":
+		// 	dockerImageName := cnst.LicenseeImage
+
+		// 	fmt.Println(source)
+		// 	if source == "." {
+		// 		source = "$PWD"
+		// 	}
+		// 	if output == "." {
+		// 		output = "$PWD"
+		// 	}
+
+		// 	// create the dockerCmd from input values
+		// 	dockerCmd := fmt.Sprintf("sudo docker run "+
+		// 		"-v %v:/source "+
+		// 		"-v %v:/output %v",
+		// 		source, output, dockerImageName)
+
+		// 	// log information
+		// 	fmt.Println("Running crawler")
+
+		// 	// execute docker command
+		// 	fmt.Println("Executing the docker command ...")
+
+		// 	// print the docker command
+		// 	fmt.Println(dockerCmd)
+
+		// 	// executing the command
+		// 	_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
+		// 	// check error
+		// 	if err != nil {
+		// 		return err
+		// 	}
+
+		// 	fmt.Println("Crawling licenses successfully completed")
+		// 	fmt.Printf("The output path: %v\n", output)
+		// 	return c.String(
+		// 		http.StatusOK,
+		// 		fmt.Sprintf("The output path: %v\n", output),
+		// 	)
+
+		// default:
+		// 	return c.String(
+		// 		http.StatusNotAcceptable,
+		// 		"file received but couldn't accept it",
+		// 	)
+		// }
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.
