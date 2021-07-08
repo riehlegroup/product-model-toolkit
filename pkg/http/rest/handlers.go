@@ -22,7 +22,11 @@ import (
 )
 
 func handleEntryPoint(c echo.Context) error {
-	return c.JSON(http.StatusOK, c.Echo().Routers())
+	type status struct {
+		Routes interface{} `json:"routes"`
+	}
+
+	return c.JSON(http.StatusOK, status{Routes: c.Echo().Routes()})
 }
 
 func handleVersion(c echo.Context) error {

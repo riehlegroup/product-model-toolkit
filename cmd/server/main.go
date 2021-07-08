@@ -8,29 +8,48 @@ import (
 	"flag"
 	"fmt"
 	// "github.com/osrgroup/product-model-toolkit/pkg/db/memory"
-	"github.com/osrgroup/product-model-toolkit/pkg/db/postgraph"
+	"github.com/osrgroup/product-model-toolkit/model"
+	// "github.com/osrgroup/product-model-toolkit/pkg/db/postgraph"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 	"os"
-	
+	"log"
+	"github.com/jinzhu/gorm"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
 )
 
 var gitCommit string
 
+
+func Migrate(db *gorm.DB) {
+	// users.AutoMigrate()
+	// db.AutoMigrate(&articles.ArticleModel{})
+	// db.AutoMigrate(&articles.TagModel{})
+	// db.AutoMigrate(&articles.FavoriteModel{})
+	// db.AutoMigrate(&articles.ArticleUserModel{})
+	// db.AutoMigrate(&articles.CommentModel{})
+}
+
 func main() {
 	if checkFlags() {
 		os.Exit(0)
 	}
 
+	db, err := model.Init()
+	if err != nil {
+		log.Fatalf("db connection err: %v", err)
+	}
+	Migrate(db)
+	defer db.Close()
 	// repo := new(memory.DB)
 	// repo.AddSampleData()
 
 	// Use Postgraphile as DB backend
-	repo := postgraph.NewRepo("http://127.0.0.1:5433/graphql")
-	
+	// repo := postgraph.NewRepo("http://127.0.0.1:5433/graphql")
+	repo := model.NewRepo()
+
 	r := rest.NewSrv(
-		"127.0.0.1:8081",
+		":8081",
 		services.NewService(repo),
 	)
 	go r.Start()

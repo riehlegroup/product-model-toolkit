@@ -31,7 +31,6 @@ import (
 )
 
 var (
-	// ErrNotFound if a entity couldn't be found in the db.
 	ErrNotFound = errors.New("entity not found")
 )
 
@@ -115,7 +114,7 @@ func (s *service) Scan(scanDetails[]string) (string, error) {
 		fmt.Printf("Running scanner %v version %v\n", item.Name, item.Version)
 		fmt.Printf("Source: %v\n", source)
 		fmt.Println("Executing the docker command ...")
-		dockerCmd := fmt.Sprintf(item.DockerCmd, source, output)
+		dockerCmd := fmt.Sprintf(item.DockerCmd, source, output, item.DockerImg)
 		fmt.Println(dockerCmd)
 		// execute the command
 		_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
@@ -131,72 +130,6 @@ func (s *service) Scan(scanDetails[]string) (string, error) {
 	} else {
 		return "", errors.New("scanner not found!!1")
 	}
-	// switch scannerName {
-		// case "phpscanner":
-			// dockerImageName := cnst.PhpscannerImage
-
-
-			// create the dockerCmd from input values
-			// dockerCmd := fmt.Sprintf("sudo docker run "+
-			// 	"-v %v:/source "+
-			// 	"-v %v:/output %v",
-			// 	source, output, dockerImageName)
-
-			// log information
-
-			// execute docker command
-
-			// print the docker command
-
-		
-
-
-		// case "licensee":
-		// 	dockerImageName := cnst.LicenseeImage
-
-		// 	fmt.Println(source)
-		// 	if source == "." {
-		// 		source = "$PWD"
-		// 	}
-		// 	if output == "." {
-		// 		output = "$PWD"
-		// 	}
-
-		// 	// create the dockerCmd from input values
-		// 	dockerCmd := fmt.Sprintf("sudo docker run "+
-		// 		"-v %v:/source "+
-		// 		"-v %v:/output %v",
-		// 		source, output, dockerImageName)
-
-		// 	// log information
-		// 	fmt.Println("Running crawler")
-
-		// 	// execute docker command
-		// 	fmt.Println("Executing the docker command ...")
-
-		// 	// print the docker command
-		// 	fmt.Println(dockerCmd)
-
-		// 	// executing the command
-		// 	_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
-		// 	// check error
-		// 	if err != nil {
-		// 		return err
-		// 	}
-
-		// 	fmt.Println("Crawling licenses successfully completed")
-		// 	fmt.Printf("The output path: %v\n", output)
-		// 	return c.String(
-		// 		http.StatusOK,
-		// 		fmt.Sprintf("The output path: %v\n", output),
-		// 	)
-
-		// default:
-		// 	return c.String(
-		// 		http.StatusNotAcceptable,
-		// 		"file received but couldn't accept it",
-		// 	)
-		// }
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.
