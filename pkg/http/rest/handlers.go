@@ -225,7 +225,7 @@ func exportWithType(iSrv services.Service) echo.HandlerFunc {
 		default:
 			return c.String(
 				http.StatusNotAcceptable,
-				"file received but couldn't accept it",
+				"invalid type",
 			)
 		}
 	}

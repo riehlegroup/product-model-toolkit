@@ -220,7 +220,8 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 
 	packages := make(map[spdx.ElementID]*spdx.Package2_2)
 	for _, component := range prod.Components {
-		eId := fmt.Sprintf("Package-%v\n", component.Name)
+		eId := fmt.Sprintf("Package-%v\n", component.Package)
+		fmt.Println(eId)
 
 		pk := new(spdx.Package2_2)
 		pk.PackageSPDXIdentifier = spdx.ElementID(component.UID)

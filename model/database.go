@@ -19,8 +19,9 @@ func Init() (*gorm.DB, error) {
 	username := os.Getenv("POSTGRES_USER")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbName := os.Getenv("POSTGRES_DB")
+	dbHost := os.Getenv("POSTGRES_HOST")
 
-	dbUri := fmt.Sprintf("host=database user=%s dbname=%s sslmode=disable password=%s", username, dbName, password) //Build connection string
+	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password) //Build connection string
 	fmt.Println(dbUri)
 
 	conn, err := gorm.Open("postgres", dbUri)
