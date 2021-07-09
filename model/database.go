@@ -40,7 +40,7 @@ func GetDB() *gorm.DB {
 }
 
 type repo struct {
-	client *gorm.DB
+	conn *gorm.DB
 }
 
 // NewRepo create an instance for Postgraphile DB repository
@@ -50,18 +50,20 @@ func NewRepo() *repo {
 
 func (r *repo) FindAllProducts() ([]Product, error) {
 	products := []Product{}
-	db := GetDB()
-	if err := db.Find(&products).Error; err != nil {
+	if err := r.conn.Preload("Components").
+		Preload("UsageTypes").
+		Find(&products).Error; err != nil {
 		return nil, err
 	}
 
-	return products, nil	
+	return products, nil
 }
 
 func (r *repo) FindProductByID(id int) (Product, error) {
 	product := Product{}
-	db := GetDB()
-	if err := db.First(&product, id).Error; err != nil {
+	if err := r.conn.Preload("Components").
+		Preload("UsageTypes").
+		First(&product, id).Error; err != nil {
 		return product, err
 	}
 
@@ -69,5 +71,9 @@ func (r *repo) FindProductByID(id int) (Product, error) {
 }
 
 func (r *repo) SaveProduct(prod *Product) (Product, error) {
-	panic("implement me")
+	if err := r.conn.Create(&prod).Error; err != nil {
+		return *prod, err
+	}
+
+	return *prod, nil
 }

@@ -142,8 +142,8 @@ func TestAsComponent_withDir(t *testing.T) {
 	}
 
 	expectedPath := "/src"
-	if comp.Pkg != expectedPath {
-		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
+	if comp.Package != expectedPath {
+		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Package)
 	}
 }
 
@@ -156,8 +156,8 @@ func TestAsComponent_withDirNested(t *testing.T) {
 	}
 
 	expectedPath := "/src/client"
-	if comp.Pkg != expectedPath {
-		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
+	if comp.Package != expectedPath {
+		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Package)
 	}
 }
 
@@ -170,8 +170,8 @@ func TestAsComponent_withFile(t *testing.T) {
 	}
 
 	expectedPath := "/src/cli.go"
-	if comp.Pkg != expectedPath {
-		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
+	if comp.Package != expectedPath {
+		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Package)
 	}
 
 	if comp.Artifact.Hash.MD5 != artMain.Hash.MD5 {
@@ -196,8 +196,8 @@ func TestAsComponent_withFileNested(t *testing.T) {
 	}
 
 	expectedPath := "/src/client/crawler.go"
-	if comp.Pkg != expectedPath {
-		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Pkg)
+	if comp.Package != expectedPath {
+		t.Errorf("Expected component pkg to be '%v', but got '%v'", expectedName, comp.Package)
 	}
 
 	if comp.Artifact.Hash.MD5 != artCrawler.Hash.MD5 {

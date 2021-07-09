@@ -28,6 +28,8 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(&model.Component{})
 	db.AutoMigrate(&model.DepGraph{})
 	db.AutoMigrate(&model.UsageType{})
+	db.AutoMigrate(&model.License{})
+
 	// db.AutoMigrate(&articles.TagModel{})
 	// db.AutoMigrate(&articles.FavoriteModel{})
 	// db.AutoMigrate(&articles.ArticleUserModel{})

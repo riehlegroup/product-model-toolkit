@@ -47,11 +47,11 @@ type Vulnerability struct{}
 // Component represents a unit of composition of the product, e.g. class, lib, module.
 type Component struct {
 	gorm.Model
-	ProductRefer uint
+	ProductRefer  uint
 	UID           string   `gorm:"column:uid;not null" json:"uid"`
-	Name          string   `gorm:"column:name" json:"name,omitempty"`
-	Pkg           string   `gorm:"column:pkg" json:"pkg,omitempty"`
-	Version       string   `gorm:"column:version" json:"version,omitempty"`
+	Name          string   `gorm:"column:name" json:"name"`
+	Package       string   `gorm:"column:package" json:"package"`
+	Version       string   `gorm:"column:version" json:"version"`
 	LicenseRefer  int      `json:"-"`
 	License       License  `gorm:"foreignKey:LicenseRefer;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"license,omitempty"`
 	Copyright     string   `json:"-"`
@@ -64,7 +64,7 @@ type CmpID string
 
 // ID returns an identifier which is a combination of package + name + version.
 func (c *Component) ID() CmpID {
-	id := fmt.Sprintf("%v:%v:%v", c.Pkg, c.Name, c.Version)
+	id := fmt.Sprintf("%v:%v:%v", c.Package, c.Name, c.Version)
 	return CmpID(id)
 }
 
@@ -167,5 +167,5 @@ type Info struct {
 type UsageType struct {
 	gorm.Model
 	ProductRefer uint
-	Name string `gorm:"column:name" json:"name"`
+	Name         string `gorm:"column:name" json:"name"`
 }

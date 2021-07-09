@@ -159,7 +159,7 @@ func spdxToProduct(doc *spdx.Document2_1) (*model.Product, error) {
 		cmp := model.Component{
 			UID:     string(p.PackageSPDXIdentifier),
 			Name:    p.PackageName,
-			Pkg:     p.PackageSummary,
+			Package:     p.PackageSummary,
 			Version: p.PackageVersion,
 			License: model.License{
 				SPDXID:           string(p.PackageSPDXIdentifier),
@@ -225,7 +225,7 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 		pk := new(spdx.Package2_2)
 		pk.PackageSPDXIdentifier = spdx.ElementID(component.UID)
 		pk.PackageName = component.Name
-		pk.PackageSummary = component.Pkg
+		pk.PackageSummary = component.Package
 		pk.PackageVersion = component.Version
 		pk.PackageSPDXIdentifier = spdx.ElementID(component.License.SPDXID)
 		pk.PackageLicenseDeclared = component.License.DeclaredLicense
@@ -366,9 +366,10 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 func (s *service) ScannerImport(input io.Reader) (*model.Product, error) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(input)
+	strInput := buf.String()
 
 	prod := new(model.Product)
-	err := json.Unmarshal(buf.Bytes(), &prod)
+	err := json.Unmarshal([]byte(strInput), &prod)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
