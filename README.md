@@ -31,6 +31,14 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 
 4. The PHP scanner performs a deep analysis of a web project and sends its result as a standardized representation (like the CLI client) to the server.
 
+## How to use it ?
+
+- run `run-server.sh` script. The server and a postgres instance will be ready in a second.
+- copy the required input file to the server container. For this, use the following line:
+    - docker cp <input-file> pmt_server:/<input-file>
+- run the required command according to the help command of cli or even `scenario.sh` file
+
+
 ## Project Structure
 
 ```
