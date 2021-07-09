@@ -35,7 +35,7 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 
 - run `run-server.sh` script. The server and a postgres instance will be ready in a second.
 - copy the required input file to the server container. For this, use the following line:
-    - docker cp <input-file> pmt_server:/<input-file>
+    - `docker cp <input-file> pmt_server:/<input-file>`
 - run the required command according to the help command of cli or even `scenario.sh` file
 
 
