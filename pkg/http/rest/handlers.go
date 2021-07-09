@@ -21,8 +21,13 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+type result struct {
+	Result interface{} `json:"result"`
+}
+
 func handleEntryPoint(c echo.Context) error {
-	return c.JSON(http.StatusOK, c.Echo().Routers())
+
+	return c.JSON(http.StatusOK, result{Result: c.Echo().Routes()})
 }
 
 func handleVersion(c echo.Context) error {
@@ -30,11 +35,8 @@ func handleVersion(c echo.Context) error {
 }
 
 func handleHealth(c echo.Context) error {
-	type status struct {
-		Status string `json:"status"`
-	}
-
-	return c.JSON(http.StatusOK, status{Status: "UP"})
+	
+	return c.JSON(http.StatusOK, result{Result: "UP"})
 }
 
 func findAllProducts(srv services.Service) echo.HandlerFunc {
@@ -58,10 +60,9 @@ func findProductByID(srv services.Service) echo.HandlerFunc {
 
 		prod, err := srv.FindProductByID(id)
 		if err != nil {
-			c.String(
-				http.StatusNotFound,
-				fmt.Sprintf("unable fo find product with ID %v", id))
-		}
+			return c.JSON(http.StatusNotFound, result{Result: fmt.Sprintf("unable fo find product with ID %v", id)})
+			
+			}
 
 		return c.JSON(http.StatusOK, prod)
 	}
@@ -224,7 +225,7 @@ func exportWithType(iSrv services.Service) echo.HandlerFunc {
 		default:
 			return c.String(
 				http.StatusNotAcceptable,
-				"file received but couldn't accept it",
+				"invalid type",
 			)
 		}
 	}

@@ -66,7 +66,7 @@ func asProductModel(artifacts []model.Artifact) (*model.Product, error) {
 
 func asComponent(art model.Artifact) model.Component {
 	return model.Component{
-		Pkg:      art.Path,
+		Package:      art.Path,
 		Name:     art.Name,
 		Artifact: art,
 	}

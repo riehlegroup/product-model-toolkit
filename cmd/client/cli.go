@@ -6,16 +6,16 @@ package main
 
 import (
 	"fmt"
-	"os"
-	"github.com/spf13/viper"
-	"github.com/spf13/cobra"
-	homedir "github.com/mitchellh/go-homedir"
 	"log"
+	"os"
 	"time"
 
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/osrgroup/product-model-toolkit/cnst"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/commands"
 	"github.com/pterm/pterm"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 // define required variables
@@ -212,7 +212,6 @@ func listAvailableExportTypes() {
 
 // callImport function for the importCmd command -> returns error
 func callImport(importType, importPath string) error {
-
 	// run the run import and check the error
 	if err := commands.RunImport(importType, importPath); err != nil {
 		return err

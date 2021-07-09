@@ -31,7 +31,6 @@ import (
 )
 
 var (
-	// ErrNotFound if a entity couldn't be found in the db.
 	ErrNotFound = errors.New("entity not found")
 )
 
@@ -115,7 +114,7 @@ func (s *service) Scan(scanDetails[]string) (string, error) {
 		fmt.Printf("Running scanner %v version %v\n", item.Name, item.Version)
 		fmt.Printf("Source: %v\n", source)
 		fmt.Println("Executing the docker command ...")
-		dockerCmd := fmt.Sprintf(item.DockerCmd, source, output)
+		dockerCmd := fmt.Sprintf(item.DockerCmd, source, output, item.DockerImg)
 		fmt.Println(dockerCmd)
 		// execute the command
 		_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
@@ -131,72 +130,6 @@ func (s *service) Scan(scanDetails[]string) (string, error) {
 	} else {
 		return "", errors.New("scanner not found!!1")
 	}
-	// switch scannerName {
-		// case "phpscanner":
-			// dockerImageName := cnst.PhpscannerImage
-
-
-			// create the dockerCmd from input values
-			// dockerCmd := fmt.Sprintf("sudo docker run "+
-			// 	"-v %v:/source "+
-			// 	"-v %v:/output %v",
-			// 	source, output, dockerImageName)
-
-			// log information
-
-			// execute docker command
-
-			// print the docker command
-
-		
-
-
-		// case "licensee":
-		// 	dockerImageName := cnst.LicenseeImage
-
-		// 	fmt.Println(source)
-		// 	if source == "." {
-		// 		source = "$PWD"
-		// 	}
-		// 	if output == "." {
-		// 		output = "$PWD"
-		// 	}
-
-		// 	// create the dockerCmd from input values
-		// 	dockerCmd := fmt.Sprintf("sudo docker run "+
-		// 		"-v %v:/source "+
-		// 		"-v %v:/output %v",
-		// 		source, output, dockerImageName)
-
-		// 	// log information
-		// 	fmt.Println("Running crawler")
-
-		// 	// execute docker command
-		// 	fmt.Println("Executing the docker command ...")
-
-		// 	// print the docker command
-		// 	fmt.Println(dockerCmd)
-
-		// 	// executing the command
-		// 	_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
-		// 	// check error
-		// 	if err != nil {
-		// 		return err
-		// 	}
-
-		// 	fmt.Println("Crawling licenses successfully completed")
-		// 	fmt.Printf("The output path: %v\n", output)
-		// 	return c.String(
-		// 		http.StatusOK,
-		// 		fmt.Sprintf("The output path: %v\n", output),
-		// 	)
-
-		// default:
-		// 	return c.String(
-		// 		http.StatusNotAcceptable,
-		// 		"file received but couldn't accept it",
-		// 	)
-		// }
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.
@@ -226,7 +159,7 @@ func spdxToProduct(doc *spdx.Document2_1) (*model.Product, error) {
 		cmp := model.Component{
 			UID:     string(p.PackageSPDXIdentifier),
 			Name:    p.PackageName,
-			Pkg:     p.PackageSummary,
+			Package:     p.PackageSummary,
 			Version: p.PackageVersion,
 			License: model.License{
 				SPDXID:           string(p.PackageSPDXIdentifier),
@@ -249,7 +182,6 @@ func spdxToProduct(doc *spdx.Document2_1) (*model.Product, error) {
 		Comment:           doc.CreationInfo.CreatorComment,
 		HomepageURL:       doc.CreationInfo.DocumentNamespace,
 		ExternalReference: ref,
-		ClearingState:     nil,
 		Components:        components,
 	}
 
@@ -288,12 +220,13 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 
 	packages := make(map[spdx.ElementID]*spdx.Package2_2)
 	for _, component := range prod.Components {
-		eId := fmt.Sprintf("Package-%v\n", component.Name)
+		eId := fmt.Sprintf("Package-%v\n", component.Package)
+		fmt.Println(eId)
 
 		pk := new(spdx.Package2_2)
 		pk.PackageSPDXIdentifier = spdx.ElementID(component.UID)
 		pk.PackageName = component.Name
-		pk.PackageSummary = component.Pkg
+		pk.PackageSummary = component.Package
 		pk.PackageVersion = component.Version
 		pk.PackageSPDXIdentifier = spdx.ElementID(component.License.SPDXID)
 		pk.PackageLicenseDeclared = component.License.DeclaredLicense
@@ -434,9 +367,10 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 func (s *service) ScannerImport(input io.Reader) (*model.Product, error) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(input)
+	strInput := buf.String()
 
 	prod := new(model.Product)
-	err := json.Unmarshal(buf.Bytes(), &prod)
+	err := json.Unmarshal([]byte(strInput), &prod)
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
