@@ -33,7 +33,7 @@ The Product Model Toolkit helps you to manage third-party open source dependenci
 
 ## How to use it ?
 
-- run `docker-compose up -d` in docker directory
+- run `cd docker/scanner/` and then run `docker-compose up -d` 
 - run `run-server.sh` script. The server and a postgres instance will be ready in a second.
 - copy the required input file to the server container. For this, use the following line:
     - `docker cp <input-file> pmt_server:/<input-file>`
