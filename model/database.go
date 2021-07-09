@@ -28,9 +28,8 @@ func Init() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	// conn.Debug().AutoMigrate(&Account{}, &Contact{}) //Database migration
 	conn.DB().SetMaxIdleConns(10)
-	//db.LogMode(true)
+	conn.LogMode(true)
 	DB = conn
 	return DB, nil
 }
@@ -50,11 +49,23 @@ func NewRepo() *repo {
 }
 
 func (r *repo) FindAllProducts() ([]Product, error) {
-	panic("implement me")
+	products := []Product{}
+	db := GetDB()
+	if err := db.Find(&products).Error; err != nil {
+		return nil, err
+	}
+
+	return products, nil	
 }
 
 func (r *repo) FindProductByID(id int) (Product, error) {
-	panic("implement me")
+	product := Product{}
+	db := GetDB()
+	if err := db.First(&product, id).Error; err != nil {
+		return product, err
+	}
+
+	return product, nil
 }
 
 func (r *repo) SaveProduct(prod *Product) (Product, error) {

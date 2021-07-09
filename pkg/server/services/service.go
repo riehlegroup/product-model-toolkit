@@ -182,7 +182,6 @@ func spdxToProduct(doc *spdx.Document2_1) (*model.Product, error) {
 		Comment:           doc.CreationInfo.CreatorComment,
 		HomepageURL:       doc.CreationInfo.DocumentNamespace,
 		ExternalReference: ref,
-		ClearingState:     nil,
 		Components:        components,
 	}
 

@@ -11,7 +11,7 @@ import (
 )
 
 var prod = Product{
-	ID:                1,
+	// ID:                1,
 	Name:              "Product-Model-Tookit",
 	Version:           "0.1.0",
 	HomepageURL:       "osr.cs.fau.de/",

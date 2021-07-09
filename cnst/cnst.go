@@ -6,6 +6,7 @@ package cnst
 
 const (
 	ServerBaseURL = "http://localhost:8081/api/v1"
+	DefaultServerPort = "8081"
 )
 
 // commands descriotion
@@ -71,4 +72,15 @@ const (
 	PhpscannerImage = "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0"
 	ComposerImage   = "docker.pkg.github.com/osrgroup/product-model-toolkit/scanner-composer:dummy"
 	FilehasherImage = "docker.pkg.github.com/osrgroup/product-model-toolkit/file-hasher:latest"
+)
+
+const (
+	// OnPremise represents a on-premise installation of the product.
+	OnPremise = "on-premise"
+	// CloudService represents a usage of the product as cloud service.
+	CloudService = "cloud-service"
+	// Library represents a usage as library for other products.
+	Library = "library"
+	// Internal represents a internal usage of the products.
+	Internal = "internal"
 )

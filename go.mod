@@ -13,6 +13,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16 // indirect
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/labstack/echo/v4 v4.1.17
+	github.com/lib/pq v1.1.1 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect

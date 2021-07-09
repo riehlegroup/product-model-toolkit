@@ -13,5 +13,3 @@ COPY --from=builder /build/server .
 
 # executable
 ENTRYPOINT [ "./server" ]
-# arguments that can be overridden
-# CMD [ "3", "300" ]

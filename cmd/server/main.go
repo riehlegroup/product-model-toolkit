@@ -11,6 +11,7 @@ import (
 	"github.com/osrgroup/product-model-toolkit/model"
 	// "github.com/osrgroup/product-model-toolkit/pkg/db/postgraph"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
+	"github.com/osrgroup/product-model-toolkit/cnst"
 	"os"
 	"log"
 	"github.com/jinzhu/gorm"
@@ -23,7 +24,10 @@ var gitCommit string
 
 func Migrate(db *gorm.DB) {
 	// users.AutoMigrate()
-	// db.AutoMigrate(&articles.ArticleModel{})
+	db.AutoMigrate(&model.Product{})
+	db.AutoMigrate(&model.Component{})
+	db.AutoMigrate(&model.DepGraph{})
+	db.AutoMigrate(&model.UsageType{})
 	// db.AutoMigrate(&articles.TagModel{})
 	// db.AutoMigrate(&articles.FavoriteModel{})
 	// db.AutoMigrate(&articles.ArticleUserModel{})
@@ -47,9 +51,13 @@ func main() {
 	// Use Postgraphile as DB backend
 	// repo := postgraph.NewRepo("http://127.0.0.1:5433/graphql")
 	repo := model.NewRepo()
-
+	serverPort := os.Getenv("SERVER_PORT")
+	if serverPort == "" {
+		serverPort = cnst.DefaultServerPort
+	}
+	
 	r := rest.NewSrv(
-		":8081",
+		fmt.Sprintf(":%v", serverPort),
 		services.NewService(repo),
 	)
 	go r.Start()
