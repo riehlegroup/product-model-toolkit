@@ -1,0 +1,24 @@
+version: '3'
+services:
+  server:
+    build:
+      dockerfile: Dockerfile
+      context: .
+    container_name: pmt_server 
+    env_file:
+      - .env
+    ports: 
+        - "8081:8081"
+    depends_on: 
+      - database
+  database:
+    image: "postgres" # use latest official postgres version
+    container_name: pmt_db
+    env_file:
+      - .env # configure postgres
+    volumes:
+      - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+    expose: 
+        - "5432"
+volumes:
+  database-data: # named volumes can be managed easier using docker-compose

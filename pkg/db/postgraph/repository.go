@@ -27,39 +27,39 @@ func NewRepo(URL string) *repo {
 	return &repo{graphql.NewClient(URL)}
 }
 
+
 // FindAllProducts returns all Products from the DB.
-func (r *repo) FindAllProducts() ([]model.Product, error) {
-	req := graphql.NewRequest(`
-	query AllProds {
-		allProducts {
-		  nodes {
-			id
-			createdAt
-			name
-			vcs
-			version
-			description
-			homepageUrl
-			externalRef
-			comment
-		  }
-		}
-	  }
-	`)
+// func (r *repo) FindAllProducts() ([]model.Product, error) {
+	// req := graphql.NewRequest(`
+	// query AllProds {
+	// 	allProducts {
+	// 	  nodes {
+	// 		id
+	// 		createdAt
+	// 		name
+	// 		vcs
+	// 		version
+	// 		description
+	// 		homepageUrl
+	// 		externalRef
+	// 		comment
+	// 	  }
+	// 	}
+	//   }
+	// `)
 
-	var res struct {
-		AllProducts struct {
-			Nodes []model.Product
-		}
-	}
+	// var res struct {
+	// 	AllProducts struct {
+	// 		Nodes []model.Product
+	// 	}
+	// }
 
-	if err := r.client.Run(context.Background(), req, &res); err != nil {
-		return nil, err
-	}
+	// if err := r.client.Run(context.Background(), req, &res); err != nil {
+	// 	return nil, err
+	// }
 
-	return res.AllProducts.Nodes, nil
-}
-
+	// return res.AllProducts.Nodes, nil
+// }
 // FindProductByID return the Product with the given ID from the DB.
 func (r *repo) FindProductByID(id int) (model.Product, error) {
 	req := graphql.NewRequest(`

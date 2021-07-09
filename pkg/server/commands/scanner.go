@@ -85,8 +85,8 @@ var FileHasher = Tool{
 var PhpScanner = Tool {
 	Name: "phpscanner",
 	Version: "1.0.0",
-	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner:1.0.0",
-	DockerCmd: "sudo docker run -v %v:/source -v %v:/output phpscanner",
+	DockerImg: "docker.pkg.github.com/osrgroup/product-model-toolkit/php-scanner",
+	DockerCmd: "sudo docker run -v %v:/source -v %v:/output %v",
 	Cmd: `/bin/sh -c  "phpScanner.php --sourcedir=<path/to/scanned/folder> --outputdir=<path/to/output/folder>"`,
 	Results: []string{"phpScanner.json"},
 

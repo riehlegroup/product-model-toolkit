@@ -16,6 +16,7 @@ func Handler(g *echo.Group, srv services.Service) {
 	// default routes
 	g.GET("/", handleEntryPoint)
 	g.GET("/health", handleHealth)
+	g.GET("/version", handleVersion)
 
 	// product routes
 	g.GET("/products", findAllProducts(srv))

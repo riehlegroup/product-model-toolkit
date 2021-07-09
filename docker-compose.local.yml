@@ -1,0 +1,22 @@
+version: '3'
+services:
+  # server:
+  #   build:
+  #     dockerfile: Dockerfile
+  #     context: .
+  #   env_file:
+  #     - .env
+  #   ports: 
+  #       - "8081:8081"
+  #   depends_on: 
+  #     - database
+  database:
+    image: "postgres" # use latest official postgres version
+    env_file:
+      - .env # configure postgres
+    volumes:
+      - local-database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+    ports:
+        - "5432:5432"
+volumes:
+  local-database-data: # named volumes can be managed easier using docker-compose
