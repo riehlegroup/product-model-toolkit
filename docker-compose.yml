@@ -20,5 +20,12 @@ services:
       - database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
     expose: 
         - "5432"
+  metabase:
+    container_name: pmt_metabase
+    image: metabase/metabase
+    depends_on:
+      - database
+    ports:
+        - "3000:3000"
 volumes:
   database-data: # named volumes can be managed easier using docker-compose
