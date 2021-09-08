@@ -64,9 +64,11 @@ All available rules can be displayed with `make help`.
 
 Build with `make build` the client and server application. The generated artifacts are `pmtserver` and `pmtclient`.
 
+
 ### Test
 
 Test with `make test`. This also produces a code coverage report as a file called `coverage.out`.
+
 
 ### Run
 
@@ -75,6 +77,7 @@ Already built executable can be executed directly. For example `./pmtclient` or 
 During development, `go run cmd/client/main.go` or `go run cmd/server/main.go` can be used to run a specific application.
 
 Run client and server with `-h` as argument to show all available arguments.
+
 
 #### Perform Scan with Client
 
@@ -87,6 +90,7 @@ Scan with specific scanner: `./pmtclient -s Licensee -i ~/workspace/myProject`
 Scan with default scanner: `./pmtclient -i ~/workspace/myProject`
 
 If you run the client without arguments `./pmtclient` it will use the default scanner and scan the current working directory.
+
 
 ## API (Server)
 
