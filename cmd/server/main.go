@@ -29,31 +29,27 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(&model.DepGraph{})
 	db.AutoMigrate(&model.UsageType{})
 	db.AutoMigrate(&model.License{})
-
-	// db.AutoMigrate(&articles.TagModel{})
-	// db.AutoMigrate(&articles.FavoriteModel{})
-	// db.AutoMigrate(&articles.ArticleUserModel{})
-	// db.AutoMigrate(&articles.CommentModel{})
 }
 
 func main() {
+
 	if checkFlags() {
 		os.Exit(0)
 	}
 
+    // sb connection
 	db, err := model.Init()
 	if err != nil {
 		log.Fatalf("db connection err: %v", err)
 	}
-	Migrate(db)
 	defer db.Close()
-	// repo := new(memory.DB)
-	// repo.AddSampleData()
-
-	// Use Postgraphile as DB backend
-	// repo := postgraph.NewRepo("http://127.0.0.1:5433/graphql")
+	
+	Migrate(db)
+	
 	repo := model.NewRepo()
+	
 	serverPort := os.Getenv("SERVER_PORT")
+	
 	if serverPort == "" {
 		serverPort = cnst.DefaultServerPort
 	}

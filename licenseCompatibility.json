@@ -1,0 +1,79 @@
+{
+	"Public Domain" : {
+		"includable_in" : [
+			"MIT",
+			"X11"
+		]
+	},
+	"MIT" : {
+		"includable_in" : [
+			"BSD-2-Clause",
+			"BSD-3-Clause"
+		]
+	},
+	"X11" : {
+		"includable_in" : [
+			"BSD-2-Clause",
+			"BSD-3-Clause"
+		]
+	},
+	"BSD-2-Clause" : {
+		"includable_in" : [
+			"Apache-2.0",
+			"LGPL-2.1-only",
+			"LGPL-2.1-or-later",
+			"LGPL-3.0-only",
+			"LGPL-3.0-or-later",
+			"MPL-1.1"
+		]
+	},
+	"BSD-3-Clause" : {
+		"includable_in" : [
+			"Apache-2.0",
+			"LGPL-2.1-only",
+			"LGPL-2.1-or-later",
+			"LGPL-3.0-only",
+			"LGPL-3.0-or-later",
+			"MPL-1.1"
+		]
+	},
+	"Apache-2.0" : {
+		"includable_in" : [
+			"LGPL-3.0-only",
+			"LGPL-3.0-or-later",
+			"MPL-1.1"
+		]
+	},
+	"LGPL-2.1-only" : {
+		"includable_in" : [
+			"GPL-2.1-only",
+			"GPL-2.1-or-later"
+		]
+	},
+	"LGPL-2.1-or-later" : {
+		"includable_in" : [
+			"GPL-2.1-or-later"
+		]
+	},
+	"LGPL-3.0-only" : {
+		"includable_in" : [
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
+		]
+	},
+	"LGPL-3.0-or-later" : {
+		"includable_in" : [
+			"GPL-3.0-or-later"
+		]
+	},
+	"GPL-3.0-only" : {
+		"includable_in" : [
+			"AGPL-3.0-only"
+		]
+	},
+	"GPL-3.0-or-later" : {
+		"includable_in" : [
+			"AGPL-3.0-only"
+		]
+	}
+}

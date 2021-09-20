@@ -147,17 +147,21 @@ func main() {
 
 // introScreen creates a fancy intro message
 func introScreen() {
+
+	// create the intro message
 	ptermLogo, _ := pterm.DefaultBigText.WithLetters(
 		pterm.NewLettersFromStringWithStyle("PMT", pterm.NewStyle(pterm.FgLightGreen))).
 		Srender()
-
 	pterm.DefaultCenter.Print(ptermLogo)
 
+	// create the version message
 	pterm.DefaultCenter.Print(pterm.DefaultHeader.
 		WithFullWidth().
 		WithBackgroundStyle(pterm.NewStyle(pterm.BgLightBlue)).
 		WithMargin(10).
 		Sprint(cnst.CliShort))
+
+	// create the git commit message
 	pterm.Info.Println(pterm.Green(time.Now().Format("02 Jan 2006 - 15:04:05 MST")))
 	pterm.Println()
 
@@ -165,6 +169,7 @@ func introScreen() {
 
 // callscanner function for the scannerCmd command -> returns error
 func callscanner(name, source, output string) error {
+
 	// run the scanner and check the error
 	if err := commands.RunScanner(name, source, output); err != nil {
 		return err
@@ -172,7 +177,6 @@ func callscanner(name, source, output string) error {
 
 	return nil
 }
-
 // callDiffPath function for the diffCmd command -> returns error
 func callDiffPath(firstPath, secondPath string) error {
 
@@ -186,6 +190,7 @@ func callDiffPath(firstPath, secondPath string) error {
 
 // callExport function for the exportCmd command -> returns error
 func callExport(exportId, exportType, exportPath string) error {
+	
 	// run the run export and check the error
 	if err := commands.RunExport(exportId, exportType, exportPath); err != nil {
 		return err

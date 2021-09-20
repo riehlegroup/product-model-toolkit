@@ -210,7 +210,6 @@ func exportWithType(iSrv services.Service) echo.HandlerFunc {
 				fmt.Sprintf("export path: %v", exportPath),
 			)
 		case "human-read":
-			fmt.Println("inja1")
 			exportPath, err = iSrv.ReportExport(exportId, exportPath)
 			if err != nil {
 				return c.String(
@@ -222,6 +221,11 @@ func exportWithType(iSrv services.Service) echo.HandlerFunc {
 				http.StatusCreated,
 				fmt.Sprintf("export path: %v", exportPath),
 			)
+		case "compatibility":
+			// check if the licesnse is compatible or not
+			// if it is not return warning 
+			// if it is ok return ok
+			// https://codetree.dev/golang-graph-traversal/#representing-graphs-in-go
 		default:
 			return c.String(
 				http.StatusNotAcceptable,
