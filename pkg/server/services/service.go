@@ -9,13 +9,15 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"math/rand"
 	"os"
+	"os/exec"
 	"reflect"
 	"sort"
 	"strconv"
 	"time"
-	"os/exec"
+
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/commands"
 	convert "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert"
@@ -73,7 +75,7 @@ type Service interface {
 	// export
 	SPDXExport(exportId, exportPath string) (*spdx.Document2_2, string, error)
 	ReportExport(exportId, exportPath string) (string, error)
-
+	CompatibilityExport(exportId, exportPath string) (string, error)
 	Scan(scanDetails[]string) (string, error)
 }
 
@@ -361,6 +363,42 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 		return nil, "", err
 	}
 	return doc, exportPath, nil
+}
+
+
+func (s *service) CompatibilityExport(exportId, exportPath string) (string, error) {
+	// check if the licesnse is compatible or not
+	// if it is not return warning 
+	// if it is ok return ok
+	// https://codetree.dev/golang-graph-traversal/#representing-graphs-in-go
+	// get the product from id
+	id, err := strconv.Atoi(exportId)
+	if err != nil {
+		return "", err
+	}
+	prod, err := s.FindProductByID(id)
+	if err != nil {
+		return "", err
+	}
+
+	var listOfLicenses []string
+	for _, v := range  prod.Components {
+		listOfLicenses = append(listOfLicenses, v.License.SPDXID)
+	}
+
+	// read the config file
+	// create the graph of config file
+	// iterate over the list of licenses and check if they are compatible
+	// report all of them line by line
+
+	configFileData, err := ioutil.ReadFile("./licenseCompatibility.json")
+	if err != nil {
+		return "", err
+	}
+
+	create
+	
+	return "", nil
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.

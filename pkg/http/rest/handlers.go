@@ -222,10 +222,17 @@ func exportWithType(iSrv services.Service) echo.HandlerFunc {
 				fmt.Sprintf("export path: %v", exportPath),
 			)
 		case "compatibility":
-			// check if the licesnse is compatible or not
-			// if it is not return warning 
-			// if it is ok return ok
-			// https://codetree.dev/golang-graph-traversal/#representing-graphs-in-go
+			exportPath, err = iSrv.CompatibilityExport(exportId, exportPath)
+			if err != nil {
+				return c.String(
+					http.StatusInternalServerError,
+					err.Error(),
+				)
+			}
+			return c.String(
+				http.StatusCreated,
+				fmt.Sprintf("export path: %v", exportPath),
+			)
 		default:
 			return c.String(
 				http.StatusNotAcceptable,
