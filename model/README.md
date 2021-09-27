@@ -6,4 +6,4 @@ SPDX-License-Identifier: CC-BY-SA-4.0
 
 # The Model
 
-TBA
+Database models and required implementations
