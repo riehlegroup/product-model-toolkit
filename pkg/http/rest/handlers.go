@@ -222,13 +222,14 @@ func exportWithType(iSrv services.Service) echo.HandlerFunc {
 				fmt.Sprintf("export path: %v", exportPath),
 			)
 		case "compatibility":
-			exportPath, err = iSrv.CompatibilityExport(exportId, exportPath)
+			report, exportPath, err := iSrv.CompatibilityExport(exportId, exportPath)
 			if err != nil {
 				return c.String(
 					http.StatusInternalServerError,
 					err.Error(),
 				)
 			}
+			fmt.Println(report)
 			return c.String(
 				http.StatusCreated,
 				fmt.Sprintf("export path: %v", exportPath),

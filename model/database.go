@@ -51,6 +51,7 @@ func NewRepo() *repo {
 func (r *repo) FindAllProducts() ([]Product, error) {
 	products := []Product{}
 	if err := r.conn.Preload("Components").
+		Preload("Components.License").
 		Preload("UsageTypes").
 		Find(&products).Error; err != nil {
 		return nil, err
@@ -62,8 +63,9 @@ func (r *repo) FindAllProducts() ([]Product, error) {
 func (r *repo) FindProductByID(id int) (Product, error) {
 	product := Product{}
 	if err := r.conn.Preload("Components").
+		Preload("Components.License").
 		Preload("UsageTypes").
-		First(&product, id).Error; err != nil {
+		Find(&product, id).Error; err != nil {
 		return product, err
 	}
 

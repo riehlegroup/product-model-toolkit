@@ -35,9 +35,8 @@ func NewUndirectedGraph() *Graph {
 
 
 func (g *Graph) AddVertex(data string) {
-	if _, ok := g.Vertices[data]; !ok {
-		g.Vertices[data] = NewVertex(data)
-	}
+	v := NewVertex(data)
+	g.Vertices[data] = v
 }
 
 func (g *Graph) AddEdge(from, to string) error {
@@ -83,4 +82,54 @@ func (g *Graph) RemoveEdge(from, to string) error {
 	}
 
 	return nil
+}
+
+func IsAncestor(g *Graph, ancestor, descendant string) bool {
+	if g.directed {
+		return isAncestorDirected(g, ancestor, descendant)
+	} else {
+		return isAncestorUndirected(g, ancestor, descendant)
+	}
+}
+
+func isAncestorDirected(g *Graph, ancestor, descendant string) bool {
+	if g.Vertices[ancestor] == nil || g.Vertices[descendant] == nil {
+		return false
+	}
+
+	if g.Vertices[ancestor].Data == descendant {
+		return true
+	}
+
+	for _, v := range g.Vertices[ancestor].Vertices {
+		if v.Data == descendant {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isAncestorUndirected(g *Graph, ancestor, descendant string) bool {
+	if g.Vertices[ancestor] == nil || g.Vertices[descendant] == nil {
+		return false
+	}
+
+	if g.Vertices[ancestor].Data == descendant {
+		return true
+	}
+
+	for _, v := range g.Vertices[ancestor].Vertices {
+		if v.Data == descendant {
+			return true
+		}
+	}
+
+	for _, v := range g.Vertices[descendant].Vertices {
+		if v.Data == ancestor {
+			return true
+		}
+	}
+
+	return false
 }

@@ -204,6 +204,7 @@ func listAvailableExportTypes() {
 	availableExportOptions := []string{
 		"spdx",
 		"human-read",
+		"compatibility",
 		// "custom-report",
 	}
 

@@ -13,9 +13,10 @@ import (
 // Product represents a software product and its main properties.
 // It is the root element in the product architecture model.
 type Product struct {
-	gorm.Model
+	gorm.Model       `json:"-"`
 	Name              string      `gorm:"column:name;not null" json:"name,omitempty"`
 	Version           string      `gorm:"column:version" json:"version,omitempty"`
+	License           string      `gorm:"column:license" json:"license,omitempty"` // license added for checking the compatibiltiy
 	VCS               string      `gorm:"column:vcs" json:"vcs,omitempty"`
 	Description       string      `gorm:"column:description" json:"description,omitempty"`
 	Comment           string      `gorm:"column:comment" json:"comment,omitempty"`
@@ -46,8 +47,8 @@ type Vulnerability struct{}
 
 // Component represents a unit of composition of the product, e.g. class, lib, module.
 type Component struct {
-	gorm.Model
-	ProductRefer  uint
+	gorm.Model    `json:"-"`
+	ProductRefer  uint 	`json:"-"`
 	UID           string   `gorm:"column:uid;not null" json:"uid"`
 	Name          string   `gorm:"column:name" json:"name"`
 	Package       string   `gorm:"column:package" json:"package"`
@@ -81,7 +82,7 @@ func ContainsComp(cmps []Component, cid CmpID) bool {
 
 // License represents a open source license.
 type License struct {
-	gorm.Model
+	gorm.Model		 `json:"-"`
 	SPDXID           string `gorm:"column:spdx_id;not null" json:"spdxId,omitempty"`
 	DeclaredLicense  string `gorm:"column:declared_licesne" json:"declaredLicense,omitempty"`
 	ConcludedLicense string `gorm:"column:concluded_license" json:"concludedLicense,omitempty"`

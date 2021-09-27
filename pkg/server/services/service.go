@@ -75,7 +75,7 @@ type Service interface {
 	// export
 	SPDXExport(exportId, exportPath string) (*spdx.Document2_2, string, error)
 	ReportExport(exportId, exportPath string) (string, error)
-	CompatibilityExport(exportId, exportPath string) (string, error)
+	CompatibilityExport(exportId, exportPath string) (string, string, error)
 	Scan(scanDetails[]string) (string, error)
 }
 
@@ -366,39 +366,76 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 }
 
 
-func (s *service) CompatibilityExport(exportId, exportPath string) (string, error) {
-	// check if the licesnse is compatible or not
-	// if it is not return warning 
-	// if it is ok return ok
-	// https://codetree.dev/golang-graph-traversal/#representing-graphs-in-go
+func (s *service) CompatibilityExport(exportId, exportPath string) (string, string, error) {
 	// get the product from id
 	id, err := strconv.Atoi(exportId)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	prod, err := s.FindProductByID(id)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	var listOfLicenses []string
-	for _, v := range  prod.Components {
-		listOfLicenses = append(listOfLicenses, v.License.SPDXID)
-	}
-
-	// read the config file
-	// create the graph of config file
-	// iterate over the list of licenses and check if they are compatible
-	// report all of them line by line
 
 	configFileData, err := ioutil.ReadFile("./licenseCompatibility.json")
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	create
+	g, err := convertConfigFileToGraph(configFileData)
+	if err != nil {
+		return "", "", err
+	}
+
+	var rp string
+	// iterate over the list of licenses
+	for _, v := range  prod.Components {
+		if !IsAncestor(g, v.License.SPDXID, prod.License) {
+			localResult := fmt.Sprintf("The [PACKAGE] %s with [DATABASE ID] %d and [LICENSE] %s, is not compatible with [PRODUCT ID] %d with [LICENSE] %s\n",v.Package, v.ID, v.License.SPDXID, prod.ID, prod.License)
+			rp += localResult
+		}
+	}
 	
-	return "", nil
+
+	// create a report file and write down all strings into it
+	reportFile, err := os.Create(exportPath)
+	if err != nil {
+		return "", "", err
+	}
+	defer reportFile.Close()
+
+	reportFile.WriteString(rp)
+
+	
+	return rp, exportPath, nil
+}
+
+func convertConfigFileToGraph(data []byte) (*Graph, error) {
+	var cnf map[string]Value
+	if err := json.Unmarshal(data, &cnf); err != nil {
+        return nil, err 
+    }
+
+	fmt.Println(cnf)
+	// create a graph
+	g:= NewDirectedGraph()
+	for k, _ := range cnf {
+		g.AddVertex(k)
+	}
+
+	for k, v := range cnf {
+		for _, vv := range v.IncludableIn {
+			g.AddEdge(k, vv)
+		}
+	}
+
+	return g, nil
+}
+
+
+type Value struct {
+	IncludableIn []string `json:"includable_in"`
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.
