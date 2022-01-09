@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+// SPDX-FileCopyrightText: 2022 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -52,6 +52,7 @@ func NewRepo() *repo {
 	return &repo{DB}
 }
 
+// find all products
 func (r *repo) FindAllProducts() ([]Product, error) {
 	products := []Product{}
 	if err := r.conn.Preload("Components").
@@ -64,6 +65,7 @@ func (r *repo) FindAllProducts() ([]Product, error) {
 	return products, nil
 }
 
+// find product by id
 func (r *repo) FindProductByID(id int) (Product, error) {
 	product := Product{}
 	if err := r.conn.Preload("Components").
@@ -76,6 +78,7 @@ func (r *repo) FindProductByID(id int) (Product, error) {
 	return product, nil
 }
 
+// save product
 func (r *repo) SaveProduct(prod *Product) (Product, error) {
 	if err := r.conn.Create(&prod).Error; err != nil {
 		return *prod, err

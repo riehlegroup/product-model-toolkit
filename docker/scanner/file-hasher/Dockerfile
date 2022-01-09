@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+# SPDX-FileCopyrightText: 2022 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
 #
 # SPDX-License-Identifier: Apache-2.0
 

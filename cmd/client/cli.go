@@ -1,4 +1,4 @@
-// SPDX-FileCopyrightText: 2020 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
+// SPDX-FileCopyrightText: 2022 Friedrich-Alexander University Erlangen-Nürnberg (FAU)
 //
 // SPDX-License-Identifier: Apache-2.0
 
@@ -64,9 +64,11 @@ func init() {
 	rootCmd.AddCommand(searchCmd)
 	rootCmd.AddCommand(scannerCmd)
 	// rootCmd.AddCommand(mergeCmd)
+
+	// This line is required to read the config file
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cli.yaml)")
 
-	// adding the subcommands for the crawlerCmd
+	// Add subcommands for the crawlerCmd
 	scannerCmd.AddCommand(listScannerOptions)
 	scannerCmd.Flags().StringVarP(&scannerName, "name", "n", "", "scanner name")
 	scannerCmd.Flags().StringVarP(&scannerSource, "source", "s", "", "scanner source")
@@ -75,7 +77,7 @@ func init() {
 	_ = scannerCmd.MarkFlagRequired("source")
 	_ = scannerCmd.MarkFlagRequired("out")
 
-	// adding the subcommands for the diffCmd
+	// Add subcommands for the diffCmd
 	diffCmd.AddCommand(diffBasedOnPath)
 
 	diffBasedOnPath.Flags().StringVarP(&diffFirstFile, "first", "f", "", "first file")
@@ -83,7 +85,7 @@ func init() {
 	_ = diffBasedOnPath.MarkFlagRequired("first")
 	_ = diffBasedOnPath.MarkFlagRequired("second")
 
-	// adding the subcommands for the exportCmd
+	// Add subcommands for the exportCmd
 	exportCmd.AddCommand(listExportOptions)
 	exportCmd.Flags().StringVarP(&exportId, "id", "i", "", "id of the product to be exported (required)")
 	exportCmd.Flags().StringVarP(&exportType, "type", "t", "", "export type (required)")
@@ -93,14 +95,14 @@ func init() {
 	_ = exportCmd.MarkFlagRequired("path")
 
 
-	// adding the subcommands for the importCmd
+	// Add subcommands for the importCmd
 	importCmd.AddCommand(listImportOptions)
 	importCmd.Flags().StringVarP(&importType, "type", "t", "", "import file type (required)")
 	importCmd.Flags().StringVarP(&importPath, "path", "p", "", "import file path (required)")
 	_ = importCmd.MarkFlagRequired("type")
 	_ = importCmd.MarkFlagRequired("path")
 
-	// adding the subcommands for the searchCmd
+	// Add subcommands for the searchCmd
 	searchCmd.Flags().StringVarP(&searchPackageName, "name", "n", "", "package name")
 	searchCmd.Flags().StringVarP(&searchRootDir, "dir", "d", "", "package root dir")
 	searchCmd.Flags().StringVarP(&searchFileOut, "out", "o", "", "spdx file out")
@@ -248,6 +250,8 @@ func listAvailableImportTypes() {
 	// print instruction, loop over the
 	// list and print the available options
 	fmt.Println("Available import options:")
+
+	// loop over the list and print the available options
 	for key, name := range availableImportOptions {
 		fmt.Printf("%v) %v\n", key+1, name)
 	}
@@ -255,6 +259,7 @@ func listAvailableImportTypes() {
 
 // callSearch function for the searchCmd command
 func callSearch(searchPackageName, searchRootDir, searchFileOut string) error {
+
 	// run the run search command and check the error
 	if err := commands.RunSearch(searchPackageName, searchRootDir, searchFileOut); err != nil {
 		return err
@@ -264,6 +269,7 @@ func callSearch(searchPackageName, searchRootDir, searchFileOut string) error {
 
 // printVersion function for the versionCmd command
 func callVersion() error {
+
 	// run the run version command and check the error
 	if err := commands.RunVersion(gitCommit); err != nil {
 		return err
