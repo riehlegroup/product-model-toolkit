@@ -15,8 +15,8 @@ services:
     env_file:
       - .env # configure postgres
     volumes:
-      - local-database-data:/var/lib/postgresql/data/ # persist data even if container shuts down
+      - local-db:/var/lib/postgresql/data/ # persist data even if container shuts down
     ports:
         - "5432:5432"
 volumes:
-  local-database-data: # named volumes can be managed easier using docker-compose
+  local-db: # named volumes can be managed easier using docker-compose
