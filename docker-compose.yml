@@ -6,7 +6,7 @@ services:
       context: .
     container_name: pmt_server 
     env_file:
-      - .env
+      - .envlocal
     ports: 
         - "8081:8081"
     depends_on: 
@@ -15,7 +15,7 @@ services:
     image: "postgres" # use latest official postgres version
     container_name: pmt_db
     env_file:
-      - .env # configure postgres
+      - .envlocal # configure postgres
     volumes:
       - dbdata:/var/lib/postgresql/data/ # persist data even if container shuts down
     expose: 
