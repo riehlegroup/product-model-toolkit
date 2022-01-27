@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 # DB
-POSTGRES_DB=product_model
+POSTGRES_DB= 
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=admin123
 

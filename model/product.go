@@ -13,7 +13,7 @@ import (
 // Product represents a software product and its main properties.
 // It is the root element in the product architecture model.
 type Product struct {
-	gorm.Model       `json:"-"`
+	gorm.Model        
 	Name              string      `gorm:"column:name;not null" json:"name,omitempty"`
 	Version           string      `gorm:"column:version" json:"version,omitempty"`
 	License           string      `gorm:"column:license" json:"license,omitempty"` // license added for checking the compatibiltiy
@@ -23,11 +23,11 @@ type Product struct {
 	HomepageURL       string      `gorm:"column:home_page_url" json:"home_page_url,omitempty"`
 	ExternalReference string      `gorm:"column:external_reference" json:"external_reference,omitempty"`
 	ClearingState     string      `json:"-"`
-	Components        []Component `gorm:"foreignKey:ProductRefer" json:"components"`
+	Components        []Component `gorm:"foreignKey:ProductRefer;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"components"`
 	DepGraphRefer     int         `json:"-"`
 	DepGraph          DepGraph    `gorm:"foreignKey:DepGraphRefer;constraint:OnUpdate:CASCADE,OnDelete:SET NULL" json:"-"`
 	Infrastructure    string      `json:"-"`
-	UsageTypes        []UsageType `gorm:"foreignKey:ProductRefer" json:"usageTypes,omitempty"`
+	UsageTypes        []UsageType `gorm:"foreignKey:ProductRefer;constraint:OnUpdate:CASCADE,OnDelete:SET NULL;" json:"usageTypes,omitempty"`
 }
 
 // Copyright represents a copyright statement.

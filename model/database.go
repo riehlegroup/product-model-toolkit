@@ -10,6 +10,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
+	git "gopkg.in/src-d/go-git.v4"
 )
 
 type Database struct {
@@ -76,6 +77,29 @@ func (r *repo) FindProductByID(id int) (Product, error) {
 	}
 
 	return product, nil
+}
+
+// delete product by id
+func (r *repo) DeleteProductByID(id int) error {
+	if err := r.conn.Delete(&Product{}, id).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *repo) Download(downloadDetails []string) error {
+	url, path := downloadDetails[0], downloadDetails[1]
+	_, err := git.PlainClone(path, false, &git.CloneOptions{
+		URL:      url,
+		Progress: os.Stdout,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // save product

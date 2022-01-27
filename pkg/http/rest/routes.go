@@ -21,8 +21,11 @@ func Handler(g *echo.Group, srv services.Service) {
 	// product routes
 	g.GET("/products", findAllProducts(srv))
 	g.GET("/products/:id", findProductByID(srv))
+	g.DELETE("/products/:id", deleteProductByID(srv))
 	g.POST("/products/import", importFromScanner(srv))
 	g.POST("/products/export", exportWithType(srv))
 	g.POST("/spdx/search", searchSPDX(srv))
 	g.POST("/scanner", scan(srv))
+
+	g.POST("/download", download(srv))
 }

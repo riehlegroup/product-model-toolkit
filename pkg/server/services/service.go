@@ -58,6 +58,11 @@ type Repository interface {
 	// FindProductByID returns the product with the given ID.
 	FindProductByID(id int) (model.Product, error)
 
+	// DeleteProductByID deletes the product with the given ID.
+	DeleteProductByID(id int) error
+
+	Download([]string) error
+
 	SaveProduct(prod *model.Product) (model.Product, error)
 }
 
@@ -65,6 +70,8 @@ type Repository interface {
 type Service interface {
 	FindAllProducts() ([]model.Product, error)
 	FindProductByID(id int) (model.Product, error)
+	DeleteProductByID(id int) error
+	Download([]string) error
 
 	// import
 	ComposerImport(io.Reader) (*model.Product, error)
@@ -98,6 +105,13 @@ func (s *service) FindProductByID(id int) (model.Product, error) {
 	return s.r.FindProductByID(id)
 }
 
+func (s *service) DeleteProductByID(id int) error {
+	return s.r.DeleteProductByID(id)
+}
+
+func (s *service) Download(downloadDetails []string) error {
+	return s.r.Download(downloadDetails)
+}
 func (s *service) Scan(scanDetails[]string) (string, error) {
 	scannerName, source, output := scanDetails[0], scanDetails[1], scanDetails[2]
 
