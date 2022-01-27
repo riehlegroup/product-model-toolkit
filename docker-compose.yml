@@ -28,4 +28,4 @@ services:
     ports:
         - "3001:3000"
 volumes:
-  dbdata: # named volumes can be managed easier using docker-compose
+  prddbdata: # named volumes can be managed easier using docker-compose
