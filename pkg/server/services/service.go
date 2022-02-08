@@ -169,7 +169,7 @@ func (s *service) CheckLicenseCompatibility(id int) ([]string, error) {
 	// iterate over the list of licenses
 	for _, v := range  prod.Components {
 		if !IsAncestor(g, v.License.SPDXID, prod.License) {
-			localResult := fmt.Sprintf("The [PACKAGE] %s with [DATABASE ID] %d and [LICENSE] %s, is not compatible with [PRODUCT ID] %d with [LICENSE] %s",v.Package, v.ID, v.License.SPDXID, prod.ID, prod.License)
+			localResult := fmt.Sprintf("The [PACKAGE] %v and [LICENSE] %v, is not compatible with [PRODUCT ID] %v with [LICENSE] %v",v.Package, v.License.SPDXID, prod.ID, prod.License)
 			rp = append(rp, localResult)
 		}
 	}
