@@ -72,7 +72,7 @@ type Service interface {
 	FindProductByID(id int) (model.Product, error)
 	DeleteProductByID(id int) error
 	Download([]string) error
-
+	CheckLicenseCompatibility(id int) ([]string, error)
 	// import
 	ComposerImport(io.Reader) (*model.Product, error)
 	SPDXImport(io.Reader) (*model.Product, error)
@@ -146,6 +146,35 @@ func (s *service) Scan(scanDetails[]string) (string, error) {
 	} else {
 		return "", errors.New("scanner not found!!1")
 	}
+}
+
+func (s *service) CheckLicenseCompatibility(id int) ([]string, error) {
+	// get the product from id
+	prod, err := s.FindProductByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	configFileData, err := ioutil.ReadFile("./licenseCompatibility.json")
+	if err != nil {
+		return nil, err
+	}
+
+	g, err := convertConfigFileToGraph(configFileData)
+	if err != nil {
+		return nil, err
+	}
+
+	var rp []string
+	// iterate over the list of licenses
+	for _, v := range  prod.Components {
+		if !IsAncestor(g, v.License.SPDXID, prod.License) {
+			localResult := fmt.Sprintf("The [PACKAGE] %s with [DATABASE ID] %d and [LICENSE] %s, is not compatible with [PRODUCT ID] %d with [LICENSE] %s",v.Package, v.ID, v.License.SPDXID, prod.ID, prod.License)
+			rp = append(rp, localResult)
+		}
+	}
+	return rp, nil
+	
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.

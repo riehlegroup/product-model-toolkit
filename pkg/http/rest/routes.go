@@ -26,6 +26,7 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.POST("/products/export", exportWithType(srv))
 	g.POST("/spdx/search", searchSPDX(srv))
 	g.POST("/scanner", scan(srv))
+	g.GET("/lc/:id", CheckLicenseCompatibility(srv))
 
 	g.POST("/download", download(srv))
 }

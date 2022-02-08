@@ -170,6 +170,25 @@ func scan(iSrv services.Service) echo.HandlerFunc {
 	}
 }
 
+func CheckLicenseCompatibility(srv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			c.Error(errors.Wrap(err, fmt.Sprintf("unable to convert query param id with value '%v' to int", idStr)))
+		}
+
+		res, err := srv.CheckLicenseCompatibility(id)
+		if err != nil {
+			return c.String(
+				http.StatusInternalServerError,
+				err.Error(),
+			)
+		}
+		return c.JSON(http.StatusOK, result{Result: res})
+	}
+}	
+
 func getScanDetails(c echo.Context) ([]string, error) {
 	// get json body
 	jsonBody, err := getJSONRawBody(c)
