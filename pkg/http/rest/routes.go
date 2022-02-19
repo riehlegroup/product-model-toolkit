@@ -5,7 +5,6 @@
 package rest
 
 import (
-
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
 
 	"github.com/labstack/echo/v4"
@@ -26,7 +25,6 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.POST("/products/export", exportWithType(srv))
 	g.POST("/spdx/search", searchSPDX(srv))
 	g.POST("/scanner", scan(srv))
-	g.GET("/lc/:id", CheckLicenseCompatibility(srv))
-
+	g.GET("/lc/:id", checkLicenseCompatibility(srv))
 	g.POST("/download", download(srv))
 }

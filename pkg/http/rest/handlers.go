@@ -35,7 +35,7 @@ func handleVersion(c echo.Context) error {
 }
 
 func handleHealth(c echo.Context) error {
-	
+
 	return c.JSON(http.StatusOK, result{Result: "UP"})
 }
 
@@ -61,7 +61,7 @@ func findProductByID(srv services.Service) echo.HandlerFunc {
 		prod, err := srv.FindProductByID(id)
 		if err != nil {
 			return c.JSON(http.StatusNotFound, result{Result: fmt.Sprintf("unable fo find product with ID %v", id)})
-			
+
 		}
 
 		return c.JSON(http.StatusOK, prod)
@@ -79,11 +79,11 @@ func deleteProductByID(srv services.Service) echo.HandlerFunc {
 		if err != nil {
 			return c.JSON(http.StatusNotFound, result{Result: fmt.Sprintf("unable fo find product with ID %v", id)})
 		}
-		return c.JSON(http.StatusOK, map[string]string{"result": fmt.Sprintf("product %v deleted", id),} )
+		return c.JSON(http.StatusOK, map[string]string{"result": fmt.Sprintf("product %v deleted", id)})
 	}
 }
 
-// This handler is responsible for getting the required url 
+// This handler is responsible for getting the required url
 // from user and download the git file and store it on a predefined path
 func download(iSrv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
@@ -154,7 +154,7 @@ func scan(iSrv services.Service) echo.HandlerFunc {
 		if err != nil {
 			return err
 		}
-		result , err := iSrv.Scan(scanDetails)
+		result, err := iSrv.Scan(scanDetails)
 
 		if err != nil {
 			return c.String(
@@ -165,29 +165,32 @@ func scan(iSrv services.Service) echo.HandlerFunc {
 
 		return c.String(
 			http.StatusOK,
-			result,			
+			result,
 		)
 	}
 }
 
-func CheckLicenseCompatibility(srv services.Service) echo.HandlerFunc {
+func checkLicenseCompatibility(srv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idStr := c.Param("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			c.Error(errors.Wrap(err, fmt.Sprintf("unable to convert query param id with value '%v' to int", idStr)))
+			return c.JSON(
+				http.StatusInternalServerError,
+				result{Result: err.Error()},
+			)
 		}
 
 		res, err := srv.CheckLicenseCompatibility(id)
 		if err != nil {
-			return c.String(
-				http.StatusInternalServerError,
-				err.Error(),
+			return c.JSON(
+				http.StatusNotFound,
+				result{Result: err.Error()},
 			)
 		}
 		return c.JSON(http.StatusOK, result{Result: res})
 	}
-}	
+}
 
 func getScanDetails(c echo.Context) ([]string, error) {
 	// get json body
@@ -203,7 +206,6 @@ func getScanDetails(c echo.Context) ([]string, error) {
 
 	return []string{scannerName, source, output}, nil
 }
-
 
 func getDownloadDetails(c echo.Context) ([]string, error) {
 	// get json body

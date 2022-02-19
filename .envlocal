@@ -9,4 +9,4 @@ POSTGRES_PASSWORD=admin123
 
 DATABASE_URL=postgres://postgres:admin123@db:5432/product_model
 SERVER_PORT=8081
-POSTGRES_HOST=database
+POSTGRES_HOST=172.24.0.2

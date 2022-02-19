@@ -36,19 +36,18 @@ var (
 	ErrNotFound = errors.New("entity not found")
 )
 
-
 func init() {
-    rand.Seed(time.Now().UnixNano())
+	rand.Seed(time.Now().UnixNano())
 }
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
 func randStringRunes(n int) string {
-    b := make([]rune, n)
-    for i := range b {
-        b[i] = letterRunes[rand.Intn(len(letterRunes))]
-    }
-    return string(b)
+	b := make([]rune, n)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
 
 // Repository provides access to the product db.
@@ -72,7 +71,7 @@ type Service interface {
 	FindProductByID(id int) (model.Product, error)
 	DeleteProductByID(id int) error
 	Download([]string) error
-	CheckLicenseCompatibility(id int) ([]string, error)
+	CheckLicenseCompatibility(id int) ([]localResult, error)
 	// import
 	ComposerImport(io.Reader) (*model.Product, error)
 	SPDXImport(io.Reader) (*model.Product, error)
@@ -83,7 +82,7 @@ type Service interface {
 	SPDXExport(exportId, exportPath string) (*spdx.Document2_2, string, error)
 	ReportExport(exportId, exportPath string) (string, error)
 	CompatibilityExport(exportId, exportPath string) (string, string, error)
-	Scan(scanDetails[]string) (string, error)
+	Scan(scanDetails []string) (string, error)
 }
 
 type service struct {
@@ -112,18 +111,18 @@ func (s *service) DeleteProductByID(id int) error {
 func (s *service) Download(downloadDetails []string) error {
 	return s.r.Download(downloadDetails)
 }
-func (s *service) Scan(scanDetails[]string) (string, error) {
+func (s *service) Scan(scanDetails []string) (string, error) {
 	scannerName, source, output := scanDetails[0], scanDetails[1], scanDetails[2]
 
 	sort.Slice(commands.Available[:], func(i, j int) bool {
 		return commands.Available[i].Name <= commands.Available[j].Name
 	})
 
-	idx := sort.Search(len(commands.Available), func (i int) bool {
+	idx := sort.Search(len(commands.Available), func(i int) bool {
 		return string(commands.Available[i].Name) >= scannerName
 	})
- 
-	if item:=commands.Available[idx]; item.Name == scannerName {
+
+	if item := commands.Available[idx]; item.Name == scannerName {
 		if item.DockerCmd == "" {
 			return "", errors.New("The scanner has not been defined yet!")
 		}
@@ -141,14 +140,30 @@ func (s *service) Scan(scanDetails[]string) (string, error) {
 
 		fmt.Println("Crawling licenses successfully completed")
 		fmt.Printf("The output path: %v\n", output)
-		return fmt.Sprintf("The output path: %v\n", output),nil
-	
+		return fmt.Sprintf("The output path: %v\n", output), nil
+
 	} else {
 		return "", errors.New("scanner not found!!1")
 	}
 }
 
-func (s *service) CheckLicenseCompatibility(id int) ([]string, error) {
+type localPackage struct {
+	Name    string `json:"name"`
+	License string `json:"license"`
+}
+
+type localProd struct {
+	ProductId string `json:"product_id"`
+	License   string `json:"license"`
+}
+
+type localResult struct {
+	Package      localPackage
+	Product      localProd
+	IsCompatible bool `json:"is_compatible"`
+}
+
+func (s *service) CheckLicenseCompatibility(id int) ([]localResult, error) {
 	// get the product from id
 	prod, err := s.FindProductByID(id)
 	if err != nil {
@@ -165,16 +180,28 @@ func (s *service) CheckLicenseCompatibility(id int) ([]string, error) {
 		return nil, err
 	}
 
-	var rp []string
+	var finalResult []localResult
 	// iterate over the list of licenses
-	for _, v := range  prod.Components {
-		if !IsAncestor(g, v.License.SPDXID, prod.License) {
-			localResult := fmt.Sprintf("The [PACKAGE] %v and [LICENSE] %v, is not compatible with [PRODUCT ID] %v with [LICENSE] %v",v.Package, v.License.SPDXID, prod.ID, prod.License)
-			rp = append(rp, localResult)
+	for _, v := range prod.Components {
+		lr := new(localResult)
+		lr.Package = localPackage{
+			v.Package,
+			v.License.SPDXID,
 		}
+		lr.Product = localProd{
+			string(prod.ID),
+			prod.License,
+		}
+		if !IsAncestor(g, prod.License, v.License.SPDXID) {
+			lr.IsCompatible = false
+		} else {
+			lr.IsCompatible = true
+		}
+		finalResult = append(finalResult, *lr)
+
 	}
-	return rp, nil
-	
+	return finalResult, nil
+
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.
@@ -204,7 +231,7 @@ func spdxToProduct(doc *spdx.Document2_1) (*model.Product, error) {
 		cmp := model.Component{
 			UID:     string(p.PackageSPDXIdentifier),
 			Name:    p.PackageName,
-			Package:     p.PackageSummary,
+			Package: p.PackageSummary,
 			Version: p.PackageVersion,
 			License: model.License{
 				SPDXID:           string(p.PackageSPDXIdentifier),
@@ -300,7 +327,7 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 
 // SPDX import a SPDX representation of the BOM.
 func (s *service) SPDXImport(input io.Reader) (*model.Product, error) {
-	
+
 	doc, err := tvloader.Load2_1(input)
 	if err != nil {
 		msg := fmt.Sprintf("error while parsing SPDX body: %v", err)
@@ -408,7 +435,6 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 	return doc, exportPath, nil
 }
 
-
 func (s *service) CompatibilityExport(exportId, exportPath string) (string, string, error) {
 	// get the product from id
 	id, err := strconv.Atoi(exportId)
@@ -419,7 +445,6 @@ func (s *service) CompatibilityExport(exportId, exportPath string) (string, stri
 	if err != nil {
 		return "", "", err
 	}
-
 
 	configFileData, err := ioutil.ReadFile("./licenseCompatibility.json")
 	if err != nil {
@@ -433,13 +458,12 @@ func (s *service) CompatibilityExport(exportId, exportPath string) (string, stri
 
 	var rp string
 	// iterate over the list of licenses
-	for _, v := range  prod.Components {
+	for _, v := range prod.Components {
 		if !IsAncestor(g, v.License.SPDXID, prod.License) {
-			localResult := fmt.Sprintf("The [PACKAGE] %s with [DATABASE ID] %d and [LICENSE] %s, is not compatible with [PRODUCT ID] %d with [LICENSE] %s\n",v.Package, v.ID, v.License.SPDXID, prod.ID, prod.License)
+			localResult := fmt.Sprintf("The [PACKAGE] %s with [DATABASE ID] %d and [LICENSE] %s, is not compatible with [PRODUCT ID] %d with [LICENSE] %s\n", v.Package, v.ID, v.License.SPDXID, prod.ID, prod.License)
 			rp += localResult
 		}
 	}
-	
 
 	// create a report file and write down all strings into it
 	reportFile, err := os.Create(exportPath)
@@ -450,19 +474,18 @@ func (s *service) CompatibilityExport(exportId, exportPath string) (string, stri
 
 	reportFile.WriteString(rp)
 
-	
 	return rp, exportPath, nil
 }
 
 func convertConfigFileToGraph(data []byte) (*Graph, error) {
 	var cnf map[string]Value
 	if err := json.Unmarshal(data, &cnf); err != nil {
-        return nil, err 
-    }
+		return nil, err
+	}
 
 	fmt.Println(cnf)
 	// create a graph
-	g:= NewDirectedGraph()
+	g := NewDirectedGraph()
 	for k, _ := range cnf {
 		g.AddVertex(k)
 	}
@@ -475,7 +498,6 @@ func convertConfigFileToGraph(data []byte) (*Graph, error) {
 
 	return g, nil
 }
-
 
 type Value struct {
 	IncludableIn []string `json:"includable_in"`
@@ -502,5 +524,5 @@ func (s *service) ScannerImport(input io.Reader) (*model.Product, error) {
 	}
 
 	return &pSaved, nil
-	
+
 }

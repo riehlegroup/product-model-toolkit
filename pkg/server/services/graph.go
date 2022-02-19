@@ -14,7 +14,7 @@ type Vertex struct {
 
 func NewVertex(data string) *Vertex {
 	return &Vertex{
-		Data: data,
+		Data:     data,
 		Vertices: make(map[string]*Vertex),
 	}
 }
@@ -25,9 +25,9 @@ type Graph struct {
 }
 
 func NewDirectedGraph() *Graph {
-return &Graph{
-	Vertices: make(map[string]*Vertex),
-	directed: true,
+	return &Graph{
+		Vertices: make(map[string]*Vertex),
+		directed: true,
 	}
 }
 
@@ -37,7 +37,6 @@ func NewUndirectedGraph() *Graph {
 	}
 }
 
-
 func (g *Graph) AddVertex(data string) {
 	v := NewVertex(data)
 	g.Vertices[data] = v
@@ -45,8 +44,8 @@ func (g *Graph) AddVertex(data string) {
 
 func (g *Graph) AddEdge(from, to string) error {
 
-	v1:= g.Vertices[from]
-	v2:= g.Vertices[to]
+	v1 := g.Vertices[from]
+	v2 := g.Vertices[to]
 
 	if v1 == nil || v2 == nil {
 		return fmt.Errorf("Vertex not found")
@@ -67,10 +66,9 @@ func (g *Graph) AddEdge(from, to string) error {
 	return nil
 }
 
-
 func (g *Graph) RemoveEdge(from, to string) error {
-	v1:= g.Vertices[from]
-	v2:= g.Vertices[to]
+	v1 := g.Vertices[from]
+	v2 := g.Vertices[to]
 
 	if v1 == nil || v2 == nil {
 		return fmt.Errorf("Vertex not found")
