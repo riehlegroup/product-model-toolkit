@@ -6,6 +6,7 @@ package model
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/jinzhu/gorm"
@@ -96,6 +97,7 @@ func (r *repo) Download(downloadDetails []string) error {
 	})
 
 	if err != nil {
+		log.Printf("error: %v\n", err.Error())
 		return err
 	}
 

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -126,24 +127,20 @@ func (s *service) Scan(scanDetails []string) (string, error) {
 		if item.DockerCmd == "" {
 			return "", errors.New("The scanner has not been defined yet!")
 		}
-		fmt.Printf("Running scanner %v version %v\n", item.Name, item.Version)
-		fmt.Printf("Source: %v\n", source)
-		fmt.Println("Executing the docker command ...")
 		dockerCmd := fmt.Sprintf(item.DockerCmd, source, output, item.DockerImg)
-		fmt.Println(dockerCmd)
 		// execute the command
 		_, err := exec.Command("/bin/sh", "-c", dockerCmd).CombinedOutput()
 		if err != nil {
-			fmt.Println(err)
+			log.Printf("docker command failed: %s", dockerCmd)
+			log.Printf("error: %v\n", err.Error())
 			return "", err
 		}
 
-		fmt.Println("Crawling licenses successfully completed")
-		fmt.Printf("The output path: %v\n", output)
 		return fmt.Sprintf("The output path: %v\n", output), nil
 
 	} else {
-		return "", errors.New("scanner not found!!1")
+		err := errors.New("The scanner has not been defined yet!")
+		return "", err
 	}
 }
 
@@ -276,24 +273,27 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 
 	w, err := os.Create(exportPath)
 	if err != nil {
-		fmt.Printf("error while opening %v for writing: %v\n", exportPath, err)
+		log.Printf("error while creating the export file %q: %v", exportPath, err)
 		return nil, "", err
 
 	}
-	defer w.Close()
+	defer func() {
+		if err := w.Close(); err != nil {
+			log.Printf("error while closing the export file %q: %v", exportPath, err)
+		}
+	}()
 
 	packageRootDir := exportPath
 
 	doc, err := builder.Build2_2(prod.Name, packageRootDir, config)
 	if err != nil {
-		fmt.Printf("error while building document: %v\n", err)
+		log.Printf("error while building the SPDX document: %v", err)
 		return nil, "", err
 	}
 
 	packages := make(map[spdx.ElementID]*spdx.Package2_2)
 	for _, component := range prod.Components {
 		eId := fmt.Sprintf("Package-%v\n", component.Package)
-		fmt.Println(eId)
 
 		pk := new(spdx.Package2_2)
 		pk.PackageSPDXIdentifier = spdx.ElementID(component.UID)
@@ -318,7 +318,7 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 
 	err = tvsaver.Save2_2(doc, w)
 	if err != nil {
-		fmt.Printf("error while saving %v: %v", exportPath, err)
+		log.Printf("error while saving the SPDX document %q: %v", exportPath, err)
 		return nil, "", err
 	}
 
@@ -330,18 +330,19 @@ func (s *service) SPDXImport(input io.Reader) (*model.Product, error) {
 
 	doc, err := tvloader.Load2_1(input)
 	if err != nil {
-		msg := fmt.Sprintf("error while parsing SPDX body: %v", err)
-		return nil, errors.New(msg)
+		log.Printf("error while loading the SPDX document: %v", err)
+		return nil, err
 	}
 	prod, err := spdxToProduct(doc)
 	if err != nil {
+		log.Printf("error while converting the SPDX document: %v", err)
 		return nil, err
 	}
 
 	pSaved, err := s.r.SaveProduct(prod)
 	if err != nil {
-		msg := fmt.Sprintf("error while saving the product to the DB: %v", err)
-		return nil, errors.New(msg)
+		log.Printf("error while saving the product: %v", err)
+		return nil, err
 	}
 
 	return &pSaved, nil
@@ -368,13 +369,14 @@ func (s *service) FileHasherImport(input io.Reader) (*model.Product, error) {
 func (s *service) ReportExport(exportId, exportPath string) (string, error) {
 	doc, exportPath, err := s.SPDXExport(exportId, exportPath)
 	if err != nil {
+		log.Printf("error: %v\n", err.Error())
 		return "", err
 	}
 	if (len(doc.Packages)) > 0 {
 		// check whether the SPDX file has at least one package that it describes
 		pkgIDs, err := spdxlib.GetDescribedPackageIDs2_2(doc)
 		if err != nil {
-			fmt.Printf("Unable to get describe packages from SPDX document: %v\n", err)
+			log.Printf("error: %v\n", err.Error())
 			return "", err
 		}
 
@@ -382,30 +384,35 @@ func (s *service) ReportExport(exportId, exportPath string) (string, error) {
 		for _, pkgID := range pkgIDs {
 			pkg, ok := doc.Packages[pkgID]
 			if !ok {
-				fmt.Printf("package %s has described relationship but ID not found\n", string(pkgID))
+				err := errors.New(fmt.Sprintf(
+					"package %s has described relationship but ID not found\n", string(pkgID)))
+				log.Printf("error: %v\n", err.Error())
 				continue
 			}
 
 			// check whether the package had its files analyzed
 			if !pkg.FilesAnalyzed {
-				fmt.Printf("package %s (%s) had FilesAnalyzed: false\n", string(pkgID), pkg.PackageName)
+				err := errors.New(fmt.Sprintf(
+					"package %s (%s) had FilesAnalyzed: false\n", string(pkgID), pkg.PackageName))
+
+				log.Printf("error: %v\n", err)
 				return exportPath, err
 			}
 
 			// also check whether the package has any files present
 			if pkg.Files == nil || len(pkg.Files) < 1 {
-				fmt.Printf("package %s (%s) has no Files\n", string(pkgID), pkg.PackageName)
+				err := errors.New(fmt.Sprintf(
+					"package %s (%s) has no Files\n", string(pkgID), pkg.PackageName))
 				return exportPath, err
 			}
 
 			// if we got here, there's at least one file
 			// generate and print a report of the Package's Files' LicenseConcluded
 			// values, sorted by # of occurrences
-			fmt.Printf("============================\n")
-			fmt.Printf("Package %s (%s)\n", string(pkgID), pkg.PackageName)
+			log.Printf("Package %s (%s)\n", string(pkgID), pkg.PackageName)
 			err = reporter.Generate2_2(pkg, os.Stdout)
 			if err != nil {
-				fmt.Printf("error while generating report: %v\n", err)
+				log.Printf("error: %v\n", err.Error())
 				return "", err
 			}
 		}
@@ -420,16 +427,19 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 	// get the product from id
 	id, err := strconv.Atoi(exportId)
 	if err != nil {
+		log.Printf("error: %v\n", err.Error())
 		return nil, "", err
 	}
 	prod, err := s.FindProductByID(id)
 	if err != nil {
+		log.Printf("error: %v\n", err.Error())
 		return nil, "", err
 	}
 
 	// convert the product to spdx
 	doc, exportPath, err := productToSPDX(&prod, exportPath)
 	if err != nil {
+		log.Printf("error: %v\n", err.Error())
 		return nil, "", err
 	}
 	return doc, exportPath, nil
