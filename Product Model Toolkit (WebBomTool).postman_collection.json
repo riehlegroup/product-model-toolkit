@@ -1,0 +1,283 @@
+{
+	"info": {
+		"_postman_id": "9f9ad3d4-fba2-4141-bbce-8003f2baefe4",
+		"name": "Product Model Toolkit (WebBomTool)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Information routes",
+			"item": [
+				{
+					"name": "List of APIs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Health check",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/health",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Version",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/version",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"version"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product routes",
+			"item": [
+				{
+					"name": "Get all products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/products",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get product by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/products/{{product_id}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete product by ID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/products/{{product_id}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"products",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Import new product from scanner",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"importType\":\"spdx\", \n    \"importPath\": \"test-data/spdx/lib.spdx\" \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/products/import",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"products",
+								"import"
+							]
+						},
+						"description": "importPath -> It's the location of the import file on the docker container.\n\nimportType -> spdx OR composer OR file-hasher OR scanner"
+					},
+					"response": []
+				},
+				{
+					"name": "Export product by type from the server",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"exportId\": \"1\",\n    \"exportType\": \"spdx\",\n    \"exportPath\": \"export_test.spdx\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/products/export",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"products",
+								"export"
+							]
+						},
+						"description": "exportType -> spdx OR human-read OR compatibility"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Functionalities",
+			"item": [
+				{
+					"name": "Scan the product using scanners",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"scannerName\":\"phpscanner\",\n    \"source\":\"source\",\n    \"output\":\"output\"   \n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/scanner",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"scanner"
+							]
+						},
+						"description": "scannerName -> phpscanner OR licensee OR scancode OR composer OR filehasher"
+					},
+					"response": []
+				},
+				{
+					"name": "Search spdx file",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"hello-go-bin\",\n    \"dir\":\"test-data/spdx\",\n    \"out\":\"out.spdx\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/spdx/search",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"spdx",
+								"search"
+							]
+						},
+						"description": "dir is the directory of searching files."
+					},
+					"response": []
+				},
+				{
+					"name": "Check license compatibility of a product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api_url}}/lc/{{product_id}}",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"lc",
+								"{{product_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download a git repo to the container",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"url\":\"https://github.com/kubernetes/client-go\",\n    \"path\":\"test-data/\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/download",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"download"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
