@@ -7,9 +7,7 @@ services:
     env_file:
       - .env # configure postgres
     volumes:
-      - data:/var/lib/postgresql/data/ # persist data even if container shuts down
-#    ports:
-#        - "5432:5432"
+      - datav2:/var/lib/postgresql/data/ # persist data even if container shuts down
   server:
     build:
       dockerfile: Dockerfile
@@ -21,12 +19,12 @@ services:
       - "8081:8081"
     depends_on:
       - database
-  metabase:
-    container_name: pmt_metabase
-    image: metabase/metabase
-    depends_on:
-      - database
-    ports:
-        - "3001:3000"
+#  metabase:
+#    container_name: pmt_metabase
+#    image: metabase/metabase
+#    depends_on:
+#      - database
+#    ports:
+#        - "3001:3000"
 volumes:
-  data: # named volumes can be managed easier using docker-compose
+  datav2: # named volumes can be managed easier using docker-compose
