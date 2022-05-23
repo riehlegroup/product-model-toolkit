@@ -7,18 +7,17 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/jinzhu/gorm"
+	"github.com/osrgroup/product-model-toolkit/cnst"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/services"
-	"github.com/osrgroup/product-model-toolkit/cnst"
-	"os"
 	"log"
-	"github.com/jinzhu/gorm"
+	"os"
 
 	"github.com/osrgroup/product-model-toolkit/pkg/http/rest"
 )
 
 var gitCommit string
-
 
 // Migrate database
 func Migrate(db *gorm.DB) {
@@ -37,25 +36,25 @@ func main() {
 		os.Exit(0)
 	}
 
-    // Connect to database
+	// Connect to database
 	db, err := model.Init()
 	if err != nil {
-		log.Fatalf("db connection err: %v", err)
+		log.Fatalf("database connection err: %v\n", err)
 	}
 	defer db.Close()
-	
+
 	// Migrate database
 	Migrate(db)
-	
+
 	// Create services
 	repo := model.NewRepo()
-	
+
 	// Create REST API port
 	serverPort := os.Getenv("SERVER_PORT")
 	if serverPort == "" {
 		serverPort = cnst.DefaultServerPort
 	}
-	
+
 	// Create REST API
 	r := rest.NewSrv(
 		fmt.Sprintf(":%v", serverPort),

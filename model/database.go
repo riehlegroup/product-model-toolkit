@@ -91,6 +91,7 @@ func (r *repo) DeleteProductByID(id int) error {
 
 func (r *repo) Download(downloadDetails []string) error {
 	url, path := downloadDetails[0], downloadDetails[1]
+
 	_, err := git.PlainClone(path, false, &git.CloneOptions{
 		URL:      url,
 		Progress: os.Stdout,
