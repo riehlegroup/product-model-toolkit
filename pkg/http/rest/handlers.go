@@ -230,7 +230,7 @@ func getDownloadDetails(c echo.Context) ([]string, error) {
 
 	// read data
 	url := jsonBody["url"]
-	output := jsonBody["output"]
+	output := jsonBody["path"]
 
 	return []string{url, output}, nil
 }
