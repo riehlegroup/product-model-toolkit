@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// Handler handle all request for the given route group.
+// Handler handles all request for the given route group.
 func Handler(g *echo.Group, srv services.Service) {
 	// default routes
 	g.GET("/", handleEntryPoint)
@@ -23,8 +23,10 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.DELETE("/products/:id", deleteProductByID(srv))
 	g.POST("/products/import", importFromScanner(srv))
 	g.POST("/products/export", exportWithType(srv))
-	g.POST("/spdx/search", searchSPDX(srv))
+
+	// functionalities
 	g.POST("/scanner", scan(srv))
+	g.POST("/spdx/search", searchSPDX(srv))
 	g.GET("/lc/:id", checkLicenseCompatibility(srv))
 	g.POST("/download", download(srv))
 }

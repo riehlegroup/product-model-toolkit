@@ -148,34 +148,39 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 			c.Error(errors.Wrap(err, fmt.Sprintf("unable to perform import for scanner %s", scanner)))
 		}
 
-		return c.JSON(http.StatusCreated, fmt.Sprintf("successfully parsed content from scanner %s."+
-			"\nProduct id: %v\nFound %v packages\n", scanner, prod.ID, len(prod.Components)),
-		)
+		return c.JSON(http.StatusCreated, result{Result: fmt.Sprintf("successfully parsed content from scanner %s."+
+			"\nProduct id: %v\nFound %v packages\n", scanner, prod.ID, len(prod.Components))})
 	}
 }
 
 func scan(iSrv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
+		// get the scan details
 		scanDetails, err := getScanDetails(c)
+
+		// check the errors
 		if err != nil {
 			log.Printf("Error: %s\n", err.Error())
 			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
 		}
+
+		// send scan data to the service
 		res, err := iSrv.Scan(scanDetails)
+
+		// check the errors
 		if err != nil {
 			log.Printf("Error: %s\n", err.Error())
 			return c.JSON(http.StatusInternalServerError, result{Result: err.Error()})
 		}
 
+		// return the required json data
 		return c.JSON(
 			http.StatusOK,
 			result{Result: struct {
 				Report string `json:"report"`
-				Data   string `json:"data"`
+				//Data   string `json:"data"`
 			}{
-				fmt.Sprintf("successfully scanned %v packages", len(res)),
-				res,
-			},
+				fmt.Sprintf(res)},
 			},
 		)
 	}

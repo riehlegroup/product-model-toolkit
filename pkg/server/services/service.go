@@ -135,8 +135,7 @@ func (s *service) Scan(scanDetails []string) (string, error) {
 			log.Printf("error: %v\n", err.Error())
 			return "", err
 		}
-
-		return fmt.Sprintf("The output path: %v\n", output), nil
+		return fmt.Sprintf("The output path: %v", output), nil
 
 	} else {
 		err := errors.New("The scanner has not been defined yet!")
