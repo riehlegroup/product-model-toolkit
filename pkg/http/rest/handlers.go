@@ -89,7 +89,7 @@ func deleteProductByID(srv services.Service) echo.HandlerFunc {
 
 // This handler is responsible for getting the required url
 // from user and download the git file and store it on a predefined path
-func download(iSrv services.Service) echo.HandlerFunc {
+func download(srv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		downloadDetails, err := getDownloadDetails(c)
 		if err != nil {
@@ -97,12 +97,38 @@ func download(iSrv services.Service) echo.HandlerFunc {
 			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
 		}
 
-		err = iSrv.Download(downloadDetails)
+		downloadData, err := srv.Download(downloadDetails)
 		if err != nil {
 			log.Printf("error: %s\n", err.Error())
 			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
 		}
+
+		err = srv.StoreDownloadedRepo(downloadData)
+		if err != nil {
+			log.Printf("error: %s\n", err.Error())
+			// remove the path directory
+			path := downloadDetails[1]
+			err := os.Remove(path)
+			if err != nil {
+				log.Printf("error: %s\n", err.Error())
+				return c.JSON(http.StatusInternalServerError, result{Result: err.Error()})
+			}
+			return c.JSON(http.StatusInternalServerError, result{Result: err.Error()})
+		}
+
 		return c.JSON(http.StatusOK, result{Result: "Download completed"})
+	}
+}
+
+func getAllDownloadedRepos(srv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		data, err := srv.FindAllDownloadedRepos()
+		if err != nil {
+			log.Printf("error: %s\n", err.Error())
+			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
+		}
+
+		return c.JSON(http.StatusOK, result{Result: data})
 	}
 }
 
@@ -113,7 +139,7 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 			log.Printf("Error: %s\n", err.Error())
 			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
 		}
-		scanner, importPath := importDetails[0], importDetails[1]
+		scanner, importPath, importName := importDetails[0], importDetails[1], importDetails[2]
 
 		rb, err := os.ReadFile(importPath)
 		if err != nil {
@@ -129,13 +155,13 @@ func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 		// switch over the scanner name
 		switch scanner {
 		case "spdx":
-			prod, err = iSrv.SPDXImport(r)
+			prod, err = iSrv.SPDXImport(r, importName)
 		case "composer":
-			prod, err = iSrv.ComposerImport(r)
+			prod, err = iSrv.ComposerImport(r, importName)
 		case "file-hasher":
-			prod, err = iSrv.FileHasherImport(r)
+			prod, err = iSrv.FileHasherImport(r, importName)
 		case "scanner":
-			prod, err = iSrv.ScannerImport(r)
+			prod, err = iSrv.ScannerImport(r, importName)
 		default:
 			return c.JSON(http.StatusBadRequest, result{Result: fmt.Sprintf(
 				"received result file with content length %d, "+
@@ -250,8 +276,9 @@ func getImportDetails(c echo.Context) ([]string, error) {
 	// read data
 	importType := jsonBody["importType"]
 	importPath := jsonBody["importPath"]
+	importName := jsonBody["importName"]
 
-	return []string{importType, importPath}, nil
+	return []string{importType, importPath, importName}, nil
 }
 
 func getJSONRawBody(c echo.Context) (map[string]string, error) {

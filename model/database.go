@@ -12,6 +12,7 @@ import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	git "gopkg.in/src-d/go-git.v4"
+	"net/url"
 )
 
 type Database struct {
@@ -23,11 +24,12 @@ var DB *gorm.DB
 // Opening a database and save the reference to `Database` struct.
 func Init() (*gorm.DB, error) {
 	username := os.Getenv("POSTGRES_USER")
+	dbPort := os.Getenv("POSTGRES_PORT")
 	password := os.Getenv("POSTGRES_PASSWORD")
 	dbName := os.Getenv("POSTGRES_DB")
 	dbHost := os.Getenv("POSTGRES_HOST")
 
-	dbUri := fmt.Sprintf("host=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, username, dbName, password) //Build connection string
+	dbUri := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable password=%s", dbHost, dbPort, username, dbName, password) //Build connection string
 
 	conn, err := gorm.Open("postgres", dbUri)
 	if err != nil {
@@ -89,20 +91,30 @@ func (r *repo) DeleteProductByID(id int) error {
 	return nil
 }
 
-func (r *repo) Download(downloadDetails []string) error {
-	url, path := downloadDetails[0], downloadDetails[1]
+func (r *repo) Download(downloadDetails []string) (*DownloadData, error) {
+	u, path := downloadDetails[0], downloadDetails[1]
 
 	_, err := git.PlainClone(path, false, &git.CloneOptions{
-		URL:      url,
+		URL:      u,
 		Progress: os.Stdout,
 	})
 
 	if err != nil {
 		log.Printf("error: %v\n", err.Error())
-		return err
+		return nil, err
 	}
 
-	return nil
+	downloadData := new(DownloadData)
+	downloadData.Path = path
+	tempUrl, err := url.Parse(u)
+	if err != nil {
+		return nil, err
+	}
+
+	downloadData.Url = u
+	downloadData.Slug = string(tempUrl.Path)[1:]
+
+	return downloadData, nil
 }
 
 // save product
@@ -112,4 +124,19 @@ func (r *repo) SaveProduct(prod *Product) (Product, error) {
 	}
 
 	return *prod, nil
+}
+
+func (r *repo) StoreDownloadedRepo(data *DownloadData) error {
+	if err := r.conn.Create(&data).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repo) FindAllDownloadedRepos() ([]DownloadData, error) {
+	downloadedData := []DownloadData{}
+	if err := r.conn.Find(&downloadedData).Error; err != nil {
+		return nil, err
+	}
+	return downloadedData, nil
 }

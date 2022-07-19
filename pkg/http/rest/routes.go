@@ -29,4 +29,5 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.POST("/spdx/search", searchSPDX(srv))
 	g.GET("/lc/:id", checkLicenseCompatibility(srv))
 	g.POST("/download", download(srv))
+	g.GET("/downloads", getAllDownloadedRepos(srv))
 }

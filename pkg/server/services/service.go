@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/osrgroup/product-model-toolkit/cnst"
 	"io"
 	"io/ioutil"
 	"log"
@@ -61,9 +62,13 @@ type Repository interface {
 	// DeleteProductByID deletes the product with the given ID.
 	DeleteProductByID(id int) error
 
-	Download([]string) error
+	Download([]string) (*model.DownloadData, error)
 
 	SaveProduct(prod *model.Product) (model.Product, error)
+
+	StoreDownloadedRepo(data *model.DownloadData) error
+
+	FindAllDownloadedRepos() ([]model.DownloadData, error)
 }
 
 // Service  provides product querying operations.
@@ -71,19 +76,21 @@ type Service interface {
 	FindAllProducts() ([]model.Product, error)
 	FindProductByID(id int) (model.Product, error)
 	DeleteProductByID(id int) error
-	Download([]string) error
+	Download([]string) (*model.DownloadData, error)
 	CheckLicenseCompatibility(id int) ([]localResult, error)
 	// import
-	ComposerImport(io.Reader) (*model.Product, error)
-	SPDXImport(io.Reader) (*model.Product, error)
-	FileHasherImport(io.Reader) (*model.Product, error)
-	ScannerImport(io.Reader) (*model.Product, error)
+	ComposerImport(io.Reader, string) (*model.Product, error)
+	SPDXImport(io.Reader, string) (*model.Product, error)
+	FileHasherImport(io.Reader, string) (*model.Product, error)
+	ScannerImport(io.Reader, string) (*model.Product, error)
 
 	// export
 	SPDXExport(exportId, exportPath string) (*spdx.Document2_2, string, error)
 	ReportExport(exportId, exportPath string) (string, error)
 	CompatibilityExport(exportId, exportPath string) (string, string, error)
 	Scan(scanDetails []string) (string, error)
+	StoreDownloadedRepo(data *model.DownloadData) error
+	FindAllDownloadedRepos() ([]model.DownloadData, error)
 }
 
 type service struct {
@@ -93,6 +100,14 @@ type service struct {
 // NewService creates a querying service with all necessary dependencies.
 func NewService(r Repository) Service {
 	return &service{r}
+}
+
+func (s *service) FindAllDownloadedRepos() ([]model.DownloadData, error) {
+	return s.r.FindAllDownloadedRepos()
+}
+
+func (s *service) StoreDownloadedRepo(data *model.DownloadData) error {
+	return s.r.StoreDownloadedRepo(data)
 }
 
 // FindAllProducts returns all existing products.
@@ -109,7 +124,7 @@ func (s *service) DeleteProductByID(id int) error {
 	return s.r.DeleteProductByID(id)
 }
 
-func (s *service) Download(downloadDetails []string) error {
+func (s *service) Download(downloadDetails []string) (*model.DownloadData, error) {
 	return s.r.Download(downloadDetails)
 }
 func (s *service) Scan(scanDetails []string) (string, error) {
@@ -201,12 +216,16 @@ func (s *service) CheckLicenseCompatibility(id int) ([]localResult, error) {
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.
-func (s *service) ComposerImport(input io.Reader) (*model.Product, error) {
+func (s *service) ComposerImport(input io.Reader, importName string) (*model.Product, error) {
 	var c convert.Converter = new(composer.Composer)
 	prod, err := c.Convert(input)
 	if err != nil {
 		msg := fmt.Sprintf("Error while parsing Composer JSON body: %v", err)
 		return nil, errors.New(msg)
+	}
+
+	if importName != cnst.Empty {
+		prod.Name = importName
 	}
 
 	pSaved, err := s.r.SaveProduct(prod)
@@ -325,7 +344,7 @@ func productToSPDX(prod *model.Product, exportPath string) (*spdx.Document2_2, s
 }
 
 // SPDX import a SPDX representation of the BOM.
-func (s *service) SPDXImport(input io.Reader) (*model.Product, error) {
+func (s *service) SPDXImport(input io.Reader, importName string) (*model.Product, error) {
 
 	doc, err := tvloader.Load2_1(input)
 	if err != nil {
@@ -336,6 +355,10 @@ func (s *service) SPDXImport(input io.Reader) (*model.Product, error) {
 	if err != nil {
 		log.Printf("error while converting the SPDX document: %v", err)
 		return nil, err
+	}
+
+	if importName != cnst.Empty {
+		prod.Name = importName
 	}
 
 	pSaved, err := s.r.SaveProduct(prod)
@@ -349,12 +372,16 @@ func (s *service) SPDXImport(input io.Reader) (*model.Product, error) {
 }
 
 // FileHasherImport import a File-Hasher representation of the BOM and store it in the DB.
-func (s *service) FileHasherImport(input io.Reader) (*model.Product, error) {
+func (s *service) FileHasherImport(input io.Reader, importName string) (*model.Product, error) {
 	var c convert.Converter = new(hasher.Hasher)
 
 	prod, err := c.Convert(input)
 	if err != nil {
 		return nil, errors.Wrap(err, "error while parsing File-Hasher body")
+	}
+
+	if importName != cnst.Empty {
+		prod.Name = importName
 	}
 
 	pSaved, err := s.r.SaveProduct(prod)
@@ -513,7 +540,7 @@ type Value struct {
 }
 
 // ComposerImport import a Composer representation of the BOM and store it in the DB.
-func (s *service) ScannerImport(input io.Reader) (*model.Product, error) {
+func (s *service) ScannerImport(input io.Reader, importName string) (*model.Product, error) {
 	buf := new(bytes.Buffer)
 	buf.ReadFrom(input)
 	strInput := buf.String()
@@ -524,7 +551,12 @@ func (s *service) ScannerImport(input io.Reader) (*model.Product, error) {
 		fmt.Println(err)
 		return nil, err
 	}
-	prod.Name = fmt.Sprintf("product-%s", randStringRunes(10))
+
+	if importName != cnst.Empty {
+		prod.Name = importName
+	} else {
+		prod.Name = fmt.Sprintf("product-%s", randStringRunes(10))
+	}
 
 	pSaved, err := s.r.SaveProduct(prod)
 	if err != nil {

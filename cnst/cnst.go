@@ -5,12 +5,13 @@
 package cnst
 
 const (
-	ServerBaseURL = "http://localhost:8081/api/v1"
+	ServerBaseURL     = "http://localhost:8081/api/v1"
 	DefaultServerPort = "8081"
 )
 
 // commands descriotion
 const (
+	Empty    = ""
 	Cli      = "cli"
 	CliShort = "Product Model Toolkit"
 	CliLong  = `Product Model Toolkit for Managing Open Source Dependencies in Products`

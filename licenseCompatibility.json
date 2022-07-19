@@ -2,19 +2,31 @@
 	"Public Domain" : {
 		"includable_in" : [
 			"MIT",
-			"X11"
+			"X11",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"MIT" : {
 		"includable_in" : [
 			"BSD-2-Clause",
-			"BSD-3-Clause"
+			"BSD-3-Clause",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"X11" : {
 		"includable_in" : [
 			"BSD-2-Clause",
-			"BSD-3-Clause"
+			"BSD-3-Clause",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"BSD-2-Clause" : {
@@ -24,7 +36,11 @@
 			"LGPL-2.1-or-later",
 			"LGPL-3.0-only",
 			"LGPL-3.0-or-later",
-			"MPL-1.1"
+			"MPL-1.1",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"BSD-3-Clause" : {
@@ -34,35 +50,72 @@
 			"LGPL-2.1-or-later",
 			"LGPL-3.0-only",
 			"LGPL-3.0-or-later",
-			"MPL-1.1"
+			"MPL-1.1",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"Apache-2.0" : {
 		"includable_in" : [
 			"LGPL-3.0-only",
 			"LGPL-3.0-or-later",
-			"MPL-1.1"
+			"MPL-1.1",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"LGPL-2.1-only" : {
 		"includable_in" : [
 			"GPL-2.1-only",
-			"GPL-2.1-or-later"
+			"GPL-2.1-or-later",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"LGPL-2.1-or-later" : {
 		"includable_in" : [
-			"GPL-2.1-or-later"
+			"GPL-2.1-or-later",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
 		]
 	},
 	"LGPL-3.0-only" : {
 		"includable_in" : [
+			"GPL-3.0-only",
+			"GPL-3.0-or-later",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
 			"GPL-3.0-only",
 			"GPL-3.0-or-later"
 		]
 	},
 	"LGPL-3.0-or-later" : {
 		"includable_in" : [
+			"GPL-3.0-or-later",
+			"GPL-2.0-only",
+			"GPL-2.0-or-later",
+			"GPL-3.0-only",
+			"GPL-3.0-or-later"
+		]
+	},
+	"GPL-2.0-only" : {
+		"includable_in" : [
+			"AGPL-2.0-only"
+		]
+	},
+	"GPL-2.0-or-later" : {
+		"includable_in" : [
+			"AGPL-2.0-only",
+			"AGPL-3.0-only",
+			"GPL-3.0-only",
 			"GPL-3.0-or-later"
 		]
 	},

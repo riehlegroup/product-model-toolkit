@@ -26,6 +26,7 @@ func Migrate(db *gorm.DB) {
 	db.AutoMigrate(&model.DepGraph{})
 	db.AutoMigrate(&model.UsageType{})
 	db.AutoMigrate(&model.License{})
+	db.AutoMigrate(&model.DownloadData{})
 }
 
 // Main function
