@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "9f9ad3d4-fba2-4141-bbce-8003f2baefe4",
+		"_postman_id": "88fedfc4-4271-470f-b246-3fa7b7b80ec6",
 		"name": "Product Model Toolkit (WebBomTool)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "4102132"
@@ -290,6 +290,32 @@
 							],
 							"path": [
 								"downloads"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GEt diff of two SPDX files",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"first\":\"/Users/reza/Downloads/example1.txt\",\n    \"second\":\"/Users/reza/Downloads/example2-src.txt\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/diff",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"diff"
 							]
 						}
 					},

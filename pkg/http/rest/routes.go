@@ -30,4 +30,6 @@ func Handler(g *echo.Group, srv services.Service) {
 	g.GET("/lc/:id", checkLicenseCompatibility(srv))
 	g.POST("/download", download(srv))
 	g.GET("/downloads", getAllDownloadedRepos(srv))
+
+	g.POST("/diff", getDiffProducts(srv))
 }

@@ -132,6 +132,39 @@ func getAllDownloadedRepos(srv services.Service) echo.HandlerFunc {
 	}
 }
 
+func getDiffProducts(srv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		
+		// get json body
+		jsonBody, err := getJSONRawBody(c)
+		if err != nil {
+			log.Printf("Error: %s\n", err.Error())
+			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
+		}
+
+		// read data
+		firstFile := jsonBody["first"]
+		secondFile := jsonBody["second"]
+
+		if firstFile == "" {
+			err := errors.New("empty parameter")
+			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
+		}
+
+		if secondFile == "" {
+			err := errors.New("empty parameter")
+			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
+		}
+
+		data, err := srv.FindAllDiff(firstFile, secondFile)
+		if err != nil {
+			log.Printf("error: %s\n", err.Error())
+			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
+		}
+		return c.JSON(http.StatusOK, result{Result: data})
+	}
+}
+
 func importFromScanner(iSrv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		importDetails, err := getImportDetails(c)

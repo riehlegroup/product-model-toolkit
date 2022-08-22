@@ -177,3 +177,8 @@ type DownloadData struct {
 	Path string `json:"path"`
 	Slug string `json:"slug"`
 }
+
+type DiffData struct {
+	gorm.Model
+	
+}

@@ -20,6 +20,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/spdx/tools-golang/licensediff"
 	"github.com/osrgroup/product-model-toolkit/model"
 	"github.com/osrgroup/product-model-toolkit/pkg/server/commands"
 	convert "github.com/osrgroup/product-model-toolkit/pkg/server/services/convert"
@@ -91,6 +92,7 @@ type Service interface {
 	Scan(scanDetails []string) (string, error)
 	StoreDownloadedRepo(data *model.DownloadData) error
 	FindAllDownloadedRepos() ([]model.DownloadData, error)
+	FindAllDiff(first, second string) (map[string][]string, error)
 }
 
 type service struct {
@@ -469,6 +471,115 @@ func (s *service) SPDXExport(exportId, exportPath string) (*spdx.Document2_2, st
 		return nil, "", err
 	}
 	return doc, exportPath, nil
+}
+
+func (s *service) FindAllDiff(first, second string) (map[string][]string, error) {
+
+		// open the first spdx file
+		r, err := os.Open(first)
+		if err != nil {
+			err = errors.New(fmt.Sprintf("error while opening %v for reading", first))
+			return nil, err
+		}
+		defer r.Close()
+	
+		// try to load the first SPDX file's contents as a tag-value file, version 2.2
+		docFirst, err := tvloader.Load2_2(r)
+	
+		// check the error
+		if err != nil {
+			err = errors.New(fmt.Sprintf("error while parsing %v for reading", first))
+			return nil, err
+		}
+	
+		// check SPDX file for packages
+		pkgIDsFirst, err := spdxlib.GetDescribedPackageIDs2_2(docFirst)
+	
+		// check the erro
+		if err != nil {
+			return nil, err
+		}
+	
+		// print the successful message -> first file is loaded
+		fmt.Printf("successfully loaded first SPDX file %s\n", first)
+	
+		// open the second file
+		r, err = os.Open(second)
+	
+		// check the error
+		if err != nil {
+			return nil, err
+		}
+	
+		// close the file in defer
+		defer r.Close()
+	
+		// load the second file as tag-value
+		docSecond, err := tvloader.Load2_2(r)
+	
+		// check the error
+		if err != nil {
+			return nil, err
+		}
+	
+		// check SPDX file for packages
+		pkgIDsSecond, err := spdxlib.GetDescribedPackageIDs2_2(docSecond)
+	
+		// check the error
+		if err != nil {
+			return nil, err
+		}
+		
+		values := map[string][]string{}
+		
+		// compare the packages by SPDX ID
+		for _, pkgID := range pkgIDsFirst {
+
+			p1, okFirst := docFirst.Packages[pkgID]
+			if !okFirst {
+				values[string(pkgID)] = append(values[string(pkgID)], fmt.Sprintf("Package %s has described relationship in first document but ID not found\n", string(pkgID)))
+				continue
+			}
+
+			p2, okSecond := docSecond.Packages[pkgID]
+			if !okSecond {
+				values[string(pkgID)] = append(values[string(pkgID)], fmt.Sprintf("Found in first document, not found in second\n"))
+				continue
+			}
+	
+			pairs, err := licensediff.MakePairs2_2(p1, p2)
+			if err != nil {
+				return nil, err
+			}
+	
+			// take the pairs and turn them into a more structured results set
+			resultSet, err := licensediff.MakeResults(pairs)
+			if err != nil {
+				return nil, err
+			}
+			 
+			values[string(pkgID)] = append(values[string(pkgID)], fmt.Sprintf("Files in first only: %d\n", len(resultSet.InFirstOnly)))
+			values[string(pkgID)] = append(values[string(pkgID)], fmt.Sprintf("Files in second only: %d\n", len(resultSet.InSecondOnly)))
+			values[string(pkgID)] = append(values[string(pkgID)], fmt.Sprintf("Files in both with different licenses: %d\n", len(resultSet.InBothChanged)))
+			values[string(pkgID)] = append(values[string(pkgID)], fmt.Sprintf("Files in both with same licenses: %d\n", len(resultSet.InBothSame)))			
+		}
+	
+		// now report if there are any package IDs 
+		// in the second set that aren't in the first
+		for _, pkgID := range pkgIDsSecond {
+			p2, okSecond := docSecond.Packages[pkgID]
+			if !okSecond {
+				values[string(pkgID)] = append(values[string(pkgID)],fmt.Sprintf("Package %s has described relationship in second document but ID not found\n", string(pkgID)))
+				continue
+			}
+			_, okFirst := docFirst.Packages[pkgID]
+			if !okFirst {
+				values[string(pkgID)] = append(values[string(pkgID)], fmt.Sprintf("Package %s (%s) found in second document, not found in first", string(pkgID), p2.PackageName))
+				continue
+			}
+		}
+	
+		return values, nil
 }
 
 func (s *service) CompatibilityExport(exportId, exportPath string) (string, string, error) {
