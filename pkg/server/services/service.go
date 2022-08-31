@@ -639,7 +639,7 @@ func convertConfigFileToGraph(data []byte) (*Graph, error) {
 		return nil, err
 	}
 
-	fmt.Println(cnf)
+	// fmt.Println(cnf)
 	// create a graph
 	g := NewDirectedGraph()
 	for k, _ := range cnf {

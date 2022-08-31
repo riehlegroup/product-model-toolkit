@@ -125,7 +125,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"importType\":\"scanner\", \n    \"importPath\": \"/opt/product-model-toolkit/output/tinker/phpScanner.json\" \n}",
+							"raw": "{\n    \"importName\": \"name\"\n    \"importType\":\"scanner\", \n    \"importPath\": \"/opt/product-model-toolkit/output/tinker/phpScanner.json\" \n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -140,6 +140,34 @@
 							"path": [
 								"products",
 								"import"
+							]
+						},
+						"description": "importPath -> It's the location of the import file on the docker container.\n\nimportType -> spdx OR composer OR file-hasher OR scanner"
+					},
+					"response": []
+				},
+				{
+					"name": "Update product by ID",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\":\"test-1\",\n    \"version\":\"1.0.0\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{api_url}}/products/1",
+							"host": [
+								"{{api_url}}"
+							],
+							"path": [
+								"products",
+								"1"
 							]
 						},
 						"description": "importPath -> It's the location of the import file on the docker container.\n\nimportType -> spdx OR composer OR file-hasher OR scanner"
