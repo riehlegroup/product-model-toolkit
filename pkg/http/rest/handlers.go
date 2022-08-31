@@ -70,6 +70,31 @@ func findProductByID(srv services.Service) echo.HandlerFunc {
 	}
 }
 
+func updateProductByID(srv services.Service) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idStr := c.Param("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			log.Printf("Error: %s\n", err.Error())
+			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
+		}
+
+		updateDetails, err := getUpdateDetails(c)
+		if err != nil {
+			log.Printf("Error: %s\n", err.Error())
+			return c.JSON(http.StatusBadRequest, result{Result: err.Error()})
+		}
+
+		name, version := updateDetails[0], updateDetails[1]
+		if err := srv.UpdateProductByID(id, name, version); err != nil {
+			log.Printf("Error: %s\n", err.Error())
+			return c.JSON(http.StatusNotFound, result{Result: fmt.Sprintf("unable fo find product with ID %v", id)})
+		}
+
+		return c.JSON(http.StatusOK, result{Result: "updated!"})
+	}
+}
+
 func deleteProductByID(srv services.Service) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idStr := c.Param("id")
@@ -312,6 +337,21 @@ func getImportDetails(c echo.Context) ([]string, error) {
 	importName := jsonBody["importName"]
 
 	return []string{importType, importPath, importName}, nil
+}
+
+
+func getUpdateDetails(c echo.Context) ([]string, error) {
+	// get json body
+	jsonBody, err := getJSONRawBody(c)
+	if err != nil {
+		return nil, err
+	}
+
+	// read data
+	name := jsonBody["name"]
+	version := jsonBody["version"]
+
+	return []string{name, version}, nil
 }
 
 func getJSONRawBody(c echo.Context) (map[string]string, error) {

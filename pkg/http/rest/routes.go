@@ -20,6 +20,7 @@ func Handler(g *echo.Group, srv services.Service) {
 	// product routes
 	g.GET("/products", findAllProducts(srv))
 	g.GET("/products/:id", findProductByID(srv))
+	g.PUT("/products/:id", updateProductByID(srv))
 	g.DELETE("/products/:id", deleteProductByID(srv))
 	g.POST("/products/import", importFromScanner(srv))
 	g.POST("/products/export", exportWithType(srv))

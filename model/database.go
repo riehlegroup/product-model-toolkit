@@ -82,6 +82,17 @@ func (r *repo) FindProductByID(id int) (Product, error) {
 	return product, nil
 }
 
+// update product by id
+func (r *repo) UpdateProductByID(id int, name, version string) error {
+	if err := r.conn.Model(Product{}).Where("id = ?", id).Updates(Product{Name: name, Version: version}).Error; err != nil {
+		return err
+	}	
+
+	return nil
+}
+
+
+
 // delete product by id
 func (r *repo) DeleteProductByID(id int) error {
 	if err := r.conn.Delete(&Product{}, id).Error; err != nil {

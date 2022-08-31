@@ -59,6 +59,7 @@ type Repository interface {
 	FindAllProducts() ([]model.Product, error)
 	// FindProductByID returns the product with the given ID.
 	FindProductByID(id int) (model.Product, error)
+	UpdateProductByID(id int, name, version string) error
 
 	// DeleteProductByID deletes the product with the given ID.
 	DeleteProductByID(id int) error
@@ -76,6 +77,7 @@ type Repository interface {
 type Service interface {
 	FindAllProducts() ([]model.Product, error)
 	FindProductByID(id int) (model.Product, error)
+	UpdateProductByID(id int, name, version string) error
 	DeleteProductByID(id int) error
 	Download([]string) (*model.DownloadData, error)
 	CheckLicenseCompatibility(id int) ([]localResult, error)
@@ -121,6 +123,13 @@ func (s *service) FindAllProducts() ([]model.Product, error) {
 func (s *service) FindProductByID(id int) (model.Product, error) {
 	return s.r.FindProductByID(id)
 }
+
+// UpdateProductByID returns the product with the given ID.
+func (s *service) UpdateProductByID(id int, name, version string) error {
+	return s.r.UpdateProductByID(id, name, version)
+}
+
+
 
 func (s *service) DeleteProductByID(id int) error {
 	return s.r.DeleteProductByID(id)
